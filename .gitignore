@@ -1,0 +1,27 @@
+# Pastas na raiz do projeto
+.git/
+.github/
+.vs/
+.ref/
+
+# Pastas em qualquer lugar do projeto
+bin/
+obj/
+packages/
+wwwroot/
+Logs/
+
+# Extensoes de arquivos
+*.user
+*.suo
+*.bak
+*.pdb
+*.obj
+*.exe
+*.dll
+*.pubxml
+
+# Arquivos de configuracoes de ambiente local
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Test.json
