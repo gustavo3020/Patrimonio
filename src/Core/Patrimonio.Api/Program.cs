@@ -1,3 +1,4 @@
+using Patrimonio.Api.Exceptions;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -12,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -20,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseExceptionHandler();
 app.MapControllers();
 app.MapHealthChecks("/api/health");
 
