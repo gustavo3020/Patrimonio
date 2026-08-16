@@ -1,4 +1,10 @@
 <Solution>
-  <Project Path="Core/Patrimonio.Api/Patrimonio.Api.csproj" Id="972845bc-b9ab-407c-b3b1-f9a61535c739" />
-  <Project Path="Core/Patrimonio.Wpf/Patrimonio.Wpf.csproj" Id="db2ff78e-4d06-4507-92b7-33e9f788a8d4" />
+  <Folder Name="/Core/">
+    <Project Path="Core/Patrimonio.Api/Patrimonio.Api.csproj" Id="972845bc-b9ab-407c-b3b1-f9a61535c739" />
+    <Project Path="Core/Patrimonio.Wpf/Patrimonio.Wpf.csproj" Id="db2ff78e-4d06-4507-92b7-33e9f788a8d4" />
+  </Folder>
+  <Folder Name="/Financas/">
+    <Project Path="../tests/Financas/Patrimonio.Financas.Tests/Patrimonio.Financas.Tests.csproj" Id="65e587b0-0e9e-48c5-a711-1c57c65fe6ef" />
+    <Project Path="Financas/Patrimonio.Financas.Domain/Patrimonio.Financas.Domain.csproj" Id="cec0177e-1b85-495c-9182-2edecbb2d1b7" />
+  </Folder>
 </Solution>
