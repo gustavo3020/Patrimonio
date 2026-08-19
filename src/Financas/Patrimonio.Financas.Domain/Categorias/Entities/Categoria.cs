@@ -33,5 +33,6 @@ public sealed class Categoria : EntidadeBase
     public void AlterarNome(Nome nome)
     {
         Nome = nome;
+        RegistrarAtualizacao();
     }
 }
