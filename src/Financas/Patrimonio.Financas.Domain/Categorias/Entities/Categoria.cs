@@ -8,6 +8,7 @@ namespace Patrimonio.Financas.Domain.Categorias.Entities;
 /// </summary>
 public sealed class Categoria : EntidadeBase
 {
+    // Dados próprios.
     public Nome Nome { get; private set; }
 
     private Categoria(Nome nome)

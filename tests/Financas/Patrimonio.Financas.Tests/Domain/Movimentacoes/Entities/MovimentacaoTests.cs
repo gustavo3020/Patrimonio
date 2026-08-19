@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
-using Patrimonio.Financas.Domain.Movimentacoes.Enums;
 using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Tests.Domain.Movimentacoes.Entities;
 

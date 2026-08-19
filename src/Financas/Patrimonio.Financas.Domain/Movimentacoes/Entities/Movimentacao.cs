@@ -1,7 +1,7 @@
 ﻿using Patrimonio.Financas.Domain.Common.Entities;
 using Patrimonio.Financas.Domain.Exceptions;
-using Patrimonio.Financas.Domain.Movimentacoes.Enums;
 using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Domain.Movimentacoes.Entities;
 
@@ -10,11 +10,14 @@ namespace Patrimonio.Financas.Domain.Movimentacoes.Entities;
 /// </summary>
 public sealed class Movimentacao : EntidadeBase
 {
+    // Dados próprios.
     public DateOnly Data { get; private set; }
     public Dinheiro Valor { get; private set; }
     public Natureza Natureza { get; private set; }
     public TipoMovimentacao Tipo { get; private set; }
     public string? Descricao { get; private set; }
+
+    // Relacionamentos.
     public int ContaId { get; private set; }
     public int CategoriaId { get; private set; }
 
@@ -139,7 +142,7 @@ public sealed class Movimentacao : EntidadeBase
     /// </exception>
     private static string? NormalizarDescricao(string? descricao)
     {
-        if (descricao is null)
+        if (string.IsNullOrWhiteSpace(descricao))
             return null;
 
         descricao = descricao.Trim();

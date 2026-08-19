@@ -11,7 +11,7 @@ public sealed class ContaTests
     {
         var nome = new Nome("Conta Corrente");
 
-        var conta = Conta.Criar(1, nome);
+        var conta = Conta.Criar(nome, 1);
 
         conta.InstituicaoId.Should().Be(1);
         conta.Nome.Should().Be(nome);
@@ -22,7 +22,7 @@ public sealed class ContaTests
     {
         var nome = new Nome("Conta Corrente");
 
-        var conta = Conta.Criar(1, nome);
+        var conta = Conta.Criar(nome, 1);
 
         var novoNome = new Nome("Conta Principal");
 
@@ -36,7 +36,7 @@ public sealed class ContaTests
     {
         var nome = new Nome("Conta Corrente");
 
-        var conta = Conta.Criar(1, nome);
+        var conta = Conta.Criar(nome, 1);
 
         conta.AlterarInstituicao(2);
 

@@ -1,0 +1,12 @@
+root = true
+
+[*.cs]
+
+# Arquivos
+insert_final_newline = true
+
+# Modificadores de acesso
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+
+# Namespaces
+csharp_style_namespace_declarations = file_scoped:warning

@@ -8,6 +8,7 @@ namespace Patrimonio.Financas.Domain.Instituicoes.Entities;
 /// </summary>
 public sealed class Instituicao : EntidadeBase
 {
+    // Dados próprios.
     public Nome Nome { get; private set; }
 
     private Instituicao(Nome nome)

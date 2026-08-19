@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Patrimonio.Financas.SharedKernel\Patrimonio.Financas.SharedKernel.csproj" />
-  </ItemGroup>
-
 </Project>
