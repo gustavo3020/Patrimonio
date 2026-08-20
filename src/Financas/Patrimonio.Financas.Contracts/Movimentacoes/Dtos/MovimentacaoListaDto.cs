@@ -1,15 +1,13 @@
-﻿using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
+﻿using Patrimonio.Financas.Contracts.Common.Dtos;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 
 /// <summary>
 /// Representa os dados de uma movimentação retornados em uma listagem.
 /// </summary>
-public sealed record MovimentacaoListaDto
+public sealed record MovimentacaoListaDto : LeituraDtoBase
 {
-    // Identificação.
-    public required int Id { get; init; }
-
     // Dados próprios.
     public required DateOnly Data { get; init; }
     public required decimal Valor { get; init; }

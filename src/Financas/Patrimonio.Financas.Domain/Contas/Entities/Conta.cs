@@ -38,7 +38,7 @@ public sealed class Conta : EntidadeBase
     public void AlterarNome(Nome nome)
     {
         Nome = nome;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -48,6 +48,6 @@ public sealed class Conta : EntidadeBase
     public void AlterarInstituicao(int instituicaoId)
     {
         InstituicaoId = instituicaoId;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 }

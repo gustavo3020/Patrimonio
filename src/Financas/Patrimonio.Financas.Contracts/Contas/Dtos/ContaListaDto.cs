@@ -1,13 +1,12 @@
-﻿namespace Patrimonio.Financas.Contracts.Contas.Dtos;
+﻿using Patrimonio.Financas.Contracts.Common.Dtos;
+
+namespace Patrimonio.Financas.Contracts.Contas.Dtos;
 
 /// <summary>
 /// Representa os dados de uma conta retornados em uma listagem.
 /// </summary>
-public sealed record ContaListaDto
+public sealed record ContaListaDto : LeituraDtoBase
 {
-    // Identificação.
-    public required int Id { get; init; }
-
     // Dados próprios.
     public required string Nome { get; init; }
 

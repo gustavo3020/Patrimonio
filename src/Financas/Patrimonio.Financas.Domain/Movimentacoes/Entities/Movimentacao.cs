@@ -76,7 +76,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarData(DateOnly data)
     {
         Data = data;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarValor(Dinheiro valor)
     {
         Valor = valor;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarNatureza(Natureza natureza)
     {
         Natureza = natureza;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarTipo(TipoMovimentacao tipo)
     {
         Tipo = tipo;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarDescricao(string? descricao)
     {
         Descricao = NormalizarDescricao(descricao);
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarConta(int contaId)
     {
         ContaId = contaId;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public sealed class Movimentacao : EntidadeBase
     public void AlterarCategoria(int categoriaId)
     {
         CategoriaId = categoriaId;
-        RegistrarAtualizacao();
+        RegistrarAlteracao();
     }
 
     /// <summary>

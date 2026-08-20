@@ -9,14 +9,14 @@ public abstract class EntidadeBase
     public int Id { get; init; }
 
     // Campos de auditoria.
-    public DateOnly DataCriacao { get; init; } = DateOnly.FromDateTime(DateTime.Today);
-    public DateOnly DataAtualizacao { get; private set; } = DateOnly.FromDateTime(DateTime.Today);
+    public DateTimeOffset DataCriacao { get; init; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset DataAlteracao { get; private set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
-    /// Registra a atualização da entidade, definindo a data de atualização para o dia atual.
+    /// Registra a alteração da entidade, definindo a data de alteração para o dia atual.
     /// </summary>
-    protected void RegistrarAtualizacao()
+    protected void RegistrarAlteracao()
     {
-        DataAtualizacao = DateOnly.FromDateTime(DateTime.Today);
+        DataAlteracao = DateTimeOffset.UtcNow;
     }
 }
