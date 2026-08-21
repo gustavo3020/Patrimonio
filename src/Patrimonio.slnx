@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/Financas/">
     <Project Path="../tests/Financas/Patrimonio.Financas.Tests/Patrimonio.Financas.Tests.csproj" Id="65e587b0-0e9e-48c5-a711-1c57c65fe6ef" />
+    <Project Path="Financas/Patrimonio.Financas.Api/Patrimonio.Financas.Api.csproj" Id="fcc06de9-80dc-4e43-a763-8a84bf0504e6" />
     <Project Path="Financas/Patrimonio.Financas.Application/Patrimonio.Financas.Application.csproj" Id="e3dac0ea-ad4c-4eb9-a3f2-40abb88b3591" />
     <Project Path="Financas/Patrimonio.Financas.Contracts/Patrimonio.Financas.Contracts.csproj" Id="8bf33351-f029-42b9-bac5-d1e13f4215c7" />
     <Project Path="Financas/Patrimonio.Financas.Domain/Patrimonio.Financas.Domain.csproj" Id="cec0177e-1b85-495c-9182-2edecbb2d1b7" />

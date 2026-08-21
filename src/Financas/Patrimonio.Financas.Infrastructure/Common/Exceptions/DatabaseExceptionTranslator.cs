@@ -1,5 +1,4 @@
 ﻿using Npgsql;
-using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Infrastructure.Common.Exceptions;
 
@@ -27,7 +26,7 @@ internal sealed class DatabaseExceptionTranslator(IEnumerable<IConstraintTransla
         {
             if (translator.TentarTraduzir(exception.ConstraintName, out var message))
             {
-                return new RegraDeNegocioException(message);
+                return new ConflitoException(message);
             }
         }
 
