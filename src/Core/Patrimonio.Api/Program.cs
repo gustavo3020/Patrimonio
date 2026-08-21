@@ -1,4 +1,5 @@
 using Patrimonio.Api.Exceptions;
+using Patrimonio.Financas.Api;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -9,12 +10,15 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration);
 });
 
+builder.Services.AddFinancasModule(builder.Configuration);
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails()
+                .AddExceptionHandler<AppExceptionHandler>()
+                .AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
@@ -28,4 +32,4 @@ app.UseExceptionHandler();
 app.MapControllers();
 app.MapHealthChecks("/api/health");
 
-app.Run();
+await app.RunAsync();

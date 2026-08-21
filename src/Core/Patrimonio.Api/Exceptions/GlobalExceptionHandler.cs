@@ -7,8 +7,7 @@ namespace Patrimonio.Api.Exceptions;
 /// Trata globalmente exceções ocorridas durante o processamento das requisições HTTP,
 /// registrando os detalhes para diagnóstico e retornando uma resposta padronizada ao cliente.
 /// </summary>
-public sealed class GlobalExceptionHandler(
-    ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     /// <inheritdoc/>
     public async ValueTask<bool> TryHandleAsync(

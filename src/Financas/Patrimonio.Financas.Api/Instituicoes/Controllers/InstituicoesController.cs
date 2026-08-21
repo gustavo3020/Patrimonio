@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 
