@@ -8,6 +8,7 @@
     <Project Path="Financas/Patrimonio.Financas.Application/Patrimonio.Financas.Application.csproj" Id="e3dac0ea-ad4c-4eb9-a3f2-40abb88b3591" />
     <Project Path="Financas/Patrimonio.Financas.Contracts/Patrimonio.Financas.Contracts.csproj" Id="8bf33351-f029-42b9-bac5-d1e13f4215c7" />
     <Project Path="Financas/Patrimonio.Financas.Domain/Patrimonio.Financas.Domain.csproj" Id="cec0177e-1b85-495c-9182-2edecbb2d1b7" />
+    <Project Path="Financas/Patrimonio.Financas.Infrastructure/Patrimonio.Financas.Infrastructure.csproj" Id="73cfa859-3e71-4771-affc-6f0bc6c4cdc0" />
     <Project Path="Financas/Patrimonio.Financas.SharedKernel/Patrimonio.Financas.SharedKernel.csproj" Id="17ead1af-afd5-42d0-b01c-791f2725eb5e" />
   </Folder>
 </Solution>

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Patrimonio.Financas.Application.Instituicoes.Commands.Abstractions;
 using Patrimonio.Financas.Application.Instituicoes.Mappers;
+using Patrimonio.Financas.Application.Instituicoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
-using Patrimonio.Financas.Domain.Instituicoes.Entities;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
-using Patrimonio.Financas.Application.Instituicoes.Queries.Abstractions;
+using Patrimonio.Financas.Domain.Instituicoes.Entities;
 
 namespace Patrimonio.Financas.Application.Instituicoes.Commands.Services;
 
