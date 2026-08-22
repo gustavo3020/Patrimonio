@@ -16,20 +16,18 @@ internal sealed class InstituicaoConfiguration : IEntityTypeConfiguration<Instit
 
         builder.HasKey(i => i.Id);
 
-        builder.ComplexProperty(i => i.Nome, nome =>
+        builder.OwnsOne(c => c.Nome, nome =>
         {
-            nome.Property(i => i.Valor)
+            nome.Property(n => n.Valor)
                 .HasColumnName("Nome")
-                .HasMaxLength(200)
-                .IsRequired();
+                .HasMaxLength(200);
 
-            nome.Property(i => i.Normalizado)
+            nome.Property(n => n.Normalizado)
                 .HasColumnName("NomeNormalizado")
-                .HasMaxLength(200)
-                .IsRequired();
-        });
+                .HasMaxLength(200);
 
-        builder.HasIndex(i => i.Nome.Normalizado)
-            .IsUnique();
+            nome.HasIndex(n => n.Normalizado)
+                .IsUnique();
+        });
     }
 }

@@ -39,6 +39,10 @@ public sealed class Movimentacao : EntidadeBase
         CategoriaId = categoriaId;
     }
 
+    private Movimentacao()
+    {
+    }
+
     /// <summary>
     /// Cria uma nova movimentação financeira.
     /// </summary>

@@ -20,23 +20,23 @@ internal sealed class MovimentacaoConfiguration : IEntityTypeConfiguration<Movim
 
         builder.ComplexProperty(m => m.Valor, valor =>
         {
-            valor.Property(v => v.Valor)
-                .HasColumnName("Valor")
-                .HasPrecision(18, 2)
-                .IsRequired();
+            valor.Property(d => d.Valor)
+                 .HasColumnName("Valor")
+                 .HasPrecision(18, 2)
+                 .IsRequired();
         });
 
         builder.Property(m => m.Descricao)
-            .HasMaxLength(500);
+               .HasMaxLength(500);
 
         builder.HasOne<Categoria>()
-            .WithMany()
-            .HasForeignKey(m => m.CategoriaId)
-            .IsRequired();
+               .WithMany()
+               .HasForeignKey(m => m.CategoriaId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<Conta>()
-            .WithMany()
-            .HasForeignKey(m => m.ContaId)
-            .IsRequired();
+               .WithMany()
+               .HasForeignKey(m => m.ContaId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

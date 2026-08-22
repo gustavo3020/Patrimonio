@@ -17,25 +17,23 @@ internal sealed class ContaConfiguration : IEntityTypeConfiguration<Conta>
 
         builder.HasKey(c => c.Id);
 
-        builder.ComplexProperty(c => c.Nome, nome =>
+        builder.OwnsOne(c => c.Nome, nome =>
         {
-            nome.Property(c => c.Valor)
+            nome.Property(n => n.Valor)
                 .HasColumnName("Nome")
-                .HasMaxLength(200)
-                .IsRequired();
+                .HasMaxLength(200);
 
-            nome.Property(c => c.Normalizado)
+            nome.Property(n => n.Normalizado)
                 .HasColumnName("NomeNormalizado")
-                .HasMaxLength(200)
-                .IsRequired();
-        });
+                .HasMaxLength(200);
 
-        builder.HasIndex(c => c.Nome.Normalizado)
-               .IsUnique();
+            nome.HasIndex(n => n.Normalizado)
+                .IsUnique();
+        });
 
         builder.HasOne<Instituicao>()
                .WithMany()
                .HasForeignKey(c => c.InstituicaoId)
-               .IsRequired();
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

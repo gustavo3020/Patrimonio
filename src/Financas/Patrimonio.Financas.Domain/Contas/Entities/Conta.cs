@@ -14,6 +14,10 @@ public sealed class Conta : EntidadeBase
     // Relacionamentos.
     public int InstituicaoId { get; private set; }
 
+    private Conta()
+    {
+    }
+
     private Conta(Nome nome, int instituicaoId)
     {
         Nome = nome;

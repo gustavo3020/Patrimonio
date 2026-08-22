@@ -11,6 +11,10 @@ public sealed class Instituicao : EntidadeBase
     // Dados próprios.
     public Nome Nome { get; private set; }
 
+    private Instituicao()
+    {
+    }
+
     private Instituicao(Nome nome)
     {
         Nome = nome;

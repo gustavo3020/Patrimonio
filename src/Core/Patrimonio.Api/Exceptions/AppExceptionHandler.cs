@@ -19,7 +19,6 @@ public sealed class AppExceptionHandler(ILogger<AppExceptionHandler> logger) : I
             RegraDeNegocioException => (StatusCodes.Status400BadRequest, "Regra de negócio violada"),
             RecursoNaoEncontradoException => (StatusCodes.Status404NotFound, "Recurso não encontrado"),
             ConflitoException => (StatusCodes.Status409Conflict, "Conflito de dados"),
-            ConfiguracaoInvalidaException => (StatusCodes.Status500InternalServerError, "Configuração inválida"),
             _ => (0, null)
         };
 
@@ -28,7 +27,7 @@ public sealed class AppExceptionHandler(ILogger<AppExceptionHandler> logger) : I
 
         var traceId = httpContext.TraceIdentifier;
 
-        logger.LogWarning(exception, "Erro de aplicação. | TraceId: {TraceId} | Status: {Status}", traceId, status);
+        logger.LogWarning("Erro de aplicação. | Status: {Status} | Mensagem: {Mensagem}", status, exception.Message);
 
         var problemDetails = new ProblemDetails
         {
