@@ -11,5 +11,6 @@
     <Project Path="Financas/Patrimonio.Financas.Domain/Patrimonio.Financas.Domain.csproj" Id="cec0177e-1b85-495c-9182-2edecbb2d1b7" />
     <Project Path="Financas/Patrimonio.Financas.Infrastructure/Patrimonio.Financas.Infrastructure.csproj" Id="73cfa859-3e71-4771-affc-6f0bc6c4cdc0" />
     <Project Path="Financas/Patrimonio.Financas.SharedKernel/Patrimonio.Financas.SharedKernel.csproj" Id="17ead1af-afd5-42d0-b01c-791f2725eb5e" />
+    <Project Path="Financas/Patrimonio.Financas.Wpf/Patrimonio.Financas.Wpf.csproj" Id="00025cc8-c38d-4746-bc4c-e5b0571f3aab" />
   </Folder>
 </Solution>
