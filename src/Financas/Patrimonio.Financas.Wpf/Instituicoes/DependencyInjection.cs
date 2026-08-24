@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Instituicoes.HttpClients;
+using Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Instituicoes;
 
@@ -17,14 +18,21 @@ internal static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddInstituicoesWpf(this IServiceCollection services)
     {
+        // HTTP Clients
         services.AddHttpClient<InstituicaoHttpClient>()
             .AddHttpMessageHandler<ApiResponseHandler>();
 
+        // Services
         services.AddTransient<IInstituicaoCommandService>(
             serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
 
         services.AddTransient<IInstituicaoQueryService>(
             serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
+
+        // ViewModels
+        services.AddTransient<InstituicaoAlteracaoViewModel>();
+        services.AddTransient<InstituicaoCriacaoViewModel>();
+        services.AddTransient<InstituicaoListaViewModel>();
 
         return services;
     }

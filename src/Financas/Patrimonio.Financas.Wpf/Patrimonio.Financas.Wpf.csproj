@@ -1,18 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Patrimonio.Financas.Contracts\Patrimonio.Financas.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Categorias\Views\CategoriaAlteracaoView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Instituicoes\Views\InstituicaoAlteracaoView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Instituicoes\Views\InstituicaoCriacaoView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Instituicoes\Views\InstituicaoListaView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Movimentacoes\Views\MovimentacaoCriacaoView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Movimentacoes.HttpClients;
+using Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes;
 
@@ -17,14 +18,21 @@ internal static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddMovimentacoesWpf(this IServiceCollection services)
     {
+        // HTTP Clients
         services.AddHttpClient<MovimentacaoHttpClient>()
             .AddHttpMessageHandler<ApiResponseHandler>();
 
+        // Services
         services.AddTransient<IMovimentacaoCommandService>(
             serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
 
         services.AddTransient<IMovimentacaoQueryService>(
             serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
+
+        // ViewModels
+        services.AddTransient<MovimentacaoAlteracaoViewModel>();
+        services.AddTransient<MovimentacaoCriacaoViewModel>();
+        services.AddTransient<MovimentacaoListaViewModel>();
 
         return services;
     }

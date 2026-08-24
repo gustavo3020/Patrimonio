@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Movimentacoes.Views.MovimentacaoListaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.ViewModels"
+             mc:Ignorable="d"  
+             d:DataContext="{d:DesignInstance vm:MovimentacaoListaViewModel}">
+
+    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Cabeçalho -->
+        <Grid Grid.Row="0" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
+
+            <StackPanel>
+                <TextBlock Text="{Binding Titulo}" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="Consulte e gerencie suas movimentações financeiras." Margin="0,4,0,0" Foreground="Gray"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+
+                <Button Content="+ Nova entrada" Margin="0,0,8,0" Padding="16,8"/>
+
+                <Button Content="+ Nova saída" Padding="16,8"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Resumo -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
+
+            <Border Margin="0,0,8,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
+
+                <StackPanel>
+                    <TextBlock Text="Entradas" Foreground="Gray"/>
+                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Margin="4,0,4,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
+
+                <StackPanel>
+                    <TextBlock Text="Saídas" Foreground="Gray"/>
+                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Margin="8,0,0,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
+
+                <StackPanel>
+                    <TextBlock Text="Saldo" Foreground="Gray"/>
+                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Filtros -->
+        <Border Grid.Row="2" Padding="16" Margin="0,0,0,16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
+
+            <Grid ColumnDefinitions="140,140,180,180,*,Auto">
+
+                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <TextBlock Text="De" Margin="0,0,0,4"/>
+                    <DatePicker/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                    <TextBlock Text="Até" Margin="0,0,0,4"/>
+                    <DatePicker/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                    <TextBlock Text="Conta" Margin="0,0,0,4"/>
+                    <ComboBox/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                    <TextBlock Text="Categoria" Margin="0,0,0,4"/>
+                    <ComboBox/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Margin="0,0,10,0">
+                    <TextBlock Text="Descrição" Margin="0,0,0,4"/>
+                    <TextBox/>
+                </StackPanel>
+
+                <Button Grid.Column="5" Content="Filtrar" VerticalAlignment="Bottom" Padding="16,6"/>
+            </Grid>
+        </Border>
+
+        <!-- Lista -->
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Movimentacoes}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" SelectionMode="Single">
+
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="110"/>
+                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="180"/>
+                <DataGridTextColumn Header="Conta" Binding="{Binding ContaNome}" Width="180"/>
+                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="130"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor}" Width="130"/>
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

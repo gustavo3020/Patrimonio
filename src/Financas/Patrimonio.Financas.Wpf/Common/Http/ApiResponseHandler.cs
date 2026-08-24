@@ -1,4 +1,5 @@
 ﻿using Patrimonio.Financas.Wpf.Common.Exceptions;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 

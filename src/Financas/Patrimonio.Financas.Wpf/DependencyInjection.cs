@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Wpf.Categorias;
+using Patrimonio.Financas.Wpf.Common.Dialogs;
+using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Contas;
 using Patrimonio.Financas.Wpf.Instituicoes;
@@ -19,8 +21,12 @@ public static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddFinancasModule(this IServiceCollection services)
     {
+        // Infraestrutura comum
         services.AddTransient<ApiResponseHandler>();
+        services.AddTransient<ExceptionHandler>();
+        services.AddTransient<IDialogService, DialogService>();
 
+        // Funcionalidades
         services.AddCategoriasWpf()
                 .AddContasWpf()
                 .AddInstituicoesWpf()

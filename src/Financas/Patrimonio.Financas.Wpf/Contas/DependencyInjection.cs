@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Contas.HttpClients;
+using Patrimonio.Financas.Wpf.Contas.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Contas;
 
@@ -17,14 +18,21 @@ internal static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddContasWpf(this IServiceCollection services)
     {
+        // HTTP Clients
         services.AddHttpClient<ContaHttpClient>()
             .AddHttpMessageHandler<ApiResponseHandler>();
 
+        // Services
         services.AddTransient<IContaCommandService>(
             serviceProvider => serviceProvider.GetRequiredService<ContaHttpClient>());
 
         services.AddTransient<IContaQueryService>(
             serviceProvider => serviceProvider.GetRequiredService<ContaHttpClient>());
+
+        // ViewModels
+        services.AddTransient<ContaAlteracaoViewModel>();
+        services.AddTransient<ContaCriacaoViewModel>();
+        services.AddTransient<ContaListaViewModel>();
 
         return services;
     }
