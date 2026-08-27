@@ -12,7 +12,7 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// <summary>
 /// ViewModel responsável pela criação de contas.
 /// </summary>
-internal partial class ContaCriacaoViewModel(
+internal sealed partial class ContaCriacaoViewModel(
     IContaCommandService commandService,
     IInstituicaoQueryService instituicaoQueryService,
     ExceptionHandler exceptionHandler) : BaseViewModel

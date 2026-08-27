@@ -15,7 +15,7 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// <summary>
 /// ViewModel responsável pela criação de movimentações financeiras.
 /// </summary>
-internal partial class MovimentacaoCriacaoViewModel(
+internal sealed partial class MovimentacaoCriacaoViewModel(
     IMovimentacaoCommandService commandService,
     IContaQueryService contaQueryService,
     ICategoriaQueryService categoriaQueryService,

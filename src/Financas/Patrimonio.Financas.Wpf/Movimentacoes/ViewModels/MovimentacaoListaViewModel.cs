@@ -10,7 +10,7 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// <summary>
 /// ViewModel responsável pela listagem de movimentações financeiras.
 /// </summary>
-internal partial class MovimentacaoListaViewModel(
+internal sealed partial class MovimentacaoListaViewModel(
     IMovimentacaoQueryService queryService,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {

@@ -10,7 +10,7 @@ namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 /// <summary>
 /// ViewModel responsável pela alteração de instituições.
 /// </summary>
-internal partial class InstituicaoAlteracaoViewModel(
+internal sealed partial class InstituicaoAlteracaoViewModel(
     IInstituicaoCommandService commandService,
     IInstituicaoQueryService queryService,
     ExceptionHandler exceptionHandler) : BaseViewModel

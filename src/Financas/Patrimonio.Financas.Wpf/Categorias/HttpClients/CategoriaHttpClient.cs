@@ -1,6 +1,7 @@
 ﻿using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
+using System.Net.Http;
 
 namespace Patrimonio.Financas.Wpf.Categorias.HttpClients;
 

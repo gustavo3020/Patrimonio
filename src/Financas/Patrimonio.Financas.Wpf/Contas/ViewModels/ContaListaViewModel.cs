@@ -10,7 +10,7 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// <summary>
 /// ViewModel responsável pela listagem de contas.
 /// </summary>
-internal partial class ContaListaViewModel(
+internal sealed partial class ContaListaViewModel(
     IContaQueryService queryService,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {

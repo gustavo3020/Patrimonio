@@ -12,7 +12,7 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// <summary>
 /// ViewModel responsável pela alteração de contas.
 /// </summary>
-internal partial class ContaAlteracaoViewModel(
+internal sealed partial class ContaAlteracaoViewModel(
     IContaCommandService commandService,
     IContaQueryService queryService,
     IInstituicaoQueryService instituicaoQueryService,
