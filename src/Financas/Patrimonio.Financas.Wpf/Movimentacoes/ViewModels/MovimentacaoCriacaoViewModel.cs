@@ -9,6 +9,7 @@ using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 
@@ -19,6 +20,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     IMovimentacaoCommandService commandService,
     IContaQueryService contaQueryService,
     ICategoriaQueryService categoriaQueryService,
+    MovimentacaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -54,7 +56,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     /// </summary>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand]
-    private async Task CarregarAsync(CancellationToken cancellationToken)
+    public async Task InicializarAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -112,6 +114,8 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
                     CategoriaId = CategoriaId!.Value
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -121,5 +125,11 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

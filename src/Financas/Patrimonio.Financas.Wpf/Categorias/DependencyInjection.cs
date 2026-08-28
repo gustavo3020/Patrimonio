@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Contracts.Categorias.Services;
 using Patrimonio.Financas.Wpf.Categorias.HttpClients;
+using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Categorias.ViewModels;
 using Patrimonio.Financas.Wpf.Common.Http;
 
@@ -33,6 +34,9 @@ internal static class DependencyInjection
         services.AddTransient<CategoriaAlteracaoViewModel>();
         services.AddTransient<CategoriaCriacaoViewModel>();
         services.AddTransient<CategoriaListaViewModel>();
+
+        // Navigation
+        services.AddSingleton<CategoriaNavigation>();
 
         return services;
     }

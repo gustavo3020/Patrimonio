@@ -9,6 +9,7 @@ using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 
@@ -20,6 +21,7 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
     IMovimentacaoQueryService queryService,
     IContaQueryService contaQueryService,
     ICategoriaQueryService categoriaQueryService,
+    MovimentacaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -57,7 +59,7 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
     /// <param name="movimentacaoId">Identificador da movimentação a ser carregada.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand]
-    private async Task CarregarAsync(
+    public async Task InicializarAsync(
         int movimentacaoId,
         CancellationToken cancellationToken)
     {
@@ -143,5 +145,11 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

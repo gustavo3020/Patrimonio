@@ -6,6 +6,7 @@
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Contas/ViewTemplates.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Instituicoes/ViewTemplates.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Movimentacoes/ViewTemplates.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Navigation/NavigationViewTemplates.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

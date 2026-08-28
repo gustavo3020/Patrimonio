@@ -4,6 +4,7 @@ using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 
@@ -12,6 +13,7 @@ namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 /// </summary>
 internal sealed partial class InstituicaoCriacaoViewModel(
     IInstituicaoCommandService commandService,
+    InstituicaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -38,6 +40,8 @@ internal sealed partial class InstituicaoCriacaoViewModel(
                     Nome = Nome
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -47,5 +51,11 @@ internal sealed partial class InstituicaoCriacaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

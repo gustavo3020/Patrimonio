@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
+using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
 
@@ -10,8 +11,9 @@ namespace Patrimonio.Financas.Wpf.Categorias.ViewModels;
 /// <summary>
 /// ViewModel responsável pela criação de categorias.
 /// </summary>
-internal partial class CategoriaCriacaoViewModel(
+internal sealed partial class CategoriaCriacaoViewModel(
     ICategoriaCommandService commandService,
+    CategoriaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -38,6 +40,8 @@ internal partial class CategoriaCriacaoViewModel(
                     Nome = Nome
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -47,5 +51,11 @@ internal partial class CategoriaCriacaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Instituicoes.HttpClients;
+using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
 using Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Instituicoes;
@@ -33,6 +34,9 @@ internal static class DependencyInjection
         services.AddTransient<InstituicaoAlteracaoViewModel>();
         services.AddTransient<InstituicaoCriacaoViewModel>();
         services.AddTransient<InstituicaoListaViewModel>();
+
+        // Navigation
+        services.AddSingleton<InstituicaoNavigation>();
 
         return services;
     }

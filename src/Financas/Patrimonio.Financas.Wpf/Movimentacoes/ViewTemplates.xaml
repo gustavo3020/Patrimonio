@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.ViewModels"
-                    xmlns:views="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.Views">
+                    xmlns:views="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.Views"
+                    xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.Navigation">
 
     <DataTemplate DataType="{x:Type vm:MovimentacaoAlteracaoViewModel}">
         <views:MovimentacaoAlteracaoView />
@@ -13,6 +14,10 @@
 
     <DataTemplate DataType="{x:Type vm:MovimentacaoListaViewModel}">
         <views:MovimentacaoListaView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nav:MovimentacaoNavigation}">
+        <nav:MovimentacaoNavigationView/>
     </DataTemplate>
 
 </ResourceDictionary>

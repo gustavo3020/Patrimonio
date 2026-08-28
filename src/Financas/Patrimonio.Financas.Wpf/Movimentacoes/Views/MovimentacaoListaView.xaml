@@ -11,16 +11,20 @@
 
         <!-- Cabeçalho -->
         <Grid Grid.Row="0" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
-
-            <StackPanel>
-                <TextBlock Text="{Binding Titulo}" FontSize="28" FontWeight="SemiBold"/>
-            </StackPanel>
-
+            <TextBlock Text="Instituições"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-
-                <Button Content="+ Nova entrada" Margin="0,0,8,0" Padding="16,8"/>
-
-                <Button Content="+ Nova saída" Padding="16,8"/>
+                <Button Content="Criar"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding ExcluirCommand}"/>
             </StackPanel>
         </Grid>
 
@@ -87,17 +91,22 @@
         </Border>
 
         <!-- Lista -->
-        <DataGrid Grid.Row="3" ItemsSource="{Binding Movimentacoes}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" SelectionMode="Single">
+        <DataGrid Grid.Row="3"
+                  ItemsSource="{Binding Movimentacoes}"
+                  SelectedItem="{Binding Selecionado}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  SelectionMode="Single">
 
             <DataGrid.Columns>
-
                 <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="110"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor}" Width="130"/>
                 <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
                 <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="180"/>
+                <DataGridTextColumn Header="Natureza" Binding="{Binding Natureza}" Width="180"/>
                 <DataGridTextColumn Header="Conta" Binding="{Binding ContaNome}" Width="180"/>
                 <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="130"/>
-                <DataGridTextColumn Header="Valor" Binding="{Binding Valor}" Width="130"/>
-
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -6,6 +6,7 @@ using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Contas.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 
@@ -15,6 +16,7 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 internal sealed partial class ContaCriacaoViewModel(
     IContaCommandService commandService,
     IInstituicaoQueryService instituicaoQueryService,
+    ContaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     public override string Titulo => "Nova conta";
@@ -33,7 +35,7 @@ internal sealed partial class ContaCriacaoViewModel(
     /// Token utilizado para cancelar a operação.
     /// </param>
     [RelayCommand]
-    private async Task CarregarAsync(CancellationToken cancellationToken)
+    public async Task InicializarAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -74,6 +76,8 @@ internal sealed partial class ContaCriacaoViewModel(
                     InstituicaoId = InstituicaoId!.Value
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -83,5 +87,11 @@ internal sealed partial class ContaCriacaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
+using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
 
@@ -10,9 +11,10 @@ namespace Patrimonio.Financas.Wpf.Categorias.ViewModels;
 /// <summary>
 /// ViewModel responsável pela alteração de categorias.
 /// </summary>
-internal partial class CategoriaAlteracaoViewModel(
+internal sealed partial class CategoriaAlteracaoViewModel(
     ICategoriaCommandService commandService,
     ICategoriaQueryService queryService,
+    CategoriaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -30,8 +32,7 @@ internal partial class CategoriaAlteracaoViewModel(
     /// <param name="cancellationToken">
     /// Token utilizado para cancelar a operação.
     /// </param>
-    [RelayCommand]
-    private async Task CarregarAsync(
+    public async Task InicializarAsync(
         int categoriaId,
         CancellationToken cancellationToken)
     {
@@ -77,6 +78,8 @@ internal partial class CategoriaAlteracaoViewModel(
                     Nome = Nome
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -86,5 +89,11 @@ internal partial class CategoriaAlteracaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

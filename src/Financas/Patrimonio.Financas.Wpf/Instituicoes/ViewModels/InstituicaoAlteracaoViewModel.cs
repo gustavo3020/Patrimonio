@@ -4,6 +4,7 @@ using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 
@@ -13,6 +14,7 @@ namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 internal sealed partial class InstituicaoAlteracaoViewModel(
     IInstituicaoCommandService commandService,
     IInstituicaoQueryService queryService,
+    InstituicaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     /// <inheritdoc />
@@ -30,8 +32,7 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
     /// <param name="cancellationToken">
     /// Token utilizado para cancelar a operação.
     /// </param>
-    [RelayCommand]
-    private async Task CarregarAsync(
+    public async Task InicializarAsync(
         int instituicaoId,
         CancellationToken cancellationToken)
     {
@@ -77,6 +78,8 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
                     Nome = Nome
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -86,5 +89,11 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

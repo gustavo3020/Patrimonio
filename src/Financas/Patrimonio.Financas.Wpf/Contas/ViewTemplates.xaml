@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Contas.ViewModels"
-                    xmlns:views="clr-namespace:Patrimonio.Financas.Wpf.Contas.Views">
+                    xmlns:views="clr-namespace:Patrimonio.Financas.Wpf.Contas.Views"
+                    xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Contas.Navigation">
 
     <DataTemplate DataType="{x:Type vm:ContaAlteracaoViewModel}">
         <views:ContaAlteracaoView />
@@ -13,6 +14,10 @@
 
     <DataTemplate DataType="{x:Type vm:ContaListaViewModel}">
         <views:ContaListaView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nav:ContaNavigation}">
+        <nav:ContaNavigationView/>
     </DataTemplate>
 
 </ResourceDictionary>

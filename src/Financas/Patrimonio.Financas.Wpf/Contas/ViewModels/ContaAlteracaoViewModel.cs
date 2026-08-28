@@ -6,6 +6,7 @@ using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Contas.Navigation;
 
 namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 
@@ -16,8 +17,10 @@ internal sealed partial class ContaAlteracaoViewModel(
     IContaCommandService commandService,
     IContaQueryService queryService,
     IInstituicaoQueryService instituicaoQueryService,
+    ContaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    /// <inheritdoc />
     public override string Titulo => "Editar conta";
 
     [ObservableProperty] private int contaId;
@@ -31,14 +34,10 @@ internal sealed partial class ContaAlteracaoViewModel(
     /// <summary>
     /// Carrega os dados da conta a ser alterada.
     /// </summary>
-    /// <param name="contaId">
-    /// Identificador da conta a ser carregada.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="contaId">Identificador da conta a ser carregada.</param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand]
-    private async Task CarregarAsync(
+    public async Task InicializarAsync(
         int contaId,
         CancellationToken cancellationToken)
     {
@@ -97,6 +96,8 @@ internal sealed partial class ContaAlteracaoViewModel(
                     InstituicaoId = InstituicaoId!.Value
                 },
                 cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -106,5 +107,11 @@ internal sealed partial class ContaAlteracaoViewModel(
         {
             Carregando = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
     }
 }

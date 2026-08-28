@@ -11,37 +11,37 @@
 
         <!-- Cabeçalho -->
         <Grid Grid.Row="0" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
-            <StackPanel>
-                <TextBlock Text="Instituições" FontSize="28" FontWeight="SemiBold"/>
+            <TextBlock Text="Instituições"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Criar"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding ExcluirCommand}"/>
             </StackPanel>
-            <Button Grid.Column="1" Content="+ Nova instituição" Padding="16,8"/>
         </Grid>
 
         <!-- Lista -->
-        <DataGrid Grid.Row="1" 
-                  ItemsSource="{Binding Instituicoes}" 
-                  AutoGenerateColumns="False" 
-                  IsReadOnly="True" 
-                  CanUserAddRows="False" 
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Instituicoes}"
+                  SelectedItem="{Binding Selecionado}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
                   SelectionMode="Single">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="*"/>
-
-                <DataGridTemplateColumn Header="Ações" Width="160">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="Editar" Margin="0,0,8,0" Padding="10,4"/>
-                                <Button Content="Excluir" Padding="10,4"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="*"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="*"/>
             </DataGrid.Columns>
-
         </DataGrid>
-
     </Grid>
-
 </UserControl>

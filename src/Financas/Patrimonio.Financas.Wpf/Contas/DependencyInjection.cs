@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Contas.HttpClients;
+using Patrimonio.Financas.Wpf.Contas.Navigation;
 using Patrimonio.Financas.Wpf.Contas.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Contas;
@@ -33,6 +34,9 @@ internal static class DependencyInjection
         services.AddTransient<ContaAlteracaoViewModel>();
         services.AddTransient<ContaCriacaoViewModel>();
         services.AddTransient<ContaListaViewModel>();
+
+        // Navigation
+        services.AddSingleton<ContaNavigation>();
 
         return services;
     }

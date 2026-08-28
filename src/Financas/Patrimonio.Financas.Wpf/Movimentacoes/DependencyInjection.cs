@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Movimentacoes.HttpClients;
+using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
 using Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes;
@@ -33,6 +34,9 @@ internal static class DependencyInjection
         services.AddTransient<MovimentacaoAlteracaoViewModel>();
         services.AddTransient<MovimentacaoCriacaoViewModel>();
         services.AddTransient<MovimentacaoListaViewModel>();
+
+        // Navigation
+        services.AddSingleton<MovimentacaoNavigation>();
 
         return services;
     }

@@ -6,6 +6,7 @@ using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Contas;
 using Patrimonio.Financas.Wpf.Instituicoes;
 using Patrimonio.Financas.Wpf.Movimentacoes;
+using Patrimonio.Financas.Wpf.Navigation;
 
 namespace Patrimonio.Financas.Wpf;
 
@@ -22,15 +23,18 @@ public static class DependencyInjection
     public static IServiceCollection AddFinancasModule(this IServiceCollection services)
     {
         // Infraestrutura comum
-        services.AddTransient<ApiResponseHandler>();
-        services.AddTransient<ExceptionHandler>();
-        services.AddTransient<IDialogService, DialogService>();
+        services.AddTransient<ApiResponseHandler>()
+                .AddSingleton<ExceptionHandler>()
+                .AddSingleton<IDialogService, DialogService>();
 
         // Funcionalidades
         services.AddCategoriasWpf()
                 .AddContasWpf()
                 .AddInstituicoesWpf()
                 .AddMovimentacoesWpf();
+
+        // Navegação
+        services.AddSingleton<FinancasNavigation>();
 
         return services;
     }
