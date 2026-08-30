@@ -5,11 +5,11 @@
                     xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.Navigation">
 
     <DataTemplate DataType="{x:Type vm:MovimentacaoAlteracaoViewModel}">
-        <views:MovimentacaoAlteracaoView />
+        <views:MovimentacaoFormView />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:MovimentacaoCriacaoViewModel}">
-        <views:MovimentacaoCriacaoView />
+        <views:MovimentacaoFormView />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:MovimentacaoListaViewModel}">

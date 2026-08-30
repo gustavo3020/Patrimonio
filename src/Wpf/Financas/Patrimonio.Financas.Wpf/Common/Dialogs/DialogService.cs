@@ -44,7 +44,7 @@ internal sealed class DialogService : IDialogService
         return MessageBox.Show(
             message,
             "Confirmação",
-            MessageBoxButton.YesNo,
+            MessageBoxButton.YesNoCancel,
             MessageBoxImage.Question) == MessageBoxResult.Yes;
     }
 }

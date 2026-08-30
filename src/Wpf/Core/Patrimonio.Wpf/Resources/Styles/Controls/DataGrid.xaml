@@ -1,0 +1,48 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../Brushes.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Estilo base para DataGrid -->
+    <Style TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="RowBackground" Value="{StaticResource BackgroundBrush}"/>
+        <Setter Property="AlternatingRowBackground" Value="{StaticResource SurfaceBrush}"/>
+    </Style>
+
+    <!-- Cabeçalho das colunas -->
+    <Style TargetType="{x:Type DataGridColumnHeader}">
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <!-- Células -->
+    <Style TargetType="DataGridCell">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+
+        <Style.Triggers>
+
+            <!-- Selecionada -->
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
+            </Trigger>
+
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

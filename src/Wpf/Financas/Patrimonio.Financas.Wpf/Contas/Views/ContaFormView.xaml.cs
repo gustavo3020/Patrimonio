@@ -1,12 +1,13 @@
 ﻿using System.Windows.Controls;
 
 namespace Patrimonio.Financas.Wpf.Contas.Views;
+
 /// <summary>
-/// Interação lógica para ContaCriacaoView.xaml
+/// Interação lógica para ContaFormView.xaml
 /// </summary>
-public partial class ContaCriacaoView : UserControl
+public partial class ContaFormView : UserControl
 {
-    public ContaCriacaoView()
+    public ContaFormView()
     {
         InitializeComponent();
     }

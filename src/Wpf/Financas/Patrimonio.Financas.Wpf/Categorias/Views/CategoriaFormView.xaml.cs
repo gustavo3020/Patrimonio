@@ -1,12 +1,13 @@
 ﻿using System.Windows.Controls;
 
 namespace Patrimonio.Financas.Wpf.Categorias.Views;
+
 /// <summary>
-/// Interação lógica para CategoriaAlteracaoView.xaml
+/// Interação lógica para CategoriaFormView.xaml
 /// </summary>
-public partial class CategoriaAlteracaoView : UserControl
+public partial class CategoriaFormView : UserControl
 {
-    public CategoriaAlteracaoView()
+    public CategoriaFormView()
     {
         InitializeComponent();
     }

@@ -28,7 +28,7 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
     public override string Titulo => "Editar movimentação";
 
     [ObservableProperty] private int movimentacaoId;
-    [ObservableProperty] private DateOnly data;
+    [ObservableProperty] private DateTime data;
     [ObservableProperty] private decimal valor;
     [ObservableProperty] private string descricao = string.Empty;
     [ObservableProperty] private IReadOnlyCollection<ContaListaDto> contas = [];
@@ -85,7 +85,7 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
 
             var movimentacao = await movimentacaoTask;
 
-            Data = movimentacao.Data;
+            Data = movimentacao.Data.ToDateTime(TimeOnly.MinValue);
             Valor = movimentacao.Valor;
             Descricao = movimentacao.Descricao ?? string.Empty;
             Natureza = movimentacao.Natureza;
@@ -127,7 +127,7 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
                 MovimentacaoId,
                 new MovimentacaoAlteracaoDto
                 {
-                    Data = Data,
+                    Data = DateOnly.FromDateTime(Data),
                     Valor = Valor,
                     Descricao = Descricao,
                     Natureza = Natureza!.Value,

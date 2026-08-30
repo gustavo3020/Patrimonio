@@ -7,40 +7,31 @@
              mc:Ignorable="d"  
              d:DataContext="{d:DesignInstance vm:CategoriaListaViewModel}">
 
-    <Grid Margin="24" RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*">
 
         <!-- Cabeçalho -->
-        <Grid Grid.Row="0" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
-            <TextBlock Text="Categorias"
-                       FontSize="20"
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center"/>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="Criar"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirCriacaoCommand}"/>
-                <Button Content="Alterar"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirAlteracaoCommand}"/>
-                <Button Content="Excluir"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding ExcluirCommand}"/>
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource SubTitleTextBlockStyle}"/>
+            <StackPanel Grid.Column="1" Style="{StaticResource ActionStackPanelStyle}">
+                <Button Content="Criar" Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar" Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir" Command="{Binding ExcluirCommand}"/>
             </StackPanel>
         </Grid>
 
         <!-- Lista -->
         <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Categorias}"
-                  SelectedItem="{Binding Selecionado}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  SelectionMode="Single">
+                  SelectedItem="{Binding Selecionado}">
 
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />
+            </DataGrid.InputBindings>
+            
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="*"/>
-                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="*"/>
-                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="*"/>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="120"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

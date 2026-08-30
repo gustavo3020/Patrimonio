@@ -8,21 +8,22 @@
         Title="{Binding Titulo}"
         d:DataContext="{d:DesignInstance nav:AppNavigation}"
         MinWidth="1200"
-        MinHeight="700">
+        MinHeight="700"
+        Style="{StaticResource BaseWindowStyle}">
 
-    <Grid RowDefinitions="64,*">
+    <Grid RowDefinitions="48, *">
 
         <!-- Barra superior -->
-        <Border Grid.Row="0" BorderBrush="#DDDDDD" BorderThickness="0,0,0,1" Padding="24,0">
-            <TextBlock Text="Patrimônio" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <Border Grid.Row="0" Style="{StaticResource BottomBorderStyle}">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource TitleTextBlockStyle}"/>
         </Border>
 
         <!-- Área principal -->
-        <Grid Grid.Row="1" ColumnDefinitions="130, *">
+        <Grid Grid.Row="1" ColumnDefinitions="120, *">
 
             <!-- Barra lateral -->
-            <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="0,0,1,0">
-                <StackPanel Margin="12">
+            <Border Grid.Column="0" Style="{StaticResource RightBorderStyle}">
+                <StackPanel>
                     <Button Content="Finanças"
                             Style="{StaticResource MenuButtonStyle}"
                             Command="{Binding AbrirFinancasCommand}"/>

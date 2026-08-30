@@ -26,7 +26,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     /// <inheritdoc />
     public override string Titulo => "Nova movimentação";
 
-    [ObservableProperty] private DateOnly data = DateOnly.FromDateTime(DateTime.Today);
+    [ObservableProperty] private DateTime data = DateTime.Today;
     [ObservableProperty] private decimal valor;
     [ObservableProperty] private string descricao = string.Empty;
     [ObservableProperty] private IReadOnlyCollection<ContaListaDto> contas = [];
@@ -105,7 +105,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
             await commandService.CriarAsync(
                 new MovimentacaoCriacaoDto
                 {
-                    Data = Data,
+                    Data = DateOnly.FromDateTime(Data),
                     Valor = Valor,
                     Descricao = Descricao,
                     Natureza = Natureza!.Value,

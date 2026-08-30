@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Categorias.Views.CategoriaAlteracaoView"
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Categorias.Views.CategoriaFormView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
@@ -7,23 +7,21 @@
              mc:Ignorable="d"  
              d:DataContext="{d:DesignInstance vm:CategoriaAlteracaoViewModel}">
 
-    <Grid Margin="24" RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto, *, Auto">
 
         <!-- Formulário -->
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Nome" Margin="0,0,0,6"/>
-            <TextBox Text="{Binding Nome}" Height="32"/>
+            <TextBlock Text="Nome"/>
+            <TextBox Text="{Binding Nome}"/>
         </StackPanel>
 
         <!-- Espaço -->
         <Grid Grid.Row="1"/>
 
         <!-- Ações -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Salvar" Command="{Binding SalvarCommand}" Padding="16,8"/>
-            <Button Content="Cancelar" Command="{Binding CancelarCommand}" Margin="0,0,8,0" Padding="16,8"/>
+        <StackPanel Grid.Row="2" Style="{StaticResource ActionStackPanelStyle}">
+            <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>
         </StackPanel>
-
     </Grid>
-
 </UserControl>

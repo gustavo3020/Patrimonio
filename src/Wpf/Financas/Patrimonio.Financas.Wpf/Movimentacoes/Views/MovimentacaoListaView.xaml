@@ -7,106 +7,37 @@
              mc:Ignorable="d"  
              d:DataContext="{d:DesignInstance vm:MovimentacaoListaViewModel}">
 
-    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto, *">
 
         <!-- Cabeçalho -->
-        <Grid Grid.Row="0" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
-            <TextBlock Text="Instituições"
-                       FontSize="20"
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center"/>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="Criar"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirCriacaoCommand}"/>
-                <Button Content="Alterar"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirAlteracaoCommand}"/>
-                <Button Content="Excluir"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding ExcluirCommand}"/>
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource SubTitleTextBlockStyle}"/>
+            <StackPanel Grid.Column="1" Style="{StaticResource ActionStackPanelStyle}">
+                <Button Content="Criar" Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar" Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir" Command="{Binding ExcluirCommand}"/>
             </StackPanel>
         </Grid>
 
-        <!-- Resumo -->
-        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
-
-            <Border Margin="0,0,8,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
-
-                <StackPanel>
-                    <TextBlock Text="Entradas" Foreground="Gray"/>
-                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
-                </StackPanel>
-            </Border>
-
-            <Border Margin="4,0,4,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
-
-                <StackPanel>
-                    <TextBlock Text="Saídas" Foreground="Gray"/>
-                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
-                </StackPanel>
-            </Border>
-
-            <Border Margin="8,0,0,0" Padding="16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
-
-                <StackPanel>
-                    <TextBlock Text="Saldo" Foreground="Gray"/>
-                    <TextBlock Text="R$ 0,00" FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0"/>
-                </StackPanel>
-            </Border>
-        </UniformGrid>
-
-        <!-- Filtros -->
-        <Border Grid.Row="2" Padding="16" Margin="0,0,0,16" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="6">
-
-            <Grid ColumnDefinitions="140,140,180,180,*,Auto">
-
-                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                    <TextBlock Text="De" Margin="0,0,0,4"/>
-                    <DatePicker/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                    <TextBlock Text="Até" Margin="0,0,0,4"/>
-                    <DatePicker/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="2" Margin="0,0,10,0">
-                    <TextBlock Text="Conta" Margin="0,0,0,4"/>
-                    <ComboBox/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                    <TextBlock Text="Categoria" Margin="0,0,0,4"/>
-                    <ComboBox/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="4" Margin="0,0,10,0">
-                    <TextBlock Text="Descrição" Margin="0,0,0,4"/>
-                    <TextBox/>
-                </StackPanel>
-
-                <Button Grid.Column="5" Content="Filtrar" VerticalAlignment="Bottom" Padding="16,6"/>
-            </Grid>
-        </Border>
-
         <!-- Lista -->
-        <DataGrid Grid.Row="3"
+        <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Movimentacoes}"
-                  SelectedItem="{Binding Selecionado}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  SelectionMode="Single">
+                  SelectedItem="{Binding Selecionado}">
+            
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />
+            </DataGrid.InputBindings>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="110"/>
-                <DataGridTextColumn Header="Valor" Binding="{Binding Valor}" Width="130"/>
+                <DataGridTextColumn Header="Data movimentação" Binding="{Binding Data, StringFormat='dd/MM/yyyy'}" Width="130"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat={}{0:C}, ConverterCulture=pt-BR}" Width="80"/>
                 <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
-                <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="180"/>
-                <DataGridTextColumn Header="Natureza" Binding="{Binding Natureza}" Width="180"/>
-                <DataGridTextColumn Header="Conta" Binding="{Binding ContaNome}" Width="180"/>
-                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="130"/>
+                <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="100"/>
+                <DataGridTextColumn Header="Natureza" Binding="{Binding Natureza}" Width="80"/>
+                <DataGridTextColumn Header="Conta" Binding="{Binding ContaNome}" Width="150"/>
+                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="70"/>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="120"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

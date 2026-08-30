@@ -8,10 +8,10 @@
              d:DataContext="{d:DesignInstance nav:FinancasNavigation}"
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <Grid ColumnDefinitions="150,*">
+    <Grid ColumnDefinitions="120,*">
         <!-- Navegação do módulo -->
-        <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="0,0,1,0">
-            <StackPanel Margin="12">
+        <Border Grid.Column="0" Style="{StaticResource RightBorderStyle}">
+            <StackPanel>
                 <Button Content="Categorias"
                         Style="{StaticResource MenuButtonStyle}"
                         Command="{Binding AbrirCategoriasCommand}"/>

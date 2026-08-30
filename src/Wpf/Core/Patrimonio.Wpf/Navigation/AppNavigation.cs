@@ -10,6 +10,8 @@ namespace Patrimonio.Wpf.Navigation;
 public sealed partial class AppNavigation(
     FinancasNavigation financasNavigation) : NavigationBase
 {
+    public string Titulo { get; } = "Patrimonio";
+
     /// <summary>
     /// Abre o módulo de finanças.
     /// </summary>

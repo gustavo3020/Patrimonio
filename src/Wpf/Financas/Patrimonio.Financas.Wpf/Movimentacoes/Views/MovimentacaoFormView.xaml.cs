@@ -1,12 +1,13 @@
 ﻿using System.Windows.Controls;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes.Views;
+
 /// <summary>
-/// Interação lógica para MovimentacaoAlteracaoView.xaml
+/// Interação lógica para MovimentacaoFormView.xaml
 /// </summary>
-public partial class MovimentacaoAlteracaoView : UserControl
+public partial class MovimentacaoFormView : UserControl
 {
-    public MovimentacaoAlteracaoView()
+    public MovimentacaoFormView()
     {
         InitializeComponent();
     }

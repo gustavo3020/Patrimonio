@@ -3,11 +3,11 @@
 namespace Patrimonio.Financas.Wpf.Instituicoes.Views;
 
 /// <summary>
-/// Interação lógica para InstituicaoAlteracaoView.xaml
+/// Interação lógica para InstituicaoFormView.xaml
 /// </summary>
-public partial class InstituicaoAlteracaoView : UserControl
+public partial class InstituicaoFormView : UserControl
 {
-    public InstituicaoAlteracaoView()
+    public InstituicaoFormView()
     {
         InitializeComponent();
     }

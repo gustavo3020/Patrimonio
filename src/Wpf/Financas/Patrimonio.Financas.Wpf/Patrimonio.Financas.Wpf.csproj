@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Categorias\Views\CategoriaAlteracaoView.xaml.cs">
+    <Compile Update="Categorias\Views\CategoriaFormView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Contas\Navigation\ContaNavigationView.xaml.cs">
@@ -27,19 +27,13 @@
     <Compile Update="Instituicoes\Navigation\InstituicaoNavigationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Instituicoes\Views\InstituicaoAlteracaoView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Instituicoes\Views\InstituicaoCriacaoView.xaml.cs">
+    <Compile Update="Instituicoes\Views\InstituicaoFormView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Instituicoes\Views\InstituicaoListaView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Movimentacoes\Navigation\MovimentacaoNavigationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Movimentacoes\Views\MovimentacaoCriacaoView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
