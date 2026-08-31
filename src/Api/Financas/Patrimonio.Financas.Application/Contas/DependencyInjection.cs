@@ -18,6 +18,7 @@ internal static class DependencyInjection
     internal static IServiceCollection AddContasApplication(this IServiceCollection services)
     {
         services.AddScoped<IContaCommandService, ContaCommandService>()
+                .AddScoped<IContaOpcoesCriacaoService, ContaOpcoesCriacaoService>()
                 .AddScoped<IContaQueryService, ContaQueryService>();
 
         return services;

@@ -18,6 +18,7 @@ internal static class DependencyInjection
     internal static IServiceCollection AddMovimentacoesApplication(this IServiceCollection services)
     {
         services.AddScoped<IMovimentacaoCommandService, MovimentacaoCommandService>()
+                .AddScoped<IMovimentacaoOpcoesCriacaoService, MovimentacaoOpcoesCriacaoService>()
                 .AddScoped<IMovimentacaoQueryService, MovimentacaoQueryService>();
 
         return services;
