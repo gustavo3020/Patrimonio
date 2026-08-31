@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Patrimonio.Financas.Contracts.Categorias.Dtos;
-using Patrimonio.Financas.Contracts.Categorias.Services;
-using Patrimonio.Financas.Contracts.Contas.Dtos;
-using Patrimonio.Financas.Contracts.Contas.Services;
+using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
@@ -18,8 +15,7 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// </summary>
 internal sealed partial class MovimentacaoCriacaoViewModel(
     IMovimentacaoCommandService commandService,
-    IContaQueryService contaQueryService,
-    ICategoriaQueryService categoriaQueryService,
+    IMovimentacaoOpcoesCriacaoService opcoesCriacaoService,
     MovimentacaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
@@ -29,8 +25,8 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     [ObservableProperty] private DateTime data = DateTime.Today;
     [ObservableProperty] private decimal valor;
     [ObservableProperty] private string descricao = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<ContaListaDto> contas = [];
-    [ObservableProperty] private IReadOnlyCollection<CategoriaListaDto> categorias = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> contas = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> categorias = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
@@ -62,18 +58,10 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
         {
             Carregando = true;
 
-            var contasTask = contaQueryService.ListarAsync(
-                cancellationToken);
+            var opcoes = await opcoesCriacaoService.ObterOpcoesCriacaoAsync(cancellationToken);
 
-            var categoriasTask = categoriaQueryService.ListarAsync(
-                cancellationToken);
-
-            await Task.WhenAll(
-                contasTask,
-                categoriasTask);
-
-            Contas = await contasTask;
-            Categorias = await categoriasTask;
+            Categorias = opcoes.Categorias;
+            Contas = opcoes.Contas;
         }
         catch (Exception ex)
         {

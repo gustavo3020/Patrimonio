@@ -9,4 +9,5 @@ internal static class ContaEndpoints
     /// Obtém a rota base para as operações de contas.
     /// </summary>
     public const string Base = "api/v1/financas/contas";
+    public static string OpcoesCriacao() => $"{Base}/opcoes-criacao";
 }

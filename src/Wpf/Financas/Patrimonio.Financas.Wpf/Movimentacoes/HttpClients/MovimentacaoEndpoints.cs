@@ -9,4 +9,5 @@ internal static class MovimentacaoEndpoints
     /// Obtém a rota base para as operações de movimentações.
     /// </summary>
     public const string Base = "api/v1/financas/movimentacoes";
+    public static string OpcoesCriacao() => $"{Base}/opcoes-criacao";
 }

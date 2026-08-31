@@ -8,7 +8,7 @@ namespace Patrimonio.Financas.Api.Movimentacoes.Controllers;
 /// Disponibiliza as opções de referência necessárias para a criação de uma movimentação.
 /// </summary>
 [ApiController]
-[Route("api/v1/financas/movimentacoes/dados-criacao")]
+[Route("api/v1/financas/movimentacoes/opcoes-criacao")]
 public sealed class MovimentacaoOpcoesCriacaoController(
     IMovimentacaoOpcoesCriacaoService opcoesCriacaoService) : ControllerBase
 {

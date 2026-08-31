@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Patrimonio.Financas.Contracts.Categorias.Dtos;
-using Patrimonio.Financas.Contracts.Categorias.Services;
-using Patrimonio.Financas.Contracts.Contas.Dtos;
-using Patrimonio.Financas.Contracts.Contas.Services;
+using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
@@ -18,9 +15,8 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// </summary>
 internal sealed partial class MovimentacaoAlteracaoViewModel(
     IMovimentacaoCommandService commandService,
+    IMovimentacaoOpcoesCriacaoService opcoesCriacaoService,
     IMovimentacaoQueryService queryService,
-    IContaQueryService contaQueryService,
-    ICategoriaQueryService categoriaQueryService,
     MovimentacaoNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
@@ -31,8 +27,8 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
     [ObservableProperty] private DateTime data;
     [ObservableProperty] private decimal valor;
     [ObservableProperty] private string descricao = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<ContaListaDto> contas = [];
-    [ObservableProperty] private IReadOnlyCollection<CategoriaListaDto> categorias = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> contas = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> categorias = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
@@ -72,18 +68,15 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
                 movimentacaoId,
                 cancellationToken);
 
-            var contasTask = contaQueryService.ListarAsync(
-                cancellationToken);
-
-            var categoriasTask = categoriaQueryService.ListarAsync(
+            var opcoesTask = opcoesCriacaoService.ObterOpcoesCriacaoAsync(
                 cancellationToken);
 
             await Task.WhenAll(
                 movimentacaoTask,
-                contasTask,
-                categoriasTask);
+                opcoesTask);
 
             var movimentacao = await movimentacaoTask;
+            var opcoes = await opcoesTask;
 
             Data = movimentacao.Data.ToDateTime(TimeOnly.MinValue);
             Valor = movimentacao.Valor;
@@ -93,8 +86,8 @@ internal sealed partial class MovimentacaoAlteracaoViewModel(
             ContaId = movimentacao.ContaId;
             CategoriaId = movimentacao.CategoriaId;
 
-            Contas = await contasTask;
-            Categorias = await categoriasTask;
+            Categorias = opcoes.Categorias;
+            Contas = opcoes.Contas;
         }
         catch (Exception ex)
         {

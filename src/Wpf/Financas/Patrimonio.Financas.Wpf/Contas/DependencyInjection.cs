@@ -23,9 +23,15 @@ internal static class DependencyInjection
         services.AddHttpClient<ContaHttpClient>()
             .AddHttpMessageHandler<ApiResponseHandler>();
 
+        services.AddHttpClient<ContaOpcoesCriacaoHttpClient>()
+            .AddHttpMessageHandler<ApiResponseHandler>();
+
         // Services
         services.AddTransient<IContaCommandService>(
             serviceProvider => serviceProvider.GetRequiredService<ContaHttpClient>());
+
+        services.AddTransient<IContaOpcoesCriacaoService>(
+            serviceProvider => serviceProvider.GetRequiredService<ContaOpcoesCriacaoHttpClient>());
 
         services.AddTransient<IContaQueryService>(
             serviceProvider => serviceProvider.GetRequiredService<ContaHttpClient>());

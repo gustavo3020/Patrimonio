@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Services;
-using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
-using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
@@ -15,14 +14,14 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// </summary>
 internal sealed partial class ContaCriacaoViewModel(
     IContaCommandService commandService,
-    IInstituicaoQueryService instituicaoQueryService,
+    IContaOpcoesCriacaoService contaOpcoesCriacaoService,
     ContaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     public override string Titulo => "Nova conta";
 
     [ObservableProperty] private string nome = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<InstituicaoListaDto> instituicoes = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> instituicoes = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
@@ -41,8 +40,9 @@ internal sealed partial class ContaCriacaoViewModel(
         {
             Carregando = true;
 
-            Instituicoes = await instituicaoQueryService.ListarAsync(
-                cancellationToken);
+            var opcoes = await contaOpcoesCriacaoService.ObterOpcoesCriacaoAsync(cancellationToken);
+
+            Instituicoes = opcoes.Instituicoes;
         }
         catch (Exception ex)
         {

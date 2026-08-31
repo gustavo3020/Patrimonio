@@ -23,9 +23,15 @@ internal static class DependencyInjection
         services.AddHttpClient<MovimentacaoHttpClient>()
             .AddHttpMessageHandler<ApiResponseHandler>();
 
+        services.AddHttpClient<MovimentacaoOpcoesCriacaoHttpClient>()
+            .AddHttpMessageHandler<ApiResponseHandler>();
+
         // Services
         services.AddTransient<IMovimentacaoCommandService>(
             serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
+
+        services.AddTransient<IMovimentacaoOpcoesCriacaoService>(
+            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoOpcoesCriacaoHttpClient>());
 
         services.AddTransient<IMovimentacaoQueryService>(
             serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());

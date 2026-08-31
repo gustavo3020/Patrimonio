@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Services;
-using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
-using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
@@ -15,8 +14,8 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// </summary>
 internal sealed partial class ContaAlteracaoViewModel(
     IContaCommandService commandService,
+    IContaOpcoesCriacaoService contaOpcoesCriacaoService,
     IContaQueryService queryService,
-    IInstituicaoQueryService instituicaoQueryService,
     ContaNavigation navigation,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
@@ -25,7 +24,7 @@ internal sealed partial class ContaAlteracaoViewModel(
 
     [ObservableProperty] private int contaId;
     [ObservableProperty] private string nome = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<InstituicaoListaDto> instituicoes = [];
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> instituicoes = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
@@ -50,18 +49,20 @@ internal sealed partial class ContaAlteracaoViewModel(
                 contaId,
                 cancellationToken);
 
-            var instituicoesTask = instituicaoQueryService.ListarAsync(
+            var opcoesTask = contaOpcoesCriacaoService.ObterOpcoesCriacaoAsync(
                 cancellationToken);
 
             await Task.WhenAll(
                 contaTask,
-                instituicoesTask);
+                opcoesTask);
 
             var conta = await contaTask;
+            var opcoes = await opcoesTask;
 
             Nome = conta.Nome;
             InstituicaoId = conta.InstituicaoId;
-            Instituicoes = await instituicoesTask;
+
+            Instituicoes = opcoes.Instituicoes;
         }
         catch (Exception ex)
         {
