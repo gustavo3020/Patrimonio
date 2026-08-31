@@ -7,6 +7,7 @@ using Patrimonio.Financas.Infrastructure.Contas;
 using Patrimonio.Financas.Infrastructure.Instituicoes;
 using Patrimonio.Financas.Infrastructure.Movimentacoes;
 using Patrimonio.Financas.Infrastructure.Persistence;
+using Patrimonio.Financas.Infrastructure.Persistence.Interceptors;
 
 namespace Patrimonio.Financas.Infrastructure;
 
@@ -23,27 +24,33 @@ public static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddFinancasInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // DbContext
+        // String de conexão
         var connectionString = configuration.GetConnectionString("DatabaseConnectionString");
 
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new ConfiguracaoInvalidaException("Connection string 'DatabaseConnectionString' não configurada.");
 
-        services.AddDbContext<FinancasDbContext>(options =>
+        // Serviços compartilhados
+        services.AddScoped<DatabaseExceptionTranslator>();
+        services.AddScoped<DatabaseExceptionInterceptor>();
+
+        // DbContext
+        services.AddDbContext<FinancasDbContext>((serviceProvider, options) =>
+        {
             options.UseNpgsql(connectionString, b =>
             {
                 b.MigrationsHistoryTable("__EFMigrationsHistory", "financas");
-            })
-        );
+            });
+
+            options.AddInterceptors(
+                serviceProvider.GetRequiredService<DatabaseExceptionInterceptor>());
+        });
 
         // Funcionalidades
         services.AddCategoriasInfrastructure()
                 .AddContasInfrastructure()
                 .AddInstituicoesInfrastructure()
                 .AddMovimentacoesInfrastructure();
-
-        // Serviços compartilhados
-        services.AddScoped<DatabaseExceptionTranslator>();
 
         return services;
     }

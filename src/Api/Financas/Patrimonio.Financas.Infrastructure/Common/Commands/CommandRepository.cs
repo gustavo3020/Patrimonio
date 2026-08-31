@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using Patrimonio.Financas.Application.Common.Abstractions;
+﻿using Patrimonio.Financas.Application.Common.Abstractions;
 using Patrimonio.Financas.Domain.Common.Entities;
 using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Persistence;
@@ -12,8 +10,7 @@ namespace Patrimonio.Financas.Infrastructure.Common.Commands;
 /// </summary>
 /// <typeparam name="TEntity">Tipo da entidade manipulada pelo repositório.</typeparam>
 /// <param name="context">Contexto de persistência do módulo financeiro.</param>
-/// <param name="translator">Tradutor de exceções provenientes do banco de dados.</param>
-internal abstract class CommandRepository<TEntity>(FinancasDbContext context, DatabaseExceptionTranslator translator)
+internal abstract class CommandRepository<TEntity>(FinancasDbContext context)
     : ICommandRepository<TEntity> where TEntity : EntidadeBase
 {
     /// <inheritdoc/>
@@ -33,14 +30,5 @@ internal abstract class CommandRepository<TEntity>(FinancasDbContext context, Da
 
     /// <inheritdoc/>
     public async Task SalvarAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresException)
-        {
-            throw translator.Traduzir(postgresException);
-        }
-    }
+        => await context.SaveChangesAsync(cancellationToken);
 }

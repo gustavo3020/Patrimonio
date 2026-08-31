@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Financas\Patrimonio.Financas.Domain\Patrimonio.Financas.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Api\Financas\Patrimonio.Financas.Domain\Patrimonio.Financas.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
