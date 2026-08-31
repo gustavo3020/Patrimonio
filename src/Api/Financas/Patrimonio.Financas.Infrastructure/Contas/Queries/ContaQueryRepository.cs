@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Patrimonio.Financas.Application.Contas.Queries.Abstractions;
 using Patrimonio.Financas.Application.Contas.Queries.ReadModels;
-using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Persistence;
 
 namespace Patrimonio.Financas.Infrastructure.Contas.Queries;
@@ -32,9 +31,9 @@ internal sealed class ContaQueryRepository(FinancasDbContext context) : IContaQu
     }
 
     /// <inheritdoc/>
-    public async Task<ContaDetalheReadModel> ObterPorIdAsync(int contaId, CancellationToken cancellationToken)
+    public async Task<ContaDetalheReadModel?> ObterPorIdAsync(int contaId, CancellationToken cancellationToken)
     {
-        var entidade = await (
+        return await (
             from conta in context.Contas
             join instituicao in context.Instituicoes
                 on conta.InstituicaoId equals instituicao.Id
@@ -50,7 +49,5 @@ internal sealed class ContaQueryRepository(FinancasDbContext context) : IContaQu
             })
             .AsNoTracking()
             .SingleOrDefaultAsync(cancellationToken);
-
-        return entidade ?? throw new RecursoNaoEncontradoException($"Conta com Id {contaId} não encontrada.");
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Patrimonio.Financas.Application.Categorias.Queries.Abstractions;
 using Patrimonio.Financas.Application.Categorias.Queries.ReadModels;
-using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Persistence;
 
 namespace Patrimonio.Financas.Infrastructure.Categorias.Queries;
@@ -28,9 +27,9 @@ internal sealed class CategoriaQueryRepository(FinancasDbContext context) : ICat
     }
 
     /// <inheritdoc/>
-    public async Task<CategoriaDetalheReadModel> ObterPorIdAsync(int categoriaId, CancellationToken cancellationToken)
+    public async Task<CategoriaDetalheReadModel?> ObterPorIdAsync(int categoriaId, CancellationToken cancellationToken)
     {
-        var entidade = await context.Categorias
+        return await context.Categorias
             .AsNoTracking()
             .Select(c => new CategoriaDetalheReadModel
             {
@@ -40,7 +39,5 @@ internal sealed class CategoriaQueryRepository(FinancasDbContext context) : ICat
                 DataAlteracao = c.DataAlteracao
             })
             .SingleOrDefaultAsync(c => c.Id == categoriaId, cancellationToken);
-
-        return entidade ?? throw new RecursoNaoEncontradoException($"Categoria com Id {categoriaId} não encontrada.");
     }
 }

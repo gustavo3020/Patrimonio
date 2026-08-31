@@ -20,5 +20,5 @@ public interface IInstituicaoQueryRepository
     /// <param name="instituicaoId">Identificador da instituição.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>ReadModel contendo os dados detalhados da instituição.</returns>
-    Task<InstituicaoDetalheReadModel> ObterPorIdAsync(int instituicaoId, CancellationToken cancellationToken);
+    Task<InstituicaoDetalheReadModel?> ObterPorIdAsync(int instituicaoId, CancellationToken cancellationToken);
 }

@@ -11,7 +11,7 @@ namespace Patrimonio.Financas.Infrastructure.Persistence.Interceptors;
 /// </summary>
 /// <param name="translator">Tradutor de exceções provenientes do banco de dados.</param>
 internal sealed class DatabaseExceptionInterceptor(
-    DatabaseExceptionTranslator translator) : SaveChangesInterceptor
+    DatabaseConstraintTranslator translator) : SaveChangesInterceptor
 {
     /// <inheritdoc/>
     public override Task SaveChangesFailedAsync(

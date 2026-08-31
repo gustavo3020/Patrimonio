@@ -4,6 +4,7 @@ using Patrimonio.Financas.Application.Movimentacoes.Mappers;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
+using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
 using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
 
@@ -35,9 +36,9 @@ internal sealed class MovimentacaoCommandService(
 
         await commandRepository.SalvarAsync(cancellationToken);
 
-        var readModel = await queryRepository.ObterPorIdAsync(entidade.Id, cancellationToken);
+        var entidadeDetalhe = await queryRepository.ObterPorIdAsync(entidade.Id, cancellationToken);
 
-        return MovimentacaoMapper.Mapear(readModel);
+        return MovimentacaoMapper.Mapear(entidadeDetalhe!);
     }
 
     /// <inheritdoc />
@@ -45,7 +46,8 @@ internal sealed class MovimentacaoCommandService(
     {
         logger.LogInformation("Alterando movimentação {MovimentacaoId}.", movimentacaoId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
         entidade.AlterarData(dto.Data);
         entidade.AlterarValor(new Dinheiro(dto.Valor));
@@ -63,7 +65,8 @@ internal sealed class MovimentacaoCommandService(
     {
         logger.LogInformation("Excluindo movimentação {MovimentacaoId}.", movimentacaoId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
         commandRepository.Remover(entidade);
 

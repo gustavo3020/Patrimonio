@@ -6,6 +6,7 @@ using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
 using Patrimonio.Financas.Domain.Categorias.Entities;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Application.Categorias.Commands.Services;
 
@@ -30,7 +31,7 @@ internal sealed class CategoriaCommandService(
 
         var entidadeDetalhe = await queryRepository.ObterPorIdAsync(entidade.Id, cancellationToken);
 
-        return CategoriaMapper.Mapear(entidadeDetalhe);
+        return CategoriaMapper.Mapear(entidadeDetalhe!);
     }
 
     /// <inheritdoc />
@@ -38,7 +39,8 @@ internal sealed class CategoriaCommandService(
     {
         logger.LogInformation("Alterando categoria {CategoriaId}.", categoriaId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(categoriaId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(categoriaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Categoria com Id {categoriaId} não encontrada.");
 
         entidade.AlterarNome(new Nome(dto.Nome));
 
@@ -50,7 +52,8 @@ internal sealed class CategoriaCommandService(
     {
         logger.LogInformation("Excluindo categoria {CategoriaId}.", categoriaId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(categoriaId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(categoriaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Categoria com Id {categoriaId} não encontrada.");
 
         commandRepository.Remover(entidade);
 

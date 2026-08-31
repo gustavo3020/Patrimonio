@@ -5,6 +5,7 @@ using Patrimonio.Financas.Application.Instituicoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
+using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Instituicoes.Entities;
 
 namespace Patrimonio.Financas.Application.Instituicoes.Commands.Services;
@@ -30,7 +31,7 @@ internal sealed class InstituicaoCommandService(
 
         var entidadeDetalhe = await queryRepository.ObterPorIdAsync(entidade.Id, cancellationToken);
 
-        return InstituicaoMapper.Mapear(entidadeDetalhe);
+        return InstituicaoMapper.Mapear(entidadeDetalhe!);
     }
 
     /// <inheritdoc />
@@ -38,7 +39,8 @@ internal sealed class InstituicaoCommandService(
     {
         logger.LogInformation("Alterando instituição {InstituicaoId}.", instituicaoId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(instituicaoId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(instituicaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Instituição com Id {instituicaoId} não encontrada.");
 
         entidade.AlterarNome(new Nome(dto.Nome));
 
@@ -50,7 +52,8 @@ internal sealed class InstituicaoCommandService(
     {
         logger.LogInformation("Excluindo instituição {InstituicaoId}.", instituicaoId);
 
-        var entidade = await commandRepository.ObterPorIdAsync(instituicaoId, cancellationToken);
+        var entidade = await commandRepository.ObterPorIdAsync(instituicaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Instituição com Id {instituicaoId} não encontrada.");
 
         commandRepository.Remover(entidade);
 

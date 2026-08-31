@@ -20,5 +20,5 @@ public interface IContaQueryRepository
     /// <param name="contaId">Identificador da conta.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>ReadModel contendo os dados detalhados da conta.</returns>
-    Task<ContaDetalheReadModel> ObterPorIdAsync(int contaId, CancellationToken cancellationToken);
+    Task<ContaDetalheReadModel?> ObterPorIdAsync(int contaId, CancellationToken cancellationToken);
 }

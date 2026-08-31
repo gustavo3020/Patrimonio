@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.Abstractions;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.ReadModels;
-using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Persistence;
 
 namespace Patrimonio.Financas.Infrastructure.Movimentacoes.Queries;
@@ -20,7 +19,6 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 on m.ContaId equals conta.Id
             join categoria in context.Categorias
                 on m.CategoriaId equals categoria.Id
-            orderby m.DataCriacao descending
             select new MovimentacaoListaReadModel
             {
                 Id = m.Id,
@@ -43,9 +41,9 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
     }
 
     /// <inheritdoc/>
-    public async Task<MovimentacaoDetalheReadModel> ObterPorIdAsync(int movimentacaoId, CancellationToken cancellationToken)
+    public async Task<MovimentacaoDetalheReadModel?> ObterPorIdAsync(int movimentacaoId, CancellationToken cancellationToken)
     {
-        var entidade = await (
+        return await (
             from m in context.Movimentacoes.AsNoTracking()
             join conta in context.Contas
                 on m.ContaId equals conta.Id
@@ -72,7 +70,5 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 DataAlteracao = m.DataAlteracao
             })
             .SingleOrDefaultAsync(cancellationToken);
-
-        return entidade ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
     }
 }

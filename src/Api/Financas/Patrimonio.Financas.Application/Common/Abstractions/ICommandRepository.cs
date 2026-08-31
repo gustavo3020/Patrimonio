@@ -26,7 +26,7 @@ public interface ICommandRepository<TEntity> where TEntity : EntidadeBase
     /// <param name="id">Identificador da entidade.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>A entidade correspondente ao identificador informado.</returns>
-    Task<TEntity> ObterPorIdAsync(int id, CancellationToken cancellationToken);
+    Task<TEntity?> ObterPorIdAsync(int id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Persiste as alterações realizadas no contexto.

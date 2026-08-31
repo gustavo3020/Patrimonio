@@ -20,5 +20,5 @@ public interface IMovimentacaoQueryRepository
     /// <param name="movimentacaoId">Identificador da movimentação.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>ReadModel contendo os dados detalhados da movimentação.</returns>
-    Task<MovimentacaoDetalheReadModel> ObterPorIdAsync(int movimentacaoId, CancellationToken cancellationToken);
+    Task<MovimentacaoDetalheReadModel?> ObterPorIdAsync(int movimentacaoId, CancellationToken cancellationToken);
 }

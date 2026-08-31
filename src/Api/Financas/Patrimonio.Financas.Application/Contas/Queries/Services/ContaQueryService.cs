@@ -3,6 +3,7 @@ using Patrimonio.Financas.Application.Contas.Mappers;
 using Patrimonio.Financas.Application.Contas.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Services;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Application.Contas.Queries.Services;
 
@@ -28,7 +29,8 @@ internal sealed class ContaQueryService(
     {
         logger.LogInformation("Obtendo conta por ID {ContaId}.", contaId);
 
-        var conta = await queryRepository.ObterPorIdAsync(contaId, cancellationToken);
+        var conta = await queryRepository.ObterPorIdAsync(contaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Conta com Id {contaId} não encontrada.");
 
         return ContaMapper.Mapear(conta);
     }

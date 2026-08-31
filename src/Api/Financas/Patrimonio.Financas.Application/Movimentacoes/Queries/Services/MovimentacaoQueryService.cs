@@ -3,6 +3,7 @@ using Patrimonio.Financas.Application.Movimentacoes.Mappers;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Application.Movimentacoes.Queries.Services;
 
@@ -28,7 +29,8 @@ internal sealed class MovimentacaoQueryService(
     {
         logger.LogInformation("Obtendo movimentação por ID {MovimentacaoId}.", movimentacaoId);
 
-        var movimentacao = await queryRepository.ObterPorIdAsync(movimentacaoId, cancellationToken);
+        var movimentacao = await queryRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
         return MovimentacaoMapper.Mapear(movimentacao);
     }

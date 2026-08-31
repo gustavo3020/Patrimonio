@@ -3,6 +3,7 @@ using Patrimonio.Financas.Application.Instituicoes.Mappers;
 using Patrimonio.Financas.Application.Instituicoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Application.Instituicoes.Queries.Services;
 
@@ -28,7 +29,8 @@ internal sealed class InstituicaoQueryService(
     {
         logger.LogInformation("Obtendo instituição por ID {InstituicaoId}.", instituicaoId);
 
-        var instituicao = await queryRepository.ObterPorIdAsync(instituicaoId, cancellationToken);
+        var instituicao = await queryRepository.ObterPorIdAsync(instituicaoId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Instituição com Id {instituicaoId} não encontrada.");
 
         return InstituicaoMapper.Mapear(instituicao);
     }

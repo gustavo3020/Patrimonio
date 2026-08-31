@@ -31,7 +31,7 @@ public static class DependencyInjection
             throw new ConfiguracaoInvalidaException("Connection string 'DatabaseConnectionString' não configurada.");
 
         // Serviços compartilhados
-        services.AddScoped<DatabaseExceptionTranslator>();
+        services.AddScoped<DatabaseConstraintTranslator>();
         services.AddScoped<DatabaseExceptionInterceptor>();
 
         // DbContext

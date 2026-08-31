@@ -3,6 +3,7 @@ using Patrimonio.Financas.Application.Categorias.Mappers;
 using Patrimonio.Financas.Application.Categorias.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Application.Categorias.Queries.Services;
 
@@ -28,7 +29,8 @@ internal sealed class CategoriaQueryService(
     {
         logger.LogInformation("Obtendo categoria por ID {CategoriaId}.", categoriaId);
 
-        var categoria = await queryRepository.ObterPorIdAsync(categoriaId, cancellationToken);
+        var categoria = await queryRepository.ObterPorIdAsync(categoriaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Categoria com Id {categoriaId} não encontrada.");
 
         return CategoriaMapper.Mapear(categoria);
     }

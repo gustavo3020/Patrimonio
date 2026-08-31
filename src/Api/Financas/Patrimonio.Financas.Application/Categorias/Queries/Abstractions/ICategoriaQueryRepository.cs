@@ -20,5 +20,5 @@ public interface ICategoriaQueryRepository
     /// <param name="categoriaId">Identificador da categoria.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>ReadModel contendo os dados detalhados da categoria.</returns>
-    Task<CategoriaDetalheReadModel> ObterPorIdAsync(int categoriaId, CancellationToken cancellationToken);
+    Task<CategoriaDetalheReadModel?> ObterPorIdAsync(int categoriaId, CancellationToken cancellationToken);
 }

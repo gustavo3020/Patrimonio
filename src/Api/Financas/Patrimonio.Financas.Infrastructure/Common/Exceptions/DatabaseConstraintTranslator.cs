@@ -7,7 +7,7 @@ namespace Patrimonio.Financas.Infrastructure.Common.Exceptions;
 /// utilizando os tradutores de constraints registrados na infraestrutura.
 /// </summary>
 /// <param name="tradutores">Tradutores de constraints registrados pelas funcionalidades.</param>
-internal sealed class DatabaseExceptionTranslator(IEnumerable<IConstraintTranslator> tradutores)
+internal sealed class DatabaseConstraintTranslator(IEnumerable<IConstraintTranslator> tradutores)
 {
     /// <summary>
     /// Traduz uma exceção do PostgreSQL utilizando os tradutores de constraints disponíveis.
