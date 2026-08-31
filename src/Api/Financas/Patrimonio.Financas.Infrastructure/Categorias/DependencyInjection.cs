@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Application.Categorias.Commands.Abstractions;
+using Patrimonio.Financas.Application.Categorias.Lookups.Abstractions;
 using Patrimonio.Financas.Application.Categorias.Queries.Abstractions;
 using Patrimonio.Financas.Infrastructure.Categorias.Commands;
 using Patrimonio.Financas.Infrastructure.Categorias.Exceptions;
+using Patrimonio.Financas.Infrastructure.Categorias.Lookups;
 using Patrimonio.Financas.Infrastructure.Categorias.Queries;
 using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 
@@ -22,6 +24,7 @@ internal static class DependencyInjection
     {
         // Repositórios
         services.AddScoped<ICategoriaCommandRepository, CategoriaCommandRepository>()
+                .AddScoped<ICategoriaLookupRepository, CategoriaLookupRepository>()
                 .AddScoped<ICategoriaQueryRepository, CategoriaQueryRepository>();
 
         // Tradutor

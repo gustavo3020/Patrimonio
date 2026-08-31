@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Application.Instituicoes.Commands.Abstractions;
+using Patrimonio.Financas.Application.Instituicoes.Lookups.Abstractions;
 using Patrimonio.Financas.Application.Instituicoes.Queries.Abstractions;
 using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Instituicoes.Commands;
 using Patrimonio.Financas.Infrastructure.Instituicoes.Exceptions;
+using Patrimonio.Financas.Infrastructure.Instituicoes.Lookups;
 using Patrimonio.Financas.Infrastructure.Instituicoes.Queries;
 
 namespace Patrimonio.Financas.Infrastructure.Instituicoes;
@@ -22,6 +24,7 @@ internal static class DependencyInjection
     {
         // Repositórios
         services.AddScoped<IInstituicaoCommandRepository, InstituicaoCommandRepository>()
+                .AddScoped<IInstituicaoLookupRepository, InstituicaoLookupRepository>()
                 .AddScoped<IInstituicaoQueryRepository, InstituicaoQueryRepository>();
 
         // Tradutor

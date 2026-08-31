@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Application.Contas.Commands.Abstractions;
+using Patrimonio.Financas.Application.Contas.Lookups.Abstractions;
 using Patrimonio.Financas.Application.Contas.Queries.Abstractions;
 using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Contas.Commands;
 using Patrimonio.Financas.Infrastructure.Contas.Exceptions;
+using Patrimonio.Financas.Infrastructure.Contas.Lookups;
 using Patrimonio.Financas.Infrastructure.Contas.Queries;
 
 namespace Patrimonio.Financas.Infrastructure.Contas;
@@ -22,6 +24,7 @@ internal static class DependencyInjection
     {
         // Repositórios
         services.AddScoped<IContaCommandRepository, ContaCommandRepository>()
+                .AddScoped<IContaLookupRepository, ContaLookupRepository>()
                 .AddScoped<IContaQueryRepository, ContaQueryRepository>();
 
         // Tradutor
