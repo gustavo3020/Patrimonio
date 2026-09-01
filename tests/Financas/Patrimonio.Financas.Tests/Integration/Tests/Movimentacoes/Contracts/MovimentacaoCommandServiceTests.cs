@@ -29,7 +29,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         };
     }
 
-    private MovimentacaoAlteracaoDto AtualizarDto()
+    private MovimentacaoAlteracaoDto AlterarDto()
     {
         return new MovimentacaoAlteracaoDto
         {
@@ -110,7 +110,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
     public async Task AlterarAsync_DeveAlterarMovimentacao()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AtualizarDto();
+        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
@@ -138,7 +138,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AtualizarDto(),
+            AlterarDto(),
             CancellationToken.None);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
@@ -160,10 +160,8 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var movimentacao = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
         var action = () => service.AlterarAsync(
-            movimentacao.Id,
+            Factory.BaseData.Movimentacao.Id,
             dto,
             CancellationToken.None);
 
@@ -186,10 +184,8 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
             ContaId = int.MaxValue
         };
 
-        var movimentacao = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
         var action = () => service.AlterarAsync(
-            movimentacao.Id,
+            Factory.BaseData.Movimentacao.Id,
             dto,
             CancellationToken.None);
 

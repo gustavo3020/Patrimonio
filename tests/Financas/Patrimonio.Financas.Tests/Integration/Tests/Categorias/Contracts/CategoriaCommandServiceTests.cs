@@ -22,7 +22,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         };
     }
 
-    private static CategoriaAlteracaoDto AtualizarDto()
+    private static CategoriaAlteracaoDto AlterarDto()
     {
         return new CategoriaAlteracaoDto
         {
@@ -71,7 +71,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
     public async Task AlterarAsync_DeveAlterarCategoria()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AtualizarDto();
+        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
@@ -90,18 +90,15 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
-
-        var categoria1 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
-        var categoria2 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
         var dto = new CategoriaAlteracaoDto
         {
-            Nome = categoria1.Nome
+            Nome = Factory.BaseData.Categoria.Nome
         };
 
+        var categoria = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
         var action = () => service.AlterarAsync(
-            categoria2.Id,
+            categoria.Id,
             dto,
             CancellationToken.None);
 
@@ -116,7 +113,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AtualizarDto(),
+            AlterarDto(),
             CancellationToken.None);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();

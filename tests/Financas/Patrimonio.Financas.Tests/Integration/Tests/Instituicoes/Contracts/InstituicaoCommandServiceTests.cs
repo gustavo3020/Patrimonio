@@ -22,7 +22,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         };
     }
 
-    private static InstituicaoAlteracaoDto AtualizarDto()
+    private static InstituicaoAlteracaoDto AlterarDto()
     {
         return new InstituicaoAlteracaoDto
         {
@@ -69,7 +69,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
     public async Task AlterarAsync_DeveAlterarInstituicao()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AtualizarDto();
+        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
@@ -88,18 +88,15 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
-
-        var instituicao1 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
-        var instituicao2 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
         var dto = new InstituicaoAlteracaoDto
         {
-            Nome = instituicao1.Nome
+            Nome = Factory.BaseData.Instituicao.Nome
         };
 
+        var instituicao = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
         var action = () => service.AlterarAsync(
-            instituicao2.Id,
+            instituicao.Id,
             dto,
             CancellationToken.None);
 
@@ -114,7 +111,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AtualizarDto(),
+            AlterarDto(),
             CancellationToken.None);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();

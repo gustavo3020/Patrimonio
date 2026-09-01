@@ -75,7 +75,6 @@ public sealed class MovimentacoesController(
     [HttpDelete("{movimentacaoId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Excluir(int movimentacaoId, CancellationToken cancellationToken)
     {
         await commandService.ExcluirAsync(movimentacaoId, cancellationToken);

@@ -23,7 +23,7 @@ public sealed class ContaCommandServiceTests(IntegrationTestFactory factory) : I
         };
     }
 
-    private ContaAlteracaoDto AtualizarDto()
+    private ContaAlteracaoDto AlterarDto()
     {
         return new ContaAlteracaoDto
         {
@@ -88,7 +88,7 @@ public sealed class ContaCommandServiceTests(IntegrationTestFactory factory) : I
     public async Task AlterarAsync_DeveAlterarConta()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AtualizarDto();
+        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
 
@@ -108,19 +108,16 @@ public sealed class ContaCommandServiceTests(IntegrationTestFactory factory) : I
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
-
-        var conta1 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
-        var conta2 = await service.CriarAsync(CriarDto(), CancellationToken.None);
-
         var dto = new ContaAlteracaoDto
         {
-            Nome = conta1.Nome,
-            InstituicaoId = conta1.InstituicaoId
+            Nome = Factory.BaseData.Conta.Nome,
+            InstituicaoId = Factory.BaseData.Instituicao.Id
         };
 
+        var conta = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
         var action = () => service.AlterarAsync(
-            conta2.Id,
+            conta.Id,
             dto,
             CancellationToken.None);
 
@@ -135,7 +132,7 @@ public sealed class ContaCommandServiceTests(IntegrationTestFactory factory) : I
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AtualizarDto(),
+            AlterarDto(),
             CancellationToken.None);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
