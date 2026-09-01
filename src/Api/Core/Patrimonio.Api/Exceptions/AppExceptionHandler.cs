@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Patrimonio.Financas.Domain.Exceptions;
-using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 
 namespace Patrimonio.Api.Exceptions;
 

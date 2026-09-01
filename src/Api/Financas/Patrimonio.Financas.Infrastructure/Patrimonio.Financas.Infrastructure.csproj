@@ -18,4 +18,9 @@
     <Folder Include="Persistence\Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+	<InternalsVisibleTo Include="Patrimonio.Financas.Tests" />
+	<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+	
 </Project>

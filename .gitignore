@@ -24,4 +24,4 @@ Logs/
 # Arquivos de configuracoes de ambiente local
 appsettings.Development.json
 appsettings.Production.json
-appsettings.Test.json
+appsettings.Testing.json

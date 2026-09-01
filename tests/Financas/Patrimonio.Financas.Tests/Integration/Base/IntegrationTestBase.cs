@@ -1,0 +1,15 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Tests.Integration.Config;
+
+namespace Patrimonio.Financas.Tests.Integration.Base;
+
+/// <summary>
+/// Fornece a infraestrutura base para os testes de integração.
+/// </summary>
+public abstract class IntegrationTestBase(IntegrationTestFactory factory)
+    : IClassFixture<IntegrationTestFactory>
+{
+    protected IntegrationTestFactory Factory { get; } = factory;
+
+    protected IServiceScope CreateScope() => Factory.Services.CreateScope();
+}

@@ -1,0 +1,207 @@
+﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Contracts.Contas.Dtos;
+using Patrimonio.Financas.Contracts.Contas.Services;
+using Patrimonio.Financas.Domain.Exceptions;
+using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Config;
+
+namespace Patrimonio.Financas.Tests.Integration.Tests.Contas.Contracts;
+
+public sealed class ContaCommandServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
+{
+    // ============================================================================
+    // DTOs
+    // ============================================================================
+
+    private ContaCriacaoDto CriarDto()
+    {
+        return new ContaCriacaoDto
+        {
+            Nome = $"Conta {Guid.NewGuid()}",
+            InstituicaoId = Factory.BaseData.Instituicao.Id
+        };
+    }
+
+    private ContaAlteracaoDto AtualizarDto()
+    {
+        return new ContaAlteracaoDto
+        {
+            Nome = $"Conta alterada {Guid.NewGuid()}",
+            InstituicaoId = Factory.BaseData.Instituicao.Id
+        };
+    }
+
+    // ============================================================================
+    // CriarAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task CriarAsync_DeveCriarContaERetornarDto()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+
+        var criado = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        criado.Should().NotBeNull();
+        criado.Nome.Should().NotBeNullOrWhiteSpace();
+        criado.Id.Should().BeGreaterThan(0);
+        criado.InstituicaoId.Should().Be(Factory.BaseData.Instituicao.Id);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecaoAoDuplicarNome()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+        var dto = CriarDto();
+
+        await service.CriarAsync(dto, CancellationToken.None);
+
+        var action = () => service.CriarAsync(dto, CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecaoAoInformarInstituicaoInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+        var dto = new ContaCriacaoDto
+        {
+            Nome = $"Conta {Guid.NewGuid()}",
+            InstituicaoId = int.MaxValue
+        };
+
+        var action = () => service.CriarAsync(dto, CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    // ============================================================================
+    // AlterarAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task AlterarAsync_DeveAlterarConta()
+    {
+        using var scope = CreateScope();
+        var dtoAlterar = AtualizarDto();
+        var command = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
+
+        var conta = await command.CriarAsync(CriarDto(), CancellationToken.None);
+
+        await command.AlterarAsync(conta.Id, dtoAlterar, CancellationToken.None);
+
+        var alterado = await query.ObterPorIdAsync(conta.Id, CancellationToken.None);
+
+        alterado.Should().NotBeNull();
+        alterado.Nome.Should().Be(dtoAlterar.Nome);
+        alterado.InstituicaoId.Should().Be(dtoAlterar.InstituicaoId);
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoDuplicarNome()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+
+        var conta1 = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        var conta2 = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        var dto = new ContaAlteracaoDto
+        {
+            Nome = conta1.Nome,
+            InstituicaoId = conta1.InstituicaoId
+        };
+
+        var action = () => service.AlterarAsync(
+            conta2.Id,
+            dto,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarContaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+
+        var action = () => service.AlterarAsync(
+            int.MaxValue,
+            AtualizarDto(),
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoInformarInstituicaoInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+        var dto = new ContaAlteracaoDto
+        {
+            Nome = $"Conta {Guid.NewGuid()}",
+            InstituicaoId = int.MaxValue
+        };
+
+        var conta = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        var action = () => service.AlterarAsync(
+            conta.Id,
+            dto,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    // ============================================================================
+    // ExcluirAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task ExcluirAsync_DeveExcluirConta()
+    {
+        using var scope = CreateScope();
+        var command = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
+
+        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+
+        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+
+        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+
+    [Fact]
+    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirContaBase()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+
+        var action = () => service.ExcluirAsync(Factory.BaseData.Conta.Id, CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    [Fact]
+    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirContaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IContaCommandService>();
+
+        var action = () => service.ExcluirAsync(
+            int.MaxValue,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+}

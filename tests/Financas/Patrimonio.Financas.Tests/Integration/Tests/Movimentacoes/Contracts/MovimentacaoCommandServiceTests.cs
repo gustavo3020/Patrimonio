@@ -1,0 +1,230 @@
+﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
+using Patrimonio.Financas.Contracts.Movimentacoes.Services;
+using Patrimonio.Financas.Domain.Exceptions;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
+using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Config;
+
+namespace Patrimonio.Financas.Tests.Integration.Tests.Movimentacoes.Contracts;
+
+public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
+{
+    // ============================================================================
+    // DTOs
+    // ============================================================================
+
+    private MovimentacaoCriacaoDto CriarDto()
+    {
+        return new MovimentacaoCriacaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = $"Movimentação {Guid.NewGuid()}",
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+    }
+
+    private MovimentacaoAlteracaoDto AtualizarDto()
+    {
+        return new MovimentacaoAlteracaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now).AddDays(5),
+            Valor = 1000.00m,
+            Natureza = Natureza.Entrada,
+            Tipo = TipoMovimentacao.Credito,
+            Descricao = $"Movimentação alterada {Guid.NewGuid()}",
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+    }
+
+    // ============================================================================
+    // CriarAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task CriarAsync_DeveCriarMovimentacaoERetornarDto()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+
+        var criado = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        criado.Should().NotBeNull();
+        criado.Descricao.Should().NotBeNullOrWhiteSpace();
+        criado.Id.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = new MovimentacaoCriacaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = $"Movimentação {Guid.NewGuid()}",
+            CategoriaId = int.MaxValue,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+
+        var action = () => service.CriarAsync(dto, CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecaoAoInformarContaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = new MovimentacaoCriacaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = $"Movimentação {Guid.NewGuid()}",
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = int.MaxValue
+        };
+
+        var action = () => service.CriarAsync(dto, CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    // ============================================================================
+    // AlterarAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task AlterarAsync_DeveAlterarMovimentacao()
+    {
+        using var scope = CreateScope();
+        var dtoAlterar = AtualizarDto();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
+
+        var movimentacao = await command.CriarAsync(CriarDto(), CancellationToken.None);
+
+        await command.AlterarAsync(movimentacao.Id, dtoAlterar, CancellationToken.None);
+
+        var alterado = await query.ObterPorIdAsync(movimentacao.Id, CancellationToken.None);
+
+        alterado.Should().NotBeNull();
+        alterado.Data.Should().Be(dtoAlterar.Data);
+        alterado.Valor.Should().Be(dtoAlterar.Valor);
+        alterado.Natureza.Should().Be(dtoAlterar.Natureza);
+        alterado.Tipo.Should().Be(dtoAlterar.Tipo);
+        alterado.Descricao.Should().Be(dtoAlterar.Descricao);
+        alterado.CategoriaId.Should().Be(dtoAlterar.CategoriaId);
+        alterado.ContaId.Should().Be(dtoAlterar.ContaId);
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarMovimentacaoInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+
+        var action = () => service.AlterarAsync(
+            int.MaxValue,
+            AtualizarDto(),
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = new MovimentacaoAlteracaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = $"Movimentação {Guid.NewGuid()}",
+            CategoriaId = int.MaxValue,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+
+        var movimentacao = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        var action = () => service.AlterarAsync(
+            movimentacao.Id,
+            dto,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    [Fact]
+    public async Task AlterarAsync_DeveLancarExcecaoAoInformarContaInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = new MovimentacaoAlteracaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = $"Movimentação {Guid.NewGuid()}",
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = int.MaxValue
+        };
+
+        var movimentacao = await service.CriarAsync(CriarDto(), CancellationToken.None);
+
+        var action = () => service.AlterarAsync(
+            movimentacao.Id,
+            dto,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<ConflitoException>();
+    }
+
+    // ============================================================================
+    // ExcluirAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task ExcluirAsync_DeveExcluirMovimentacao()
+    {
+        using var scope = CreateScope();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
+
+        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+
+        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+
+        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+
+    [Fact]
+    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirMovimentacaoInexistente()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+
+        var action = () => service.ExcluirAsync(
+            int.MaxValue,
+            CancellationToken.None);
+
+        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+}

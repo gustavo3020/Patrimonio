@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using Patrimonio.Financas.Domain.Exceptions;
 
 namespace Patrimonio.Financas.Infrastructure.Common.Exceptions;
 
