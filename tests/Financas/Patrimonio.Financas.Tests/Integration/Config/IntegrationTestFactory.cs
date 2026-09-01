@@ -11,7 +11,7 @@ namespace Patrimonio.Financas.Tests.Integration.Config;
 /// <summary>
 /// Configura e cria a aplicação utilizada nos testes de integração.
 /// </summary>
-public class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     internal BaseData BaseData { get; private set; } = null!;
 

@@ -7,7 +7,6 @@ namespace Patrimonio.Financas.Tests.Integration.Base;
 /// Fornece a infraestrutura base para os testes de integração de interfaces públicas.
 /// </summary>
 public abstract class IntegrationTestBase(IntegrationTestFactory factory)
-    : IClassFixture<IntegrationTestFactory>
 {
     protected IntegrationTestFactory Factory { get; } = factory;
 

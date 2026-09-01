@@ -8,7 +8,8 @@ using Patrimonio.Financas.Tests.Integration.Config;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Categorias.Contracts;
 
-public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
+public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
+    : IntegrationTestBase(factory)
 {
     // ============================================================================
     // DTOs
