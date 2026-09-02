@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Infrastructure.Persistence;
 using Patrimonio.Financas.Tests.Integration.Base;
 using Patrimonio.Financas.Tests.Integration.Seeders;
+using Testcontainers.PostgreSql;
 
 namespace Patrimonio.Financas.Tests.Integration.Config;
 
@@ -14,6 +16,15 @@ namespace Patrimonio.Financas.Tests.Integration.Config;
 public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     internal BaseData BaseData { get; private set; } = null!;
+    private readonly PostgreSqlContainer? _container;
+
+    public IntegrationTestFactory()
+    {
+        var usarContainer = Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true";
+
+        if (usarContainer)
+            _container = new PostgreSqlBuilder("postgres:17").Build();
+    }
 
     /// <summary>
     /// Configura o ambiente e os serviços adicionais utilizados pela aplicação nos testes de integração.
@@ -22,6 +33,17 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+
+        if (_container is not null)
+        {
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["ConnectionStrings:DatabaseConnectionString"] = _container.GetConnectionString()
+                });
+            });
+        }
 
         builder.ConfigureServices(services =>
         {
@@ -37,6 +59,15 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
     /// </summary>
     public async ValueTask InitializeAsync()
     {
+        if (_container is not null)
+        {
+            await _container.StartAsync();
+
+            Environment.SetEnvironmentVariable(
+                "ConnectionStrings__DatabaseConnectionString",
+                _container.GetConnectionString());
+        }
+
         using var scope = Services.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<FinancasDbContext>();
@@ -51,8 +82,9 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
         await scope.ServiceProvider.GetRequiredService<MovimentacaoSeeder>().SeedAsync(BaseData);
     }
 
-    public ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
-        return ValueTask.CompletedTask;
+        if (_container is not null)
+            await _container.DisposeAsync();
     }
 }
