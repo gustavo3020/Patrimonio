@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Movimentacoes.Views.MovimentacaoFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.ViewModels"
+             mc:Ignorable="d"  
+             d:DataContext="{d:DesignInstance vm:MovimentacaoAlteracaoViewModel}">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *, Auto">
+
+        <!-- Data e tipo -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Data"/>
+                <DatePicker SelectedDate="{Binding Data}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Tipo"/>
+                <ComboBox ItemsSource="{Binding Source={x:Static vm:MovimentacaoAlteracaoViewModel.Tipos}}"
+                          SelectedItem="{Binding Tipo}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Valor e natureza -->
+        <Grid Grid.Row="1" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Valor"/>
+                <TextBox Text="{Binding Valor}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Natureza"/>
+                <ComboBox ItemsSource="{Binding Source={x:Static vm:MovimentacaoAlteracaoViewModel.Naturezas}}"
+                          SelectedItem="{Binding Natureza}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Conta e categoria -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Conta"/>
+                <ComboBox ItemsSource="{Binding Contas}"
+                      SelectedValue="{Binding ContaId}"
+                      DisplayMemberPath="Nome"
+                      SelectedValuePath="Id"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Categoria"/>
+                <ComboBox ItemsSource="{Binding Categorias}"
+                      SelectedValue="{Binding CategoriaId}"
+                      DisplayMemberPath="Nome"
+                      SelectedValuePath="Id"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Descrição -->
+        <StackPanel Grid.Row="3">
+            <TextBlock Text="Descrição"/>
+            <TextBox Text="{Binding Descricao}"
+                     Style="{StaticResource DescriptionTextBoxStyle}"/>
+        </StackPanel>
+
+        <!-- Espaço -->
+        <Grid Grid.Row="4"/>
+
+        <!-- Ações -->
+        <StackPanel Grid.Row="5" Style="{StaticResource ActionStackPanelStyle}">
+            
+            <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

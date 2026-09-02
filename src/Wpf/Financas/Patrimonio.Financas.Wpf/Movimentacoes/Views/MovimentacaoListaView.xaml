@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Movimentacoes.Views.MovimentacaoListaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Movimentacoes.ViewModels"
+             mc:Ignorable="d"  
+             d:DataContext="{d:DesignInstance vm:MovimentacaoListaViewModel}">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- Cabeçalho -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource SubTitleTextBlockStyle}"/>
+            <StackPanel Grid.Column="1" Style="{StaticResource ActionStackPanelStyle}">
+                <Button Content="Criar" Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar" Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir" Command="{Binding ExcluirCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Lista -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Movimentacoes}"
+                  SelectedItem="{Binding Selecionado}">
+            
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />
+            </DataGrid.InputBindings>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Data movimentação" Binding="{Binding Data, StringFormat='dd/MM/yyyy'}" Width="130"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat={}{0:C}, ConverterCulture=pt-BR}" Width="80"/>
+                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="100"/>
+                <DataGridTextColumn Header="Natureza" Binding="{Binding Natureza}" Width="80"/>
+                <DataGridTextColumn Header="Conta" Binding="{Binding ContaNome}" Width="150"/>
+                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="70"/>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

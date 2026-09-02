@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Categorias.Views.CategoriaListaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Categorias.ViewModels"
+             mc:Ignorable="d"  
+             d:DataContext="{d:DesignInstance vm:CategoriaListaViewModel}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Cabeçalho -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource SubTitleTextBlockStyle}"/>
+            <StackPanel Grid.Column="1" Style="{StaticResource ActionStackPanelStyle}">
+                <Button Content="Criar" Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar" Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir" Command="{Binding ExcluirCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Lista -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Categorias}"
+                  SelectedItem="{Binding Selecionado}">
+
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />
+            </DataGrid.InputBindings>
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="*"/>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

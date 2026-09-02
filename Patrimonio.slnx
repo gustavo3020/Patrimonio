@@ -1,0 +1,25 @@
+<Solution>
+  <Folder Name="/Api/" />
+  <Folder Name="/Api/Core/">
+    <Project Path="src/Api/Core/Patrimonio.Api/Patrimonio.Api.csproj" Id="972845bc-b9ab-407c-b3b1-f9a61535c739" />
+  </Folder>
+  <Folder Name="/Api/Financas/">
+    <Project Path="src/Api/Financas/Patrimonio.Financas.Api/Patrimonio.Financas.Api.csproj" Id="fcc06de9-80dc-4e43-a763-8a84bf0504e6" />
+    <Project Path="src/Api/Financas/Patrimonio.Financas.Application/Patrimonio.Financas.Application.csproj" Id="e3dac0ea-ad4c-4eb9-a3f2-40abb88b3591" />
+    <Project Path="src/Api/Financas/Patrimonio.Financas.Contracts/Patrimonio.Financas.Contracts.csproj" Id="8bf33351-f029-42b9-bac5-d1e13f4215c7" />
+    <Project Path="src/Api/Financas/Patrimonio.Financas.Domain/Patrimonio.Financas.Domain.csproj" Id="cec0177e-1b85-495c-9182-2edecbb2d1b7" />
+    <Project Path="src/Api/Financas/Patrimonio.Financas.Infrastructure/Patrimonio.Financas.Infrastructure.csproj" Id="73cfa859-3e71-4771-affc-6f0bc6c4cdc0" />
+    <Project Path="src/Api/Financas/Patrimonio.Financas.SharedKernel/Patrimonio.Financas.SharedKernel.csproj" Id="17ead1af-afd5-42d0-b01c-791f2725eb5e" />
+  </Folder>
+  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/Financas/">
+    <Project Path="tests/Financas/Patrimonio.Financas.Tests/Patrimonio.Financas.Tests.csproj" Id="65e587b0-0e9e-48c5-a711-1c57c65fe6ef" />
+  </Folder>
+  <Folder Name="/Wpf/" />
+  <Folder Name="/Wpf/Core/">
+    <Project Path="src/Wpf/Core/Patrimonio.Wpf/Patrimonio.Wpf.csproj" Id="db2ff78e-4d06-4507-92b7-33e9f788a8d4" />
+  </Folder>
+  <Folder Name="/Wpf/Financas/">
+    <Project Path="src/Wpf/Financas/Patrimonio.Financas.Wpf/Patrimonio.Financas.Wpf.csproj" Id="00025cc8-c38d-4746-bc4c-e5b0571f3aab" />
+  </Folder>
+</Solution>

@@ -1,0 +1,97 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Patrimonio.Financas.Contracts.Common.Dtos;
+using Patrimonio.Financas.Contracts.Contas.Dtos;
+using Patrimonio.Financas.Contracts.Contas.Services;
+using Patrimonio.Financas.Wpf.Common.Exceptions;
+using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Contas.Navigation;
+
+namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
+
+/// <summary>
+/// ViewModel responsável pela criação de contas.
+/// </summary>
+internal sealed partial class ContaCriacaoViewModel(
+    IContaCommandService commandService,
+    IContaOpcoesCriacaoService contaOpcoesCriacaoService,
+    ContaNavigation navigation,
+    ExceptionHandler exceptionHandler) : BaseViewModel
+{
+    public override string Titulo => "Nova conta";
+
+    [ObservableProperty] private string nome = string.Empty;
+    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> instituicoes = [];
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
+    private int? instituicaoId;
+
+    /// <summary>
+    /// Carrega as instituições disponíveis para seleção no formulário.
+    /// </summary>
+    /// <param name="cancellationToken">
+    /// Token utilizado para cancelar a operação.
+    /// </param>
+    [RelayCommand]
+    public async Task InicializarAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            Carregando = true;
+
+            var opcoes = await contaOpcoesCriacaoService.ObterOpcoesCriacaoAsync(cancellationToken);
+
+            Instituicoes = opcoes.Instituicoes;
+        }
+        catch (Exception ex)
+        {
+            exceptionHandler.Handle(ex);
+        }
+        finally
+        {
+            Carregando = false;
+        }
+    }
+
+    private bool PodeSalvar() => InstituicaoId is not null;
+
+    /// <summary>
+    /// Cria uma nova conta utilizando os dados informados no formulário.
+    /// </summary>
+    /// <param name="cancellationToken">
+    /// Token utilizado para cancelar a operação.
+    /// </param>
+    [RelayCommand(CanExecute = nameof(PodeSalvar))]
+    private async Task SalvarAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            Carregando = true;
+
+            await commandService.CriarAsync(
+                new ContaCriacaoDto
+                {
+                    Nome = Nome,
+                    InstituicaoId = InstituicaoId!.Value
+                },
+                cancellationToken);
+
+            await navigation.AbrirListaAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            exceptionHandler.Handle(ex);
+        }
+        finally
+        {
+            Carregando = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CancelarAsync(CancellationToken cancellationToken)
+    {
+        await navigation.AbrirListaAsync(cancellationToken);
+    }
+}
