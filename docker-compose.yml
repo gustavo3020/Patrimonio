@@ -1,0 +1,91 @@
+services:
+
+  # ============================================================
+  # PostgreSQL
+  # ============================================================
+
+  postgres:
+    image: postgres:17
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    restart: unless-stopped
+
+  # ============================================================
+  # Migrator
+  # ============================================================
+
+  migrator:
+    image: patrimonio-financas-migrator
+
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+
+    environment:
+      ConnectionStrings__DatabaseConnectionString: >-
+        Host=postgres;
+        Port=5432;
+        Database=${POSTGRES_DB};
+        Username=${POSTGRES_USER};
+        Password=${POSTGRES_PASSWORD}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: "no"
+
+  # ============================================================
+  # API
+  # ============================================================
+
+  api:
+    image: patrimonio-api
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      ConnectionStrings__DatabaseConnectionString: >-
+        Host=postgres;
+        Port=5432;
+        Database=${POSTGRES_DB};
+        Username=${POSTGRES_USER};
+        Password=${POSTGRES_PASSWORD}
+
+    ports:
+      - "127.0.0.1:${API_PORT}:8080"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+
+    restart: unless-stopped
+
+
+# ==============================================================
+# Volumes
+# ==============================================================
+
+volumes:
+  postgres-data:
