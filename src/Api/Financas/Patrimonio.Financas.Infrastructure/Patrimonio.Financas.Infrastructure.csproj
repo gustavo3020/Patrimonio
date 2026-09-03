@@ -21,6 +21,7 @@
   <ItemGroup>
 	<InternalsVisibleTo Include="Patrimonio.Financas.Tests" />
 	<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	<InternalsVisibleTo Include="Patrimonio.Financas.Migrator" />
   </ItemGroup>
 	
 </Project>
