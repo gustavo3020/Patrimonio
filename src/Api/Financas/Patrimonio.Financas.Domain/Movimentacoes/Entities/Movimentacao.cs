@@ -1,6 +1,6 @@
 ﻿using Patrimonio.Financas.Domain.Common.Entities;
+using Patrimonio.Financas.Domain.Common.ValueObjects;
 using Patrimonio.Financas.Domain.Exceptions;
-using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Domain.Movimentacoes.Entities;
@@ -10,17 +10,6 @@ namespace Patrimonio.Financas.Domain.Movimentacoes.Entities;
 /// </summary>
 public sealed class Movimentacao : EntidadeBase
 {
-    // Dados próprios.
-    public DateOnly Data { get; private set; }
-    public Dinheiro Valor { get; private set; }
-    public Natureza Natureza { get; private set; }
-    public TipoMovimentacao Tipo { get; private set; }
-    public string? Descricao { get; private set; }
-
-    // Relacionamentos.
-    public int ContaId { get; private set; }
-    public int CategoriaId { get; private set; }
-
     private Movimentacao(
         DateOnly data,
         Dinheiro valor,
@@ -42,6 +31,17 @@ public sealed class Movimentacao : EntidadeBase
     private Movimentacao()
     {
     }
+
+    // Dados próprios.
+    public DateOnly Data { get; private set; }
+    public Dinheiro Valor { get; private set; }
+    public Natureza Natureza { get; private set; }
+    public TipoMovimentacao Tipo { get; private set; }
+    public string? Descricao { get; private set; }
+
+    // Relacionamentos.
+    public int ContaId { get; private set; }
+    public int CategoriaId { get; private set; }
 
     /// <summary>
     /// Cria uma nova movimentação financeira.

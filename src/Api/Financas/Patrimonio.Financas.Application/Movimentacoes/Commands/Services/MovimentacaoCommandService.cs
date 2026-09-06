@@ -4,9 +4,9 @@ using Patrimonio.Financas.Application.Movimentacoes.Mappers;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
+using Patrimonio.Financas.Domain.Common.ValueObjects;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
-using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
 
 namespace Patrimonio.Financas.Application.Movimentacoes.Commands.Services;
 

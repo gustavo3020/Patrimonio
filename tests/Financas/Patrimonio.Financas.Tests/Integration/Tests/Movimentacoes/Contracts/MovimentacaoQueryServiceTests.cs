@@ -54,8 +54,8 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
 
         var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var act = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
 
-        await act.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 }

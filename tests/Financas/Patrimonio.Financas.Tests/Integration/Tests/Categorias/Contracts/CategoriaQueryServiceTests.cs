@@ -52,8 +52,8 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
 
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var act = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
 
-        await act.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 }

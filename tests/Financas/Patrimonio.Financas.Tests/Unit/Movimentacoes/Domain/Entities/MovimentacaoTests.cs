@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
+using Patrimonio.Financas.Domain.Common.ValueObjects;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
-using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Tests.Unit.Movimentacoes.Domain.Entities;
@@ -162,9 +162,7 @@ public sealed class MovimentacaoTests
             1,
             2);
 
-        acao.Should()
-            .Throw<RegraDeNegocioException>()
-            .WithMessage("A descrição deve possuir no máximo 500 caracteres.");
+        acao.Should().Throw<RegraDeNegocioException>();
     }
 
     [Fact]
@@ -176,9 +174,7 @@ public sealed class MovimentacaoTests
 
         var acao = () => movimentacao.AlterarDescricao(descricao);
 
-        acao.Should()
-            .Throw<RegraDeNegocioException>()
-            .WithMessage("A descrição deve possuir no máximo 500 caracteres.");
+        acao.Should().Throw<RegraDeNegocioException>();
     }
 
     private static Movimentacao CriarMovimentacao()

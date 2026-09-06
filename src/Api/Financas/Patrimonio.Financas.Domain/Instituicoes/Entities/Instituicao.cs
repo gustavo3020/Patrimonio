@@ -8,17 +8,17 @@ namespace Patrimonio.Financas.Domain.Instituicoes.Entities;
 /// </summary>
 public sealed class Instituicao : EntidadeBase
 {
-    // Dados próprios.
-    public Nome Nome { get; private set; }
+    private Instituicao(Nome nome)
+    {
+        Nome = nome;
+    }
 
     private Instituicao()
     {
     }
 
-    private Instituicao(Nome nome)
-    {
-        Nome = nome;
-    }
+    // Dados próprios.
+    public Nome Nome { get; private set; }
 
     /// <summary>
     /// Cria uma nova instituição.
