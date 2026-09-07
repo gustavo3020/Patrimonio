@@ -124,6 +124,35 @@ public sealed class FaturaTests
     }
 
     [Fact]
+    public void DeveLancarExcecaoQuandoExcluirFaturaFechada()
+    {
+        // Arrange
+        var fatura = CriarFatura();
+        fatura.Fechar();
+
+        // Act
+        var acao = () => fatura.Excluir();
+
+        // Assert
+        acao.Should().Throw<RegraDeNegocioException>();
+    }
+
+    [Fact]
+    public void DeveLancarExcecaoQuandoExcluirFaturaPaga()
+    {
+        // Arrange
+        var fatura = CriarFatura();
+        fatura.Fechar();
+        fatura.Pagar(new DateOnly(2026, 8, 14));
+
+        // Act
+        var acao = () => fatura.Excluir();
+
+        // Assert
+        acao.Should().Throw<RegraDeNegocioException>();
+    }
+
+    [Fact]
     public void DeveLancarExcecaoQuandoFecharFaturaJaFechada()
     {
         // Arrange

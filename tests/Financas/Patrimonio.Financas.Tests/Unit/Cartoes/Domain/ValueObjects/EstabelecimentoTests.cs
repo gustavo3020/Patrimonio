@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Patrimonio.Financas.Domain.Cartoes.ValueObjects;
 
-namespace Patrimonio.Financas.Tests.Unit.Cartoes.ValueObjects;
+namespace Patrimonio.Financas.Tests.Unit.Cartoes.Domain.ValueObjects;
 
 public sealed class EstabelecimentoTests
 {

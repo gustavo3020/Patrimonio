@@ -41,7 +41,7 @@ public interface IFaturaCommandService
     /// Marca uma fatura como paga, alterando seu status para "Paga" e registrando a data de pagamento.
     /// </summary>
     /// <param name="faturaId">Identificador da fatura que será marcada como paga.</param>
-    /// <param name="dataPagamento">Data em que a fatura foi paga.</param>
+    /// <param name="dto">Dados do pagamento da fatura.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
-    Task PagarAsync(int faturaId, DateOnly dataPagamento, CancellationToken cancellationToken);
+    Task PagarAsync(int faturaId, FaturaPagamentoDto dto, CancellationToken cancellationToken);
 }

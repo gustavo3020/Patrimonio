@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Application.Cartoes;
 using Patrimonio.Financas.Application.Categorias;
 using Patrimonio.Financas.Application.Contas;
 using Patrimonio.Financas.Application.Instituicoes;
@@ -18,7 +19,8 @@ public static class DependencyInjection
     /// <returns>O contêiner de serviços configurado.</returns>
     public static IServiceCollection AddFinancasApplication(this IServiceCollection services)
     {
-        services.AddCategoriasApplication()
+        services.AddCartoesApplication()
+                .AddCategoriasApplication()
                 .AddContasApplication()
                 .AddInstituicoesApplication()
                 .AddMovimentacoesApplication();

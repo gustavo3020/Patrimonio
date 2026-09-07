@@ -11,7 +11,7 @@ public sealed record LancamentoCriacaoDto
     public required DateOnly DataCompra { get; init; }
     public required string Estabelecimento { get; init; }
     public required string Responsavel { get; init; }
-    public required string TotalParcelas { get; init; }
+    public required int TotalParcelas { get; init; }
 
     // Relacionamentos.
     public required int FaturaId { get; init; }

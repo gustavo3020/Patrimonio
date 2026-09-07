@@ -113,4 +113,14 @@ public sealed class Fatura : EntidadeBase
 
         RegistrarAlteracao();
     }
+
+    /// <summary>
+    /// Valida se a fatura pode ser excluída.
+    /// </summary>
+    /// <exception cref="RegraDeNegocioException"></exception>
+    public void Excluir()
+    {
+        if (Status != StatusFatura.Aberta)
+            throw new RegraDeNegocioException("Só é possível excluir uma fatura que esteja aberta.");
+    }
 }
