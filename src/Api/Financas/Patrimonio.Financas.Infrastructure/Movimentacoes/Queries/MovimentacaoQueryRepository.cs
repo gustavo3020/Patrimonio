@@ -14,7 +14,7 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
     public async Task<IReadOnlyCollection<MovimentacaoListaReadModel>> ListarAsync(CancellationToken cancellationToken)
     {
         return await (
-            from m in context.Movimentacoes
+            from m in context.Movimentacoes.AsNoTracking()
             join conta in context.Contas
                 on m.ContaId equals conta.Id
             join categoria in context.Categorias
@@ -27,7 +27,7 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 Valor = m.Valor.Valor,
                 Natureza = m.Natureza,
                 Tipo = m.Tipo,
-                Descricao = m.Descricao,
+                Descricao = m.Descricao != null ? m.Descricao.Valor : null,
 
                 ContaNome = conta.Nome.Valor,
                 CategoriaNome = categoria.Nome.Valor,
@@ -35,8 +35,7 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 DataCriacao = m.DataCriacao,
                 DataAlteracao = m.DataAlteracao
             })
-            .AsNoTracking()
-            .OrderByDescending(c => c.DataCriacao)
+            .OrderByDescending(m => m.DataCriacao)
             .ToListAsync(cancellationToken);
     }
 
@@ -58,7 +57,7 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 Valor = m.Valor.Valor,
                 Natureza = m.Natureza,
                 Tipo = m.Tipo,
-                Descricao = m.Descricao,
+                Descricao = m.Descricao != null ? m.Descricao.Valor : null,
 
                 ContaId = conta.Id,
                 ContaNome = conta.Nome.Valor,

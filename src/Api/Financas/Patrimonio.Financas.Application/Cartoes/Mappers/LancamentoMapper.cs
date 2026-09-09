@@ -20,7 +20,6 @@ internal static class LancamentoMapper
             Responsavel = lancamento.Responsavel,
             NumeroParcela = lancamento.NumeroParcela,
             TotalParcelas = lancamento.TotalParcelas,
-            FaturaNome = lancamento.FaturaNome,
             CategoriaNome = lancamento.CategoriaNome,
             DataCriacao = lancamento.DataCriacao,
             DataAlteracao = lancamento.DataAlteracao
@@ -40,7 +39,6 @@ internal static class LancamentoMapper
             NumeroParcela = lancamento.NumeroParcela,
             TotalParcelas = lancamento.TotalParcelas,
             FaturaId = lancamento.FaturaId,
-            FaturaNome = lancamento.FaturaNome,
             CategoriaId = lancamento.CategoriaId,
             CategoriaNome = lancamento.CategoriaNome,
             DataCriacao = lancamento.DataCriacao,

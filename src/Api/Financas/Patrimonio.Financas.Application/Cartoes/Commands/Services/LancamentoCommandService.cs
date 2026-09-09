@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Patrimonio.Financas.Application.Cartoes.Commands.Abstractions;
+using Patrimonio.Financas.Application.Cartoes.Lookups.Abstractions;
 using Patrimonio.Financas.Application.Cartoes.Mappers;
 using Patrimonio.Financas.Application.Cartoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
 using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Cartoes.Entities;
+using Patrimonio.Financas.Domain.Cartoes.Services;
 using Patrimonio.Financas.Domain.Cartoes.ValueObjects;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
 using Patrimonio.Financas.Domain.Exceptions;
@@ -18,6 +20,7 @@ namespace Patrimonio.Financas.Application.Cartoes.Commands.Services;
 internal sealed class LancamentoCommandService(
     ILancamentoCommandRepository commandRepository,
     ILancamentoQueryRepository queryRepository,
+    IFaturaLookupRepository faturaLookupRepository,
     IFaturaQueryRepository faturaQueryRepository,
     ILogger<LancamentoCommandService> logger) : ILancamentoCommandService
 {
@@ -29,18 +32,34 @@ internal sealed class LancamentoCommandService(
         var grupoId = Guid.NewGuid();
         Lancamento? primeiraParcela = null;
 
-        // TODO: associar cada parcela à fatura subsequente e dividir o valor total da compra pelo número de parcelas.
+        var primeiraFatura = await faturaQueryRepository.ObterPorIdAsync(dto.FaturaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Fatura com Id {dto.FaturaId} não encontrada.");
+
+        if (primeiraFatura.Status != StatusFatura.Aberta)
+            throw new RegraDeNegocioException($"Só é possível criar um lançamento associado a uma fatura que esteja aberta.");
+
+        var faturas = await faturaLookupRepository.ListarPorCartaoAsync(primeiraFatura.CartaoId, cancellationToken);
+
+        var parcelas = ParcelamentoService.CalcularParcelas(dto.Valor, dto.TotalParcelas);
 
         for (int numeroParcela = 1; numeroParcela <= dto.TotalParcelas; numeroParcela++)
         {
+            var valorParcela = parcelas[numeroParcela - 1];
+            var datafatura = primeiraFatura.DataVencimento.AddMonths(numeroParcela - 1);
+
+            var fatura = faturas
+                .FirstOrDefault(f => f.DataVencimento.Year == datafatura.Year
+                                  && f.DataVencimento.Month == datafatura.Month)
+                ?? throw new RecursoNaoEncontradoException($"Fatura não encontrada para {datafatura:MM/yyyy}.");
+
             var entidade = Lancamento.Criar(
                 new Descricao(dto.Descricao),
-                new Dinheiro(dto.Valor), // TODO: dividir valor corretamente
+                new Dinheiro(valorParcela),
                 dto.DataCompra,
                 new Estabelecimento(dto.Estabelecimento),
                 new Responsavel(dto.Responsavel),
                 new Parcelamento(grupoId, numeroParcela, dto.TotalParcelas),
-                dto.FaturaId, // TODO: fatura subsequente
+                fatura.Id,
                 dto.CategoriaId
             );
 

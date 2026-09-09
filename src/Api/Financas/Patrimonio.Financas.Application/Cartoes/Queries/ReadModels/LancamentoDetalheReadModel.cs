@@ -13,12 +13,11 @@ public sealed record LancamentoDetalheReadModel : LeituraReadModelBase
     public required DateOnly DataCompra { get; init; }
     public required string Estabelecimento { get; init; }
     public required string Responsavel { get; init; }
-    public required string NumeroParcela { get; init; }
-    public required string TotalParcelas { get; init; }
+    public required int NumeroParcela { get; init; }
+    public required int TotalParcelas { get; init; }
 
     // Relacionamentos.
     public required int FaturaId { get; init; }
-    public required string FaturaNome { get; init; }
     public required int CategoriaId { get; init; }
     public required string CategoriaNome { get; init; }
 }

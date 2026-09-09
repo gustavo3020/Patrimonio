@@ -15,9 +15,10 @@ public sealed class Movimentacao : EntidadeBase
         Dinheiro valor,
         Natureza natureza,
         TipoMovimentacao tipo,
-        string? descricao,
+        Descricao? descricao,
         int contaId,
-        int categoriaId)
+        int categoriaId,
+        int? faturaId)
     {
         Data = data;
         Valor = valor;
@@ -26,6 +27,7 @@ public sealed class Movimentacao : EntidadeBase
         Descricao = descricao;
         ContaId = contaId;
         CategoriaId = categoriaId;
+        FaturaId = faturaId;
     }
 
     private Movimentacao()
@@ -37,11 +39,12 @@ public sealed class Movimentacao : EntidadeBase
     public Dinheiro Valor { get; private set; }
     public Natureza Natureza { get; private set; }
     public TipoMovimentacao Tipo { get; private set; }
-    public string? Descricao { get; private set; }
+    public Descricao? Descricao { get; private set; }
 
     // Relacionamentos.
     public int ContaId { get; private set; }
     public int CategoriaId { get; private set; }
+    public int? FaturaId { get; private set; }
 
     /// <summary>
     /// Cria uma nova movimentação financeira.
@@ -53,114 +56,47 @@ public sealed class Movimentacao : EntidadeBase
     /// <param name="descricao">Descrição opcional da movimentação.</param>
     /// <param name="contaId">Identificador da conta relacionada.</param>
     /// <param name="categoriaId">Identificador da categoria relacionada.</param>
+    /// <param name="faturaId">Identificador da fatura relacionada, quando aplicável.</param>
     /// <returns>Nova movimentação criada.</returns>
     public static Movimentacao Criar(
         DateOnly data,
         Dinheiro valor,
         Natureza natureza,
         TipoMovimentacao tipo,
-        string? descricao,
+        Descricao? descricao,
         int contaId,
-        int categoriaId)
+        int categoriaId,
+        int? faturaId = null)
     {
         return new Movimentacao(
             data,
             valor,
             natureza,
             tipo,
-            NormalizarDescricao(descricao),
+            descricao,
             contaId,
-            categoriaId);
+            categoriaId,
+            faturaId);
     }
 
-    /// <summary>
-    /// Altera a data da movimentação.
-    /// </summary>
-    /// <param name="data">Nova data da movimentação.</param>
-    public void AlterarData(DateOnly data)
+    public void Alterar(
+        DateOnly data,
+        Dinheiro valor,
+        Natureza natureza,
+        TipoMovimentacao tipo,
+        Descricao? descricao,
+        int contaId,
+        int categoriaId)
     {
+        if (FaturaId.HasValue)
+            throw new RegraDeNegocioException("Não é possível alterar uma movimentação associada a uma fatura.");
+
         Data = data;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera o valor da movimentação.
-    /// </summary>
-    /// <param name="valor">Novo valor da movimentação.</param>
-    public void AlterarValor(Dinheiro valor)
-    {
         Valor = valor;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera a natureza da movimentação.
-    /// </summary>
-    /// <param name="natureza">Nova natureza da movimentação.</param>
-    public void AlterarNatureza(Natureza natureza)
-    {
         Natureza = natureza;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera o tipo da movimentação.
-    /// </summary>
-    /// <param name="tipo">Novo tipo da movimentação.</param>
-    public void AlterarTipo(TipoMovimentacao tipo)
-    {
         Tipo = tipo;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera a descrição da movimentação.
-    /// </summary>
-    /// <param name="descricao">Nova descrição opcional da movimentação.</param>
-    public void AlterarDescricao(string? descricao)
-    {
-        Descricao = NormalizarDescricao(descricao);
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera a conta relacionada à movimentação.
-    /// </summary>
-    /// <param name="contaId">Identificador da nova conta.</param>
-    public void AlterarConta(int contaId)
-    {
+        Descricao = descricao;
         ContaId = contaId;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Altera a categoria relacionada à movimentação.
-    /// </summary>
-    /// <param name="categoriaId">Identificador da nova categoria.</param>
-    public void AlterarCategoria(int categoriaId)
-    {
         CategoriaId = categoriaId;
-        RegistrarAlteracao();
-    }
-
-    /// <summary>
-    /// Normaliza e valida uma descrição de movimentação.
-    /// </summary>
-    /// <param name="descricao">Descrição a ser normalizada.</param>
-    /// <returns>A descrição normalizada ou <see langword="null"/> quando não informada.</returns>
-    /// <exception cref="RegraDeNegocioException">
-    /// Lançada quando a descrição ultrapassa o tamanho máximo permitido.
-    /// </exception>
-    private static string? NormalizarDescricao(string? descricao)
-    {
-        if (string.IsNullOrWhiteSpace(descricao))
-            return null;
-
-        descricao = descricao.Trim();
-
-        if (descricao.Length > 500)
-            throw new RegraDeNegocioException("A descrição deve possuir no máximo 500 caracteres.");
-
-        return descricao;
     }
 }

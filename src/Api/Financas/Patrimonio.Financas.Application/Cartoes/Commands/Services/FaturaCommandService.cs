@@ -98,9 +98,10 @@ internal sealed class FaturaCommandService(
             new Dinheiro(valor),
             Natureza.Saida,
             TipoMovimentacao.Debito,
-            "Pagamento fatura cartão",
+            new Descricao("Pagamento fatura cartão"),
             dto.ContaId,
-            dto.CategoriaId);
+            dto.CategoriaId,
+            faturaId: faturaId);
 
         movimentacaoCommandRepository.Adicionar(movimentacao);
 
