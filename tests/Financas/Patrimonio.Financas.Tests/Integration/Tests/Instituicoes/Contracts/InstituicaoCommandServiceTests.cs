@@ -40,7 +40,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
 
-        var criado = await service.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
         criado.Should().NotBeNull();
         criado.Nome.Should().NotBeNullOrWhiteSpace();
@@ -54,9 +54,9 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var dto = CriarDto();
 
-        await service.CriarAsync(dto, CancellationToken.None);
+        await service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -73,11 +73,11 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
-        var instituicao = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var instituicao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.AlterarAsync(instituicao.Id, dtoAlterar, CancellationToken.None);
+        await command.AlterarAsync(instituicao.Id, dtoAlterar, TestContext.Current.CancellationToken);
 
-        var alterado = await query.ObterPorIdAsync(instituicao.Id, CancellationToken.None);
+        var alterado = await query.ObterPorIdAsync(instituicao.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
         alterado.Nome.Should().Be(dtoAlterar.Nome);
@@ -93,12 +93,12 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
             Nome = Factory.BaseData.Instituicao.Nome
         };
 
-        var instituicao = await service.CriarAsync(CriarDto(), CancellationToken.None);
+        var instituicao = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
         var action = () => service.AlterarAsync(
             instituicao.Id,
             dto,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -112,7 +112,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         var action = () => service.AlterarAsync(
             int.MaxValue,
             AlterarDto(),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -128,11 +128,11 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
@@ -142,7 +142,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Instituicao.Id, CancellationToken.None);
+        var action = () => service.ExcluirAsync(Factory.BaseData.Instituicao.Id, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -155,7 +155,7 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
 
         var action = () => service.ExcluirAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

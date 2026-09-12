@@ -18,13 +18,13 @@ internal sealed class InstituicaoSeeder(
 
         try
         {
-            instituicao = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            instituicao = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var instituicaoDto = Criar();
 
-            instituicao = await commandService.CriarAsync(instituicaoDto, CancellationToken.None);
+            instituicao = await commandService.CriarAsync(instituicaoDto, TestContext.Current.CancellationToken);
         }
 
         data.Instituicao = instituicao;

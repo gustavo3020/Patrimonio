@@ -18,13 +18,13 @@ internal sealed class CategoriaSeeder(
 
         try
         {
-            categoria = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            categoria = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var categoriaDto = Criar();
 
-            categoria = await commandService.CriarAsync(categoriaDto, CancellationToken.None);
+            categoria = await commandService.CriarAsync(categoriaDto, TestContext.Current.CancellationToken);
         }
 
         data.Categoria = categoria;

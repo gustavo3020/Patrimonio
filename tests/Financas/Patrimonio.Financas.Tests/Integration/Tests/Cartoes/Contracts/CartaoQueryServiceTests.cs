@@ -19,7 +19,7 @@ public sealed class CartaoQueryServiceTests(IntegrationTestFactory factory) : In
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var cartoes = await service.ListarAsync(CancellationToken.None);
+        var cartoes = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         cartoes.Should().NotBeNull();
         cartoes.Should().Contain(c => c.Id == Factory.BaseData.Cartao.Id);
@@ -38,7 +38,7 @@ public sealed class CartaoQueryServiceTests(IntegrationTestFactory factory) : In
 
         var cartaoEsperada = Factory.BaseData.Cartao;
 
-        var cartao = await service.ObterPorIdAsync(cartaoEsperada.Id, CancellationToken.None);
+        var cartao = await service.ObterPorIdAsync(cartaoEsperada.Id, TestContext.Current.CancellationToken);
 
         cartao.Should().NotBeNull();
         cartao.Id.Should().Be(cartaoEsperada.Id);
@@ -52,7 +52,7 @@ public sealed class CartaoQueryServiceTests(IntegrationTestFactory factory) : In
 
         var service = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

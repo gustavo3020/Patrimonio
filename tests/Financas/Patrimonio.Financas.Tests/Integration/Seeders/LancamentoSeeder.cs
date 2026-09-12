@@ -18,13 +18,13 @@ internal sealed class LancamentoSeeder(
 
         try
         {
-            lancamento = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            lancamento = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var lancamentoDto = Criar(data.Fatura.Id, data.Categoria.Id);
 
-            lancamento = await commandService.CriarAsync(lancamentoDto, CancellationToken.None);
+            lancamento = await commandService.CriarAsync(lancamentoDto, TestContext.Current.CancellationToken);
         }
 
         data.Lancamento = lancamento;

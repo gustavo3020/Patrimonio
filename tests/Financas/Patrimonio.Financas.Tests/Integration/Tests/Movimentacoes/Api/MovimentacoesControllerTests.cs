@@ -52,13 +52,13 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task Listar_DeveRetornarOkComMovimentacoes()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             RotaBase,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var movimentacoes = await response.Content
+        var movimentacoes = await resposta.Content
             .ReadFromJsonAsync<IReadOnlyCollection<MovimentacaoListaDto>>(TestContext.Current.CancellationToken);
 
         movimentacoes.Should().NotBeNull();
@@ -74,13 +74,13 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     {
         var movimentacaoEsperada = Factory.BaseData.Movimentacao;
 
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{movimentacaoEsperada.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var movimentacao = await response.Content
+        var movimentacao = await resposta.Content
             .ReadFromJsonAsync<MovimentacaoDetalheDto>(TestContext.Current.CancellationToken);
 
         movimentacao.Should().NotBeNull();
@@ -91,11 +91,11 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task ObterPorId_DeveRetornarNotFoundParaMovimentacaoInexistente()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     // ============================================================================
@@ -107,14 +107,14 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     {
         var dto = CriarDto();
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var movimentacao = await response.Content
+        var movimentacao = await resposta.Content
             .ReadFromJsonAsync<MovimentacaoDetalheDto>(
                 TestContext.Current.CancellationToken);
 
@@ -122,7 +122,7 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
         movimentacao.Id.Should().BeGreaterThan(0);
         movimentacao.Descricao.Should().Be(dto.Descricao);
 
-        response.Headers.Location.Should().NotBeNull();
+        resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
@@ -139,12 +139,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -161,12 +161,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -193,12 +193,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
 
         var alterarDto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{movimentacao.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -215,12 +215,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Movimentacao.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -228,12 +228,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     {
         var dto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -250,12 +250,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Movimentacao.Id}",
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -280,20 +280,20 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
 
         movimentacao.Should().NotBeNull();
 
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{movimentacao.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
     public async Task Excluir_DeveRetornarNotFoundParaMovimentacaoInexistente()
     {
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

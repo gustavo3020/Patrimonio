@@ -53,11 +53,31 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
 
-        var criado = await service.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
         criado.Should().NotBeNull();
         criado.Descricao.Should().NotBeNullOrWhiteSpace();
         criado.Id.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveAceitarDescricaoNula()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = new MovimentacaoCriacaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = string.Empty,
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+
+        var criado = await service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        criado.Descricao.Should().BeNullOrEmpty();
     }
 
     [Fact]
@@ -76,7 +96,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
             ContaId = Factory.BaseData.Conta.Id
         };
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -97,7 +117,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
             ContaId = int.MaxValue
         };
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -114,11 +134,11 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var movimentacao = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var movimentacao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.AlterarAsync(movimentacao.Id, dtoAlterar, CancellationToken.None);
+        await command.AlterarAsync(movimentacao.Id, dtoAlterar, TestContext.Current.CancellationToken);
 
-        var alterado = await query.ObterPorIdAsync(movimentacao.Id, CancellationToken.None);
+        var alterado = await query.ObterPorIdAsync(movimentacao.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
         alterado.Data.Should().Be(dtoAlterar.Data);
@@ -131,6 +151,31 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
     }
 
     [Fact]
+    public async Task AlterarAsync_DeveAceitarDescricaoNula()
+    {
+        using var scope = CreateScope();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
+        var dto = new MovimentacaoAlteracaoDto
+        {
+            Data = DateOnly.FromDateTime(DateTime.Now),
+            Valor = 500.00m,
+            Natureza = Natureza.Saida,
+            Tipo = TipoMovimentacao.Pix,
+            Descricao = string.Empty,
+            CategoriaId = Factory.BaseData.Categoria.Id,
+            ContaId = Factory.BaseData.Conta.Id
+        };
+
+        var movimentacao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+
+        await command.AlterarAsync(movimentacao.Id, dto, TestContext.Current.CancellationToken);
+
+        var alterado = await query.ObterPorIdAsync(movimentacao.Id, TestContext.Current.CancellationToken);
+        alterado.Descricao.Should().BeNullOrEmpty();
+    }
+
+    [Fact]
     public async Task AlterarAsync_DeveLancarExcecaoAoAlterarMovimentacaoInexistente()
     {
         using var scope = CreateScope();
@@ -139,7 +184,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         var action = () => service.AlterarAsync(
             int.MaxValue,
             AlterarDto(),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -163,7 +208,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         var action = () => service.AlterarAsync(
             Factory.BaseData.Movimentacao.Id,
             dto,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -187,7 +232,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         var action = () => service.AlterarAsync(
             Factory.BaseData.Movimentacao.Id,
             dto,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -203,11 +248,11 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
@@ -219,7 +264,7 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
 
         var action = () => service.ExcluirAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

@@ -19,13 +19,13 @@ internal sealed class MovimentacaoSeeder(
 
         try
         {
-            movimentacao = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            movimentacao = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var movimentacaoDto = Criar(data.Categoria.Id, data.Conta.Id);
 
-            movimentacao = await commandService.CriarAsync(movimentacaoDto, CancellationToken.None);
+            movimentacao = await commandService.CriarAsync(movimentacaoDto, TestContext.Current.CancellationToken);
         }
 
         data.Movimentacao = movimentacao;

@@ -18,13 +18,13 @@ internal sealed class FaturaSeeder(
 
         try
         {
-            fatura = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            fatura = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var faturaDto = Criar(data.Cartao.Id);
 
-            fatura = await commandService.CriarAsync(faturaDto, CancellationToken.None);
+            fatura = await commandService.CriarAsync(faturaDto, TestContext.Current.CancellationToken);
         }
 
         data.Fatura = fatura;
@@ -34,8 +34,8 @@ internal sealed class FaturaSeeder(
     {
         return new FaturaCriacaoDto
         {
-            DataFechamento = new DateOnly(2026, 09, 11),
-            DataVencimento = new DateOnly(2026, 09, 15),
+            DataFechamento = new DateOnly(2026, 08, 11),
+            DataVencimento = new DateOnly(2026, 08, 15),
             CartaoId = cartaoId
         };
     }

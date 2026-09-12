@@ -19,7 +19,7 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var categorias = await service.ListarAsync(CancellationToken.None);
+        var categorias = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         categorias.Should().NotBeNull();
         categorias.Should().Contain(c => c.Id == Factory.BaseData.Categoria.Id);
@@ -38,7 +38,7 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
 
         var categoriaEsperada = Factory.BaseData.Categoria;
 
-        var categoria = await service.ObterPorIdAsync(categoriaEsperada.Id, CancellationToken.None);
+        var categoria = await service.ObterPorIdAsync(categoriaEsperada.Id, TestContext.Current.CancellationToken);
 
         categoria.Should().NotBeNull();
         categoria.Id.Should().Be(categoriaEsperada.Id);
@@ -52,7 +52,7 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
 
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

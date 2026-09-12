@@ -41,13 +41,13 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task Listar_DeveRetornarOkComContas()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             RotaBase,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var contas = await response.Content
+        var contas = await resposta.Content
             .ReadFromJsonAsync<IReadOnlyCollection<ContaListaDto>>(TestContext.Current.CancellationToken);
 
         contas.Should().NotBeNull();
@@ -63,13 +63,13 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     {
         var contaEsperada = Factory.BaseData.Conta;
 
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{contaEsperada.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var conta = await response.Content
+        var conta = await resposta.Content
             .ReadFromJsonAsync<ContaDetalheDto>(TestContext.Current.CancellationToken);
 
         conta.Should().NotBeNull();
@@ -80,11 +80,11 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task ObterPorId_DeveRetornarNotFoundParaContaInexistente()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     // ============================================================================
@@ -96,14 +96,14 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     {
         var dto = CriarDto();
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var conta = await response.Content
+        var conta = await resposta.Content
             .ReadFromJsonAsync<ContaDetalheDto>(
                 TestContext.Current.CancellationToken);
 
@@ -111,7 +111,7 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
         conta.Id.Should().BeGreaterThan(0);
         conta.Nome.Should().Be(dto.Nome);
 
-        response.Headers.Location.Should().NotBeNull();
+        resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
@@ -123,12 +123,12 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
             InstituicaoId = Factory.BaseData.Instituicao.Id
         };
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -175,12 +175,12 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
 
         var alterarDto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{conta.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -192,12 +192,12 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
             InstituicaoId = Factory.BaseData.Instituicao.Id
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Conta.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -205,12 +205,12 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     {
         var dto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -237,12 +237,12 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
             InstituicaoId = Factory.BaseData.Instituicao.Id
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{conta.Id}",
             dtoAlteracao,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -267,30 +267,30 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
 
         conta.Should().NotBeNull();
 
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{conta.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
     public async Task Excluir_DeveRetornarNotFoundParaContaInexistente()
     {
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Excluir_DeveRetornarConflictAoExcluirContaBase()
     {
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Conta.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 }

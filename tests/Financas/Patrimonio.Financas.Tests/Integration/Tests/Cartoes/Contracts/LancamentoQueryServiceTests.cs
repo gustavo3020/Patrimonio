@@ -19,7 +19,7 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var lancamentos = await service.ListarAsync(CancellationToken.None);
+        var lancamentos = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         lancamentos.Should().NotBeNull();
         lancamentos.Should().Contain(c => c.Id == Factory.BaseData.Lancamento.Id);
@@ -38,7 +38,7 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
 
         var lancamentoEsperada = Factory.BaseData.Lancamento;
 
-        var lancamento = await service.ObterPorIdAsync(lancamentoEsperada.Id, CancellationToken.None);
+        var lancamento = await service.ObterPorIdAsync(lancamentoEsperada.Id, TestContext.Current.CancellationToken);
 
         lancamento.Should().NotBeNull();
         lancamento.Id.Should().Be(lancamentoEsperada.Id);
@@ -52,7 +52,7 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
 
         var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

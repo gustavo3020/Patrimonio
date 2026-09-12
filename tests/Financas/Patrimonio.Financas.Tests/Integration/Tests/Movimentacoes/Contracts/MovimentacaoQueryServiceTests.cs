@@ -19,7 +19,7 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var movimentacoes = await service.ListarAsync(CancellationToken.None);
+        var movimentacoes = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         movimentacoes.Should().NotBeNull();
         movimentacoes.Should().Contain(m => m.Id == Factory.BaseData.Movimentacao.Id);
@@ -38,7 +38,7 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
 
         var movimentacaoEsperada = Factory.BaseData.Movimentacao;
 
-        var movimentacao = await service.ObterPorIdAsync(movimentacaoEsperada.Id, CancellationToken.None);
+        var movimentacao = await service.ObterPorIdAsync(movimentacaoEsperada.Id, TestContext.Current.CancellationToken);
 
         movimentacao.Should().NotBeNull();
         movimentacao.Id.Should().Be(movimentacaoEsperada.Id);
@@ -54,7 +54,7 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
 
         var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

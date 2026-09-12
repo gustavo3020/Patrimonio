@@ -5,6 +5,7 @@ using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.SharedKernel.Cartoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Cartoes.Contracts;
@@ -12,35 +13,6 @@ namespace Patrimonio.Financas.Tests.Integration.Tests.Cartoes.Contracts;
 public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     : IntegrationTestBase(factory)
 {
-    // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private CartaoCriacaoDto CriarDto()
-    {
-        return new CartaoCriacaoDto
-        {
-            Nome = $"Cartão {Guid.NewGuid()}",
-            Bandeira = BandeiraCartao.Mastercard,
-            Limite = 3000,
-            DiaFechamento = 25,
-            DiaVencimento = 30,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
-    }
-
-    private static CartaoAlteracaoDto AlterarDto()
-    {
-        return new CartaoAlteracaoDto
-        {
-            Nome = $"Cartão alterado {Guid.NewGuid()}",
-            Bandeira = BandeiraCartao.Visa,
-            Limite = 1000,
-            DiaFechamento = 10,
-            DiaVencimento = 20
-        };
-    }
-
     // ============================================================================
     // CriarAsync
     // ============================================================================
@@ -50,19 +22,19 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var dto = CriarDto();
+        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
 
-        var criado = await service.CriarAsync(dto, CancellationToken.None);
+        var criado = await service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
         criado.Should().NotBeNull();
         criado.Nome.Should().NotBeNullOrWhiteSpace();
         criado.Id.Should().BeGreaterThan(0);
-        criado.Nome.Should().Be(dto.Nome);
-        criado.Bandeira.Should().Be(dto.Bandeira);
-        criado.Limite.Should().Be(dto.Limite);
-        criado.DiaFechamento.Should().Be(dto.DiaFechamento);
-        criado.DiaVencimento.Should().Be(dto.DiaVencimento);
-        criado.InstituicaoId.Should().Be(dto.InstituicaoId);
+        criado.Nome.Should().Be(criarDto.Nome);
+        criado.Bandeira.Should().Be(criarDto.Bandeira);
+        criado.Limite.Should().Be(criarDto.Limite);
+        criado.DiaFechamento.Should().Be(criarDto.DiaFechamento);
+        criado.DiaVencimento.Should().Be(criarDto.DiaVencimento);
+        criado.InstituicaoId.Should().Be(criarDto.InstituicaoId);
     }
 
     [Fact]
@@ -70,11 +42,11 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var dto = CriarDto();
+        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
 
-        await service.CriarAsync(dto, CancellationToken.None);
+        await service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -87,22 +59,23 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     public async Task AlterarAsync_DeveAlterarCartao()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AlterarDto();
+        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
+        var alterarDto = CartaoDtoBuilder.Alterar();
         var command = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var categoria = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var categoria = await command.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
-        await command.AlterarAsync(categoria.Id, dtoAlterar, CancellationToken.None);
+        await command.AlterarAsync(categoria.Id, alterarDto, TestContext.Current.CancellationToken);
 
-        var alterado = await query.ObterPorIdAsync(categoria.Id, CancellationToken.None);
+        var alterado = await query.ObterPorIdAsync(categoria.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
-        alterado.Nome.Should().Be(dtoAlterar.Nome);
-        alterado.Bandeira.Should().Be(dtoAlterar.Bandeira);
-        alterado.Limite.Should().Be(dtoAlterar.Limite);
-        alterado.DiaFechamento.Should().Be(dtoAlterar.DiaFechamento);
-        alterado.DiaVencimento.Should().Be(dtoAlterar.DiaVencimento);
+        alterado.Nome.Should().Be(alterarDto.Nome);
+        alterado.Bandeira.Should().Be(alterarDto.Bandeira);
+        alterado.Limite.Should().Be(alterarDto.Limite);
+        alterado.DiaFechamento.Should().Be(alterarDto.DiaFechamento);
+        alterado.DiaVencimento.Should().Be(alterarDto.DiaVencimento);
         alterado.InstituicaoId.Should().Be(categoria.InstituicaoId);
     }
 
@@ -111,7 +84,8 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var dto = new CartaoAlteracaoDto
+        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
+        var alterarDto = new CartaoAlteracaoDto
         {
             Nome = Factory.BaseData.Cartao.Nome,
             Bandeira = BandeiraCartao.Visa,
@@ -120,12 +94,12 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
             DiaVencimento = 20
         };
 
-        var categoria = await service.CriarAsync(CriarDto(), CancellationToken.None);
+        var categoria = await service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
         var action = () => service.AlterarAsync(
             categoria.Id,
-            dto,
-            CancellationToken.None);
+            alterarDto,
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -138,8 +112,8 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AlterarDto(),
-            CancellationToken.None);
+            CartaoDtoBuilder.Alterar(),
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -152,14 +126,15 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
     public async Task ExcluirAsync_DeveExcluirCartao()
     {
         using var scope = CreateScope();
+        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
         var command = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await command.CriarAsync(criarDto, TestContext.Current.CancellationToken);
 
-        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
@@ -169,7 +144,7 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Cartao.Id, CancellationToken.None);
+        var action = () => service.ExcluirAsync(Factory.BaseData.Cartao.Id, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -182,7 +157,7 @@ public sealed class CartaoCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.ExcluirAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

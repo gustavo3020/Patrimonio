@@ -45,12 +45,11 @@ internal sealed class LancamentoCommandService(
         for (int numeroParcela = 1; numeroParcela <= dto.TotalParcelas; numeroParcela++)
         {
             var valorParcela = parcelas[numeroParcela - 1];
-            var datafatura = primeiraFatura.DataVencimento.AddMonths(numeroParcela - 1);
+            var dataVencimento = primeiraFatura.DataVencimento.AddMonths(numeroParcela - 1);
 
             var fatura = faturas
-                .FirstOrDefault(f => f.DataVencimento.Year == datafatura.Year
-                                  && f.DataVencimento.Month == datafatura.Month)
-                ?? throw new RecursoNaoEncontradoException($"Fatura não encontrada para {datafatura:MM/yyyy}.");
+                .FirstOrDefault(f => f.DataVencimento == dataVencimento)
+                ?? throw new RecursoNaoEncontradoException($"Fatura não encontrada para {dataVencimento:MM/yyyy}.");
 
             var entidade = Lancamento.Criar(
                 new Descricao(dto.Descricao),

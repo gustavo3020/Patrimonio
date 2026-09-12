@@ -19,7 +19,7 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var faturas = await service.ListarAsync(CancellationToken.None);
+        var faturas = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         faturas.Should().NotBeNull();
         faturas.Should().Contain(c => c.Id == Factory.BaseData.Fatura.Id);
@@ -38,7 +38,7 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
 
         var faturaEsperada = Factory.BaseData.Fatura;
 
-        var fatura = await service.ObterPorIdAsync(faturaEsperada.Id, CancellationToken.None);
+        var fatura = await service.ObterPorIdAsync(faturaEsperada.Id, TestContext.Current.CancellationToken);
 
         fatura.Should().NotBeNull();
         fatura.Id.Should().Be(faturaEsperada.Id);
@@ -52,7 +52,7 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
 
         var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

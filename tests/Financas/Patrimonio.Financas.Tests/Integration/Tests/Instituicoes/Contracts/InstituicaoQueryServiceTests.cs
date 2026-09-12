@@ -19,7 +19,7 @@ public sealed class InstituicaoQueryServiceTests(IntegrationTestFactory factory)
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
-        var instituicoes = await service.ListarAsync(CancellationToken.None);
+        var instituicoes = await service.ListarAsync(TestContext.Current.CancellationToken);
 
         instituicoes.Should().NotBeNull();
         instituicoes.Should().Contain(i => i.Id == Factory.BaseData.Instituicao.Id);
@@ -38,7 +38,7 @@ public sealed class InstituicaoQueryServiceTests(IntegrationTestFactory factory)
 
         var instituicaoEsperada = Factory.BaseData.Instituicao;
 
-        var instituicao = await service.ObterPorIdAsync(instituicaoEsperada.Id, CancellationToken.None);
+        var instituicao = await service.ObterPorIdAsync(instituicaoEsperada.Id, TestContext.Current.CancellationToken);
 
         instituicao.Should().NotBeNull();
         instituicao.Id.Should().Be(instituicaoEsperada.Id);
@@ -52,7 +52,7 @@ public sealed class InstituicaoQueryServiceTests(IntegrationTestFactory factory)
 
         var service = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, CancellationToken.None);
+        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

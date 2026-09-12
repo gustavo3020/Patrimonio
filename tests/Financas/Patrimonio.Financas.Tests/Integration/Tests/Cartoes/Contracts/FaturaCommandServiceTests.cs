@@ -5,6 +5,7 @@ using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.SharedKernel.Cartoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Cartoes.Contracts;
@@ -13,57 +14,6 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     : IntegrationTestBase(factory)
 {
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private FaturaCriacaoDto CriarDto()
-    {
-        var rnd = new Random();
-
-        var ano = rnd.Next(1, 9998);
-        var mes = rnd.Next(1, 13);
-        var diaFechamento = rnd.Next(1, 29);
-
-        var dataFechamento = new DateOnly(ano, mes, diaFechamento);
-        var dataVencimento = dataFechamento.AddDays(5);
-
-        return new FaturaCriacaoDto
-        {
-            DataFechamento = dataFechamento,
-            DataVencimento = dataVencimento,
-            CartaoId = Factory.BaseData.Cartao.Id
-        };
-    }
-
-    private static FaturaAlteracaoDto AlterarDto()
-    {
-        var rnd = new Random();
-
-        var ano = rnd.Next(1, 9999);
-        var mes = rnd.Next(1, 13);
-        var diaFechamento = rnd.Next(1, 29);
-
-        var dataFechamento = new DateOnly(ano, mes, diaFechamento);
-        var dataVencimento = dataFechamento.AddDays(5);
-
-        return new FaturaAlteracaoDto
-        {
-            DataFechamento = dataFechamento,
-            DataVencimento = dataVencimento
-        };
-    }
-
-    private FaturaPagamentoDto PagarDto(DateOnly dataPagamento)
-    {
-        return new FaturaPagamentoDto
-        {
-            DataPagamento = dataPagamento,
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
-    }
-
-    // ============================================================================
     // CriarAsync
     // ============================================================================
 
@@ -71,17 +21,20 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task CriarAsync_DeveCriarFaturaERetornarDto()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var dto = CriarDto();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
 
-        var criado = await service.CriarAsync(dto, CancellationToken.None);
+        var cartao = await CriarCartaoAsync(cartaoCommand);
 
-        criado.Should().NotBeNull();
-        criado.DataFechamento.Should().Be(dto.DataFechamento);
-        criado.DataVencimento.Should().Be(dto.DataVencimento);
-        criado.Status.Should().Be(StatusFatura.Aberta);
-        criado.DataPagamento.Should().Be(null);
-        criado.CartaoId.Should().Be(dto.CartaoId);
+        var criarDto = FaturaDtoBuilder.Criar(cartao.Id);
+        var fatura = await faturaCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+
+        fatura.Should().NotBeNull();
+        fatura.DataFechamento.Should().Be(criarDto.DataFechamento);
+        fatura.DataVencimento.Should().Be(criarDto.DataVencimento);
+        fatura.Status.Should().Be(StatusFatura.Aberta);
+        fatura.DataPagamento.Should().Be(null);
+        fatura.CartaoId.Should().Be(criarDto.CartaoId);
     }
 
     [Fact]
@@ -89,14 +42,14 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var dto = new FaturaCriacaoDto
+        var criarDto = new FaturaCriacaoDto
         {
             DataFechamento = new DateOnly(2023, 1, 1),
             DataVencimento = new DateOnly(2023, 1, 6),
             CartaoId = int.MaxValue
         };
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<ConflitoException>();
     }
 
@@ -108,15 +61,16 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task AlterarAsync_DeveAlterarFatura()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AlterarDto();
-        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var faturaQuery = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var fatura = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
 
-        await command.AlterarAsync(fatura.Id, dtoAlterar, CancellationToken.None);
+        var dtoAlterar = FaturaDtoBuilder.Alterar();
+        await faturaCommand.AlterarAsync(fatura.Id, dtoAlterar, TestContext.Current.CancellationToken);
 
-        var alterado = await query.ObterPorIdAsync(fatura.Id, CancellationToken.None);
+        var alterado = await faturaQuery.ObterPorIdAsync(fatura.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
         alterado.DataFechamento.Should().Be(dtoAlterar.DataFechamento);
@@ -132,8 +86,8 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.AlterarAsync(
             int.MaxValue,
-            AlterarDto(),
-            CancellationToken.None);
+            FaturaDtoBuilder.Alterar(),
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -146,14 +100,15 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task ExcluirAsync_DeveExcluirFatura()
     {
         using var scope = CreateScope();
-        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var faturaQuery = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
 
-        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+        await faturaCommand.ExcluirAsync(fatura.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var action = () => faturaQuery.ObterPorIdAsync(fatura.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
@@ -161,9 +116,9 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirFaturaBase()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Fatura.Id, CancellationToken.None);
+        var action = () => faturaCommand.ExcluirAsync(Factory.BaseData.Fatura.Id, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -172,11 +127,11 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirFaturaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
 
-        var action = () => service.ExcluirAsync(
+        var action = () => faturaCommand.ExcluirAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -185,12 +140,12 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirFaturaFechada()
     {
         using var scope = CreateScope();
-        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
-        await command.FecharAsync(criado.Id, CancellationToken.None);
+        var fatura = await CriarFaturaFechadaAsync(cartaoCommand, faturaCommand);
 
-        var action = () => command.ExcluirAsync(criado.Id, CancellationToken.None);
+        var action = () => faturaCommand.ExcluirAsync(fatura.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
@@ -202,14 +157,15 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task FecharAsync_DeveFecharFatura()
     {
         using var scope = CreateScope();
-        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
 
-        await command.FecharAsync(criado.Id, CancellationToken.None);
+        await faturaCommand.FecharAsync(criado.Id, TestContext.Current.CancellationToken);
 
-        var fatura = await query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var fatura = await query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         fatura.Should().NotBeNull();
         fatura.Status.Should().Be(StatusFatura.Fechada);
     }
@@ -222,7 +178,7 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.FecharAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -235,31 +191,22 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     public async Task PagarAsync_DevePagarFatura()
     {
         using var scope = CreateScope();
-        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
+        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
         var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-        var dto = CriarDto();
+        var faturaQuery = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var criado = await command.CriarAsync(dto, CancellationToken.None);
+        var criado = await CriarFaturaFechadaComLancamentoAsync(cartaoCommand, faturaCommand, lancamentoCommand);
 
-        var lancamentoDto = new LancamentoCriacaoDto
+        var pagarDto = new FaturaPagamentoDto
         {
-            Descricao = "Teste de Lancamento para pagar fatura",
-            Valor = 100,
-            DataCompra = criado.DataFechamento,
-            Estabelecimento = "Loja Teste",
-            Responsavel = "Usuário Teste",
-            TotalParcelas = 1,
-            FaturaId = criado.Id,
+            DataPagamento = criado.DataFechamento.AddDays(5),
+            ContaId = Factory.BaseData.Conta.Id,
             CategoriaId = Factory.BaseData.Categoria.Id
         };
+        await faturaCommand.PagarAsync(criado.Id, pagarDto, TestContext.Current.CancellationToken);
 
-        await lancamentoCommand.CriarAsync(lancamentoDto, CancellationToken.None);
-
-        await command.FecharAsync(criado.Id, CancellationToken.None);
-        await command.PagarAsync(criado.Id, PagarDto(dto.DataVencimento.AddDays(5)), CancellationToken.None);
-
-        var fatura = await query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var fatura = await faturaQuery.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         fatura.Should().NotBeNull();
         fatura.Status.Should().Be(StatusFatura.Paga);
     }
@@ -269,12 +216,75 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var pagarDto = new FaturaPagamentoDto
+        {
+            DataPagamento = new DateOnly(2023, 1, 1),
+            ContaId = Factory.BaseData.Conta.Id,
+            CategoriaId = Factory.BaseData.Categoria.Id
+        };
 
         var action = () => service.PagarAsync(
             int.MaxValue,
-            PagarDto(new DateOnly(2023, 1, 1)),
-            CancellationToken.None);
+            pagarDto,
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+
+    // ============================================================================
+    // MÉTODOS PRIVADOS
+    // ============================================================================
+
+    private async Task<CartaoDetalheDto> CriarCartaoAsync(
+        ICartaoCommandService cartaoCommand)
+    {
+        var cartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
+        return await cartaoCommand.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
+    }
+
+    private async Task<FaturaDetalheDto> CriarCartaoEFaturaAsync(
+        ICartaoCommandService cartaoCommand,
+        IFaturaCommandService faturaCommand)
+    {
+        var cartao = await CriarCartaoAsync(cartaoCommand);
+
+        var faturaDto = FaturaDtoBuilder.Criar(cartao.Id);
+        return await faturaCommand.CriarAsync(faturaDto, TestContext.Current.CancellationToken);
+    }
+
+    private async Task<FaturaDetalheDto> CriarFaturaFechadaAsync(
+        ICartaoCommandService cartaoCommand,
+        IFaturaCommandService faturaCommand)
+    {
+        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
+
+        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
+
+        return fatura;
+    }
+
+    private async Task<FaturaDetalheDto> CriarFaturaFechadaComLancamentoAsync(
+        ICartaoCommandService cartaoCommand,
+        IFaturaCommandService faturaCommand,
+        ILancamentoCommandService lancamentoCommand)
+    {
+        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
+
+        var dtoLancamento = new LancamentoCriacaoDto
+        {
+            Descricao = $"Lancamento {Guid.NewGuid()}",
+            Valor = 100.00m,
+            DataCompra = new DateOnly(2026, 9, 1),
+            Estabelecimento = "Estabelecimento Teste",
+            Responsavel = "Responsavel Teste",
+            TotalParcelas = 1,
+            FaturaId = fatura.Id,
+            CategoriaId = Factory.BaseData.Categoria.Id
+        };
+
+        await lancamentoCommand.CriarAsync(dtoLancamento, TestContext.Current.CancellationToken);
+        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
+
+        return fatura;
     }
 }

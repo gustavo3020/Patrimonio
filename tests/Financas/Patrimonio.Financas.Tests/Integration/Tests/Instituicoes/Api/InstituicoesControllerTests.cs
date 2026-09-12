@@ -39,13 +39,13 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task Listar_DeveRetornarOkComInstituicoes()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             RotaBase,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var instituicoes = await response.Content
+        var instituicoes = await resposta.Content
             .ReadFromJsonAsync<IReadOnlyCollection<InstituicaoListaDto>>(TestContext.Current.CancellationToken);
 
         instituicoes.Should().NotBeNull();
@@ -61,13 +61,13 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
     {
         var instituicaoEsperada = Factory.BaseData.Instituicao;
 
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{instituicaoEsperada.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var instituicao = await response.Content
+        var instituicao = await resposta.Content
             .ReadFromJsonAsync<InstituicaoDetalheDto>(TestContext.Current.CancellationToken);
 
         instituicao.Should().NotBeNull();
@@ -78,11 +78,11 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task ObterPorId_DeveRetornarNotFoundParaInstituicaoInexistente()
     {
-        var response = await Client.GetAsync(
+        var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     // ============================================================================
@@ -94,14 +94,14 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
     {
         var dto = CriarDto();
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var instituicao = await response.Content
+        var instituicao = await resposta.Content
             .ReadFromJsonAsync<InstituicaoDetalheDto>(
                 TestContext.Current.CancellationToken);
 
@@ -109,7 +109,7 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
         instituicao.Id.Should().BeGreaterThan(0);
         instituicao.Nome.Should().Be(dto.Nome);
 
-        response.Headers.Location.Should().NotBeNull();
+        resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
@@ -120,12 +120,12 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
             Nome = string.Empty
         };
 
-        var response = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -172,12 +172,12 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
 
         var alterarDto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{instituicao.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -188,12 +188,12 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
             Nome = string.Empty
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Instituicao.Id}",
             alterarDto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -201,12 +201,12 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
     {
         var dto = AlterarDto();
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
             dto,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -232,12 +232,12 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
             Nome = Factory.BaseData.Instituicao.Nome
         };
 
-        var response = await Client.PutAsJsonAsync(
+        var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{instituicao.Id}",
             dtoAlteracao,
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -262,30 +262,30 @@ public sealed class InstituicoesControllerTests(IntegrationTestFactory factory)
 
         instituicao.Should().NotBeNull();
 
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{instituicao.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
     public async Task Excluir_DeveRetornarNotFoundParaInstituicaoInexistente()
     {
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Excluir_DeveRetornarConflictAoExcluirInstituicaoBase()
     {
-        var response = await Client.DeleteAsync(
+        var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Instituicao.Id}",
             TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 }

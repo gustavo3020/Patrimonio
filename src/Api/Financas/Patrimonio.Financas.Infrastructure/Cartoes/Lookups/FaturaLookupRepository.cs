@@ -19,7 +19,7 @@ internal sealed class FaturaLookupRepository(
         return await context.Faturas
             .AsNoTracking()
             .Where(f => f.CartaoId == cartaoId)
-            .OrderByDescending(f => f.DataVencimento)
+            .OrderBy(f => f.DataVencimento)
             .Select(f => new FaturaOpcaoReadModel
             {
                 Id = f.Id,

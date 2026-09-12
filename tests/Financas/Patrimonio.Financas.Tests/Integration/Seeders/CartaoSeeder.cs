@@ -19,13 +19,13 @@ internal sealed class CartaoSeeder(
 
         try
         {
-            cartao = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            cartao = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var cartaoDto = Criar(data.Instituicao.Id);
 
-            cartao = await commandService.CriarAsync(cartaoDto, CancellationToken.None);
+            cartao = await commandService.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
         }
 
         data.Cartao = cartao;

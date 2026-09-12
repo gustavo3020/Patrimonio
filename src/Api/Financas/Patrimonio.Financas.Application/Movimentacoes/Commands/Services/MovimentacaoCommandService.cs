@@ -23,7 +23,9 @@ internal sealed class MovimentacaoCommandService(
     {
         logger.LogInformation("Criando movimentação para a data {Data}.", dto.Data);
 
-        var descricao = dto.Descricao is not null ? new Descricao(dto.Descricao) : null;
+        var descricao = string.IsNullOrWhiteSpace(dto.Descricao)
+            ? null
+            : new Descricao(dto.Descricao);
 
         var entidade = Movimentacao.Criar(
             dto.Data,
@@ -51,7 +53,9 @@ internal sealed class MovimentacaoCommandService(
         var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
             ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
-        var descricao = dto.Descricao is not null ? new Descricao(dto.Descricao) : null;
+        var descricao = string.IsNullOrWhiteSpace(dto.Descricao)
+            ? null
+            : new Descricao(dto.Descricao);
 
         entidade.Alterar(
             dto.Data,
