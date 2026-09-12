@@ -18,6 +18,8 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     HttpClient httpClient,
     string rotaBase)
 {
+    public HttpClient HttpClient { get; } = httpClient;
+
     /// <summary>
     /// Obtém a lista de recursos disponíveis na API.
     /// </summary>
@@ -25,7 +27,7 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// <returns>A coleção de recursos retornada pela API, ou uma coleção vazia caso não haja nenhum.</returns>
     public async Task<IReadOnlyCollection<TListaDto>> ListarAsync(CancellationToken cancellationToken)
     {
-        return await httpClient.GetFromJsonAsync<IReadOnlyCollection<TListaDto>>(
+        return await HttpClient.GetFromJsonAsync<IReadOnlyCollection<TListaDto>>(
             rotaBase,
             cancellationToken)
             ?? [];
@@ -42,7 +44,7 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// </exception>
     public async Task<TDetalheDto> ObterPorIdAsync(int id, CancellationToken cancellationToken)
     {
-        return await httpClient.GetFromJsonAsync<TDetalheDto>(
+        return await HttpClient.GetFromJsonAsync<TDetalheDto>(
             $"{rotaBase}/{id}",
             cancellationToken)
             ?? throw new ApiResponseException("A API não retornou os dados esperados.");
@@ -59,7 +61,7 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// </exception>
     public async Task<TDetalheDto> CriarAsync(TCriacaoDto dto, CancellationToken cancellationToken)
     {
-        using var response = await httpClient.PostAsJsonAsync(
+        using var response = await HttpClient.PostAsJsonAsync(
             rotaBase,
             dto,
             cancellationToken);
@@ -77,7 +79,7 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public Task AlterarAsync(int id, TAlteracaoDto dto, CancellationToken cancellationToken)
     {
-        return httpClient.PutAsJsonAsync(
+        return HttpClient.PutAsJsonAsync(
             $"{rotaBase}/{id}",
             dto,
             cancellationToken);
@@ -90,7 +92,7 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public Task ExcluirAsync(int id, CancellationToken cancellationToken)
     {
-        return httpClient.DeleteAsync(
+        return HttpClient.DeleteAsync(
             $"{rotaBase}/{id}",
             cancellationToken);
     }

@@ -20,15 +20,11 @@ internal static class DependencyInjection
     public static IServiceCollection AddInstituicoesWpf(this IServiceCollection services)
     {
         // HTTP Clients
-        services.AddHttpClient<InstituicaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
+        services.AddHttpClient<InstituicaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
         // Services
-        services.AddTransient<IInstituicaoCommandService>(
-            serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
-
-        services.AddTransient<IInstituicaoQueryService>(
-            serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
+        services.AddTransient<IInstituicaoCommandService, InstituicaoHttpClient>();
+        services.AddTransient<IInstituicaoQueryService, InstituicaoHttpClient>();
 
         // ViewModels
         services.AddTransient<InstituicaoAlteracaoViewModel>();

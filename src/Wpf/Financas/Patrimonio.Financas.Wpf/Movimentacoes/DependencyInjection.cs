@@ -20,21 +20,13 @@ internal static class DependencyInjection
     public static IServiceCollection AddMovimentacoesWpf(this IServiceCollection services)
     {
         // HTTP Clients
-        services.AddHttpClient<MovimentacaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
-
-        services.AddHttpClient<MovimentacaoOpcoesCriacaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
+        services.AddHttpClient<MovimentacaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
+        services.AddHttpClient<MovimentacaoOpcoesCriacaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
         // Services
-        services.AddTransient<IMovimentacaoCommandService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
-
-        services.AddTransient<IMovimentacaoOpcoesCriacaoService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoOpcoesCriacaoHttpClient>());
-
-        services.AddTransient<IMovimentacaoQueryService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
+        services.AddTransient<IMovimentacaoCommandService, MovimentacaoHttpClient>();
+        services.AddTransient<IMovimentacaoOpcoesCriacaoService, MovimentacaoOpcoesCriacaoHttpClient>();
+        services.AddTransient<IMovimentacaoQueryService, MovimentacaoHttpClient>();
 
         // ViewModels
         services.AddTransient<MovimentacaoAlteracaoViewModel>();

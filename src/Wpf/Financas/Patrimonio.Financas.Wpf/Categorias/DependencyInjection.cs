@@ -20,15 +20,11 @@ internal static class DependencyInjection
     public static IServiceCollection AddCategoriasWpf(this IServiceCollection services)
     {
         // HTTP Clients
-        services.AddHttpClient<CategoriaHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
+        services.AddHttpClient<CategoriaHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
         // Services
-        services.AddTransient<ICategoriaCommandService>(
-            serviceProvider => serviceProvider.GetRequiredService<CategoriaHttpClient>());
-
-        services.AddTransient<ICategoriaQueryService>(
-            serviceProvider => serviceProvider.GetRequiredService<CategoriaHttpClient>());
+        services.AddTransient<ICategoriaCommandService, CategoriaHttpClient>();
+        services.AddTransient<ICategoriaQueryService, CategoriaHttpClient>();
 
         // ViewModels
         services.AddTransient<CategoriaAlteracaoViewModel>();
