@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
-using Patrimonio.Financas.Contracts.Categorias.Services;
-using Patrimonio.Financas.Wpf.Categorias.Navigation;
+using Patrimonio.Financas.Wpf.Categorias.HttpClients;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
 
@@ -12,36 +11,35 @@ namespace Patrimonio.Financas.Wpf.Categorias.ViewModels;
 /// ViewModel responsável pela alteração de categorias.
 /// </summary>
 internal sealed partial class CategoriaAlteracaoViewModel(
-    ICategoriaCommandService commandService,
-    ICategoriaQueryService queryService,
-    CategoriaNavigation navigation,
+    CategoriaHttpClient client,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+
     /// <inheritdoc />
     public override string Titulo => "Editar categoria";
 
-    [ObservableProperty] private int categoriaId;
-    [ObservableProperty] private string nome = string.Empty;
+    [ObservableProperty] public partial int CategoriaId { get; set; }
+    [ObservableProperty] public partial string Nome { get; set; } = string.Empty;
 
     /// <summary>
     /// Carrega os dados da categoria a ser alterada.
     /// </summary>
-    /// <param name="categoriaId">
-    /// Identificador da categoria a ser carregada.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="voltar">Função de callback utilizada para retornar à tela anterior.</param>
+    /// <param name="categoriaId">Identificador da categoria a ser carregada.</param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public async Task InicializarAsync(
+        Func<CancellationToken, Task> voltar,
         int categoriaId,
         CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
+            _voltar = voltar;
             CategoriaId = categoriaId;
 
-            var categoria = await queryService.ObterPorIdAsync(
+            var categoria = await client.ObterPorIdAsync(
                 categoriaId,
                 cancellationToken);
 
@@ -60,9 +58,7 @@ internal sealed partial class CategoriaAlteracaoViewModel(
     /// <summary>
     /// Salva as alterações realizadas na categoria.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand]
     private async Task SalvarAsync(
         CancellationToken cancellationToken)
@@ -71,7 +67,7 @@ internal sealed partial class CategoriaAlteracaoViewModel(
         {
             Carregando = true;
 
-            await commandService.AlterarAsync(
+            await client.AlterarAsync(
                 CategoriaId,
                 new CategoriaAlteracaoDto
                 {
@@ -79,7 +75,7 @@ internal sealed partial class CategoriaAlteracaoViewModel(
                 },
                 cancellationToken);
 
-            await navigation.AbrirListaAsync(cancellationToken);
+            await _voltar(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -94,6 +90,6 @@ internal sealed partial class CategoriaAlteracaoViewModel(
     [RelayCommand]
     private async Task CancelarAsync(CancellationToken cancellationToken)
     {
-        await navigation.AbrirListaAsync(cancellationToken);
+        await _voltar(cancellationToken);
     }
 }

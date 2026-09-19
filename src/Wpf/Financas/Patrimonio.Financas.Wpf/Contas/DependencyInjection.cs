@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Contas.HttpClients;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
@@ -21,12 +20,6 @@ internal static class DependencyInjection
     {
         // HTTP Clients
         services.AddHttpClient<ContaHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
-        services.AddHttpClient<ContaOpcoesCriacaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
-
-        // Services
-        services.AddTransient<IContaCommandService, ContaHttpClient>();
-        services.AddTransient<IContaOpcoesCriacaoService, ContaOpcoesCriacaoHttpClient>();
-        services.AddTransient<IContaQueryService, ContaHttpClient>();
 
         // ViewModels
         services.AddTransient<ContaAlteracaoViewModel>();

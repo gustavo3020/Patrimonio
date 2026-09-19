@@ -19,9 +19,9 @@ public sealed class FaturaController(
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Listar(CancellationToken cancellationToken)
+    public async Task<IActionResult> Listar(int cartaoId, CancellationToken cancellationToken)
     {
-        var faturas = await queryService.ListarAsync(cancellationToken);
+        var faturas = await queryService.ListarAsync(cartaoId, cancellationToken);
         return Ok(faturas);
     }
 

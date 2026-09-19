@@ -19,9 +19,9 @@ public sealed class LancamentoController(
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Listar(CancellationToken cancellationToken)
+    public async Task<IActionResult> Listar(int faturaId, CancellationToken cancellationToken)
     {
-        var lancamentos = await queryService.ListarAsync(cancellationToken);
+        var lancamentos = await queryService.ListarAsync(faturaId, cancellationToken);
         return Ok(lancamentos);
     }
 

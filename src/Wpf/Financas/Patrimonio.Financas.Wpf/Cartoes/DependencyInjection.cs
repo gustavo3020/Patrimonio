@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Wpf.Cartoes.HttpClients;
+using Patrimonio.Financas.Wpf.Cartoes.Navigation;
+using Patrimonio.Financas.Wpf.Cartoes.ViewModels;
 using Patrimonio.Financas.Wpf.Common.Http;
 
 namespace Patrimonio.Financas.Wpf.Cartoes;
@@ -22,13 +23,22 @@ internal static class DependencyInjection
         services.AddHttpClient<FaturaHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
         services.AddHttpClient<LancamentoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
-        // Services
-        services.AddTransient<ICartaoCommandService, CartaoHttpClient>();
-        services.AddTransient<ICartaoQueryService, CartaoHttpClient>();
-        services.AddTransient<IFaturaCommandService, FaturaHttpClient>();
-        services.AddTransient<IFaturaQueryService, FaturaHttpClient>();
-        services.AddTransient<ILancamentoCommandService, LancamentoHttpClient>();
-        services.AddTransient<ILancamentoQueryService, LancamentoHttpClient>();
+        // ViewModels
+        services.AddTransient<CartaoAlteracaoViewModel>();
+        services.AddTransient<CartaoCriacaoViewModel>();
+        services.AddTransient<CartaoListaViewModel>();
+        services.AddTransient<FaturaAlteracaoViewModel>();
+        services.AddTransient<FaturaCriacaoViewModel>();
+        services.AddTransient<FaturaListaViewModel>();
+        services.AddTransient<FaturaPagamentoViewModel>();
+        services.AddTransient<LancamentoAlteracaoViewModel>();
+        services.AddTransient<LancamentoCriacaoViewModel>();
+        services.AddTransient<LancamentoListaViewModel>();
+
+        // Navigation
+        services.AddSingleton<CartaoNavigation>();
+        services.AddSingleton<FaturaNavigation>();
+        services.AddSingleton<LancamentoNavigation>();
 
         return services;
     }

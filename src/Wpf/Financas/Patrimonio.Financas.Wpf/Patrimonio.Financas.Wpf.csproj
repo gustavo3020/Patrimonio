@@ -18,6 +18,36 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Cartoes\Navigation\LancamentoNavigationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Navigation\FaturaNavigationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Navigation\CartaoNavigationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\FaturaPagamentoView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\LancamentoFormView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\FaturaFormView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\CartaoFormView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\LancamentoListaView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\FaturaListaView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Cartoes\Views\CartaoListaView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Categorias\Views\CategoriaFormView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

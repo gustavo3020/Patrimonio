@@ -8,7 +8,7 @@ namespace Patrimonio.Financas.Application.Cartoes.Queries.Services;
 /// <summary>
 /// Implementa as operações para obtenção das opções necessárias à criação de um cartão.
 /// </summary>
-internal class CartaoOpcoesCriacaoService(
+internal sealed class CartaoOpcoesCriacaoService(
     IInstituicaoLookupRepository instituicaoLookupRepository) : ICartaoOpcoesCriacaoService
 {
     /// <inheritdoc/>
@@ -19,10 +19,10 @@ internal class CartaoOpcoesCriacaoService(
         return new CartaoOpcoesCriacaoDto
         {
             Instituicoes = [.. instituicoes
-                .Select(c => new OpcaoDto
+                .Select(i => new OpcaoDto
                 {
-                    Id = c.Id,
-                    Nome = c.Nome
+                    Id = i.Id,
+                    Nome = i.Nome
                 })]
         };
     }

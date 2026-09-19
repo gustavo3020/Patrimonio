@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Categorias.Services;
 using Patrimonio.Financas.Wpf.Categorias.HttpClients;
 using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Categorias.ViewModels;
@@ -21,10 +20,6 @@ internal static class DependencyInjection
     {
         // HTTP Clients
         services.AddHttpClient<CategoriaHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
-
-        // Services
-        services.AddTransient<ICategoriaCommandService, CategoriaHttpClient>();
-        services.AddTransient<ICategoriaQueryService, CategoriaHttpClient>();
 
         // ViewModels
         services.AddTransient<CategoriaAlteracaoViewModel>();

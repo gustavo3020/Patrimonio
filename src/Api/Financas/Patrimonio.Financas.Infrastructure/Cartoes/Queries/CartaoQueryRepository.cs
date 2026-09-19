@@ -29,7 +29,7 @@ internal sealed class CartaoQueryRepository(FinancasDbContext context) : ICartao
                 DataAlteracao = cartao.DataAlteracao
             })
             .AsNoTracking()
-            .OrderByDescending(c => c.DataCriacao)
+            .OrderBy(c => c.Nome)
             .ToListAsync(cancellationToken);
     }
 

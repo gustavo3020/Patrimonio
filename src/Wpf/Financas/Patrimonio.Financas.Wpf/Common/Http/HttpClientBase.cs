@@ -61,12 +61,12 @@ internal abstract class HttpClientBase<TListaDto, TDetalheDto, TCriacaoDto, TAlt
     /// </exception>
     public async Task<TDetalheDto> CriarAsync(TCriacaoDto dto, CancellationToken cancellationToken)
     {
-        using var response = await HttpClient.PostAsJsonAsync(
+        using var resposta = await HttpClient.PostAsJsonAsync(
             rotaBase,
             dto,
             cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<TDetalheDto>(
+        return await resposta.Content.ReadFromJsonAsync<TDetalheDto>(
             cancellationToken)
             ?? throw new ApiResponseException("A API não retornou os dados do recurso criado.");
     }

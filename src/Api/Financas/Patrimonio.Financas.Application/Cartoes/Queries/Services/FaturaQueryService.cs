@@ -15,11 +15,11 @@ internal sealed class FaturaQueryService(
     ILogger<FaturaQueryService> logger) : IFaturaQueryService
 {
     /// <inheritdoc />
-    public async Task<IReadOnlyCollection<FaturaListaDto>> ListarAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<FaturaListaDto>> ListarAsync(int cartaoId, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Listando faturas.");
+        logger.LogInformation("Listando faturas para o cartão ID {CartaoId}.", cartaoId);
 
-        var faturas = await queryRepository.ListarAsync(cancellationToken);
+        var faturas = await queryRepository.ListarAsync(cartaoId, cancellationToken);
 
         return [.. faturas.Select(FaturaMapper.Mapear)];
     }

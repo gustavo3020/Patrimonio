@@ -35,7 +35,7 @@ internal sealed class MovimentacaoQueryRepository(FinancasDbContext context) : I
                 DataCriacao = m.DataCriacao,
                 DataAlteracao = m.DataAlteracao
             })
-            .OrderByDescending(m => m.DataCriacao)
+            .OrderByDescending(m => m.Data)
             .ToListAsync(cancellationToken);
     }
 

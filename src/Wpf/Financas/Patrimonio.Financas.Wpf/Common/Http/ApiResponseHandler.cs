@@ -28,18 +28,18 @@ internal sealed class ApiResponseHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var response = await base.SendAsync(request, cancellationToken);
+        var resposta = await base.SendAsync(request, cancellationToken);
 
-        if (response.IsSuccessStatusCode)
-            return response;
+        if (resposta.IsSuccessStatusCode)
+            return resposta;
 
-        var statusCode = (int)response.StatusCode;
+        var statusCode = (int)resposta.StatusCode;
 
         ApiProblemDetails? problem = null;
 
         try
         {
-            problem = await response.Content.ReadFromJsonAsync<ApiProblemDetails>(
+            problem = await resposta.Content.ReadFromJsonAsync<ApiProblemDetails>(
                 cancellationToken);
         }
         catch (JsonException)
@@ -48,7 +48,7 @@ internal sealed class ApiResponseHandler : DelegatingHandler
         }
         finally
         {
-            response.Dispose();
+            resposta.Dispose();
         }
 
         throw new ApiException(

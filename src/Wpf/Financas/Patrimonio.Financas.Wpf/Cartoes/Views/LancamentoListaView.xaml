@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Cartoes.Views.LancamentoListaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.ViewModels"
+             mc:Ignorable="d"  
+             d:DataContext="{d:DesignInstance vm:LancamentoListaViewModel}">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- Cabeçalho -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <TextBlock Text="{Binding Titulo}" Style="{StaticResource SubTitleTextBlockStyle}"/>
+            <StackPanel Grid.Column="1" Style="{StaticResource ActionStackPanelStyle}">
+                <Button Content="Voltar" Command="{Binding VoltarCommand}"/>
+                <Button Content="Criar" Command="{Binding AbrirCriacaoCommand}"/>
+                <Button Content="Alterar" Command="{Binding AbrirAlteracaoCommand}"/>
+                <Button Content="Excluir" Command="{Binding ExcluirCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Lista -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Lancamentos}"
+                  SelectedItem="{Binding Selecionado}">
+
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />
+            </DataGrid.InputBindings>
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Data da compra" Binding="{Binding DataCompra, StringFormat='dd/MM/yyyy'}" Width="*"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor}" Width="*"/>
+                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaNome}" Width="*"/>
+                <DataGridTextColumn Header="Responsável" Binding="{Binding Responsavel}" Width="*"/>
+                <DataGridTextColumn Header="Estabelecimento" Binding="{Binding Estabelecimento}" Width="*"/>
+                <DataGridTextColumn Header="Número Parcela" Binding="{Binding NumeroParcela}" Width="*"/>
+                <DataGridTextColumn Header="Total Parcelas" Binding="{Binding TotalParcelas}" Width="*"/>
+                <DataGridTextColumn Header="Data de criação" Binding="{Binding DataCriacao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                <DataGridTextColumn Header="Data de alteração" Binding="{Binding DataAlteracao, StringFormat='dd/MM/yyyy'}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Patrimonio.Financas.Wpf.Cartoes.Navigation;
 using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Common.Navigation;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
@@ -12,6 +13,7 @@ namespace Patrimonio.Financas.Wpf.Navigation;
 /// </summary>
 public sealed partial class FinancasNavigation(
     CategoriaNavigation categoriaNavigation,
+    CartaoNavigation cartaoNavigation,
     ContaNavigation contaNavigation,
     InstituicaoNavigation instituicaoNavigation,
     MovimentacaoNavigation movimentacaoNavigation) : NavigationBase
@@ -25,6 +27,17 @@ public sealed partial class FinancasNavigation(
         await categoriaNavigation.AbrirListaAsync(cancellationToken);
 
         ConteudoAtual = categoriaNavigation;
+    }
+
+    /// <summary>
+    /// Abre a funcionalidade de cartões.
+    /// </summary>
+    [RelayCommand]
+    private async Task AbrirCartoes(CancellationToken cancellationToken)
+    {
+        await cartaoNavigation.AbrirListaAsync(cancellationToken);
+
+        ConteudoAtual = cartaoNavigation;
     }
 
     /// <summary>

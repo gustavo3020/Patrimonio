@@ -10,6 +10,5 @@ public abstract partial class NavigationBase : ObservableObject
     /// <summary>
     /// Obtém o conteúdo atualmente selecionado pela navegação.
     /// </summary>
-    [ObservableProperty]
-    private object? conteudoAtual;
+    [ObservableProperty] public partial object? ConteudoAtual { get; set; }
 }

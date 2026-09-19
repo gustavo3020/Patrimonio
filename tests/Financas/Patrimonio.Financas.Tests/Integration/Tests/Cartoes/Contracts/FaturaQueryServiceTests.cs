@@ -14,15 +14,27 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarFaturas()
+    public async Task ListarAsync_DeveRetornarFaturasDoCartaoBase()
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var faturas = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var faturas = await service.ListarAsync(Factory.BaseData.Cartao.Id, TestContext.Current.CancellationToken);
 
         faturas.Should().NotBeNull();
         faturas.Should().Contain(c => c.Id == Factory.BaseData.Fatura.Id);
+    }
+
+    [Fact]
+    public async Task ListarAsync_DeveRetornarListaVaziaQuandoCartaoNaoPossuiFaturas()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+
+        var faturas = await service.ListarAsync(0, TestContext.Current.CancellationToken);
+
+        faturas.Should().NotBeNull();
+        faturas.Should().BeEmpty();
     }
 
     // ============================================================================

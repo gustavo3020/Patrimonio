@@ -2,10 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
-using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
-using Patrimonio.Financas.Wpf.Contas.Navigation;
+using Patrimonio.Financas.Wpf.Contas.HttpClients;
 
 namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 
@@ -13,43 +12,44 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// ViewModel responsável pela alteração de contas.
 /// </summary>
 internal sealed partial class ContaAlteracaoViewModel(
-    IContaCommandService commandService,
-    IContaOpcoesCriacaoService contaOpcoesCriacaoService,
-    IContaQueryService queryService,
-    ContaNavigation navigation,
+    ContaHttpClient client,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+
     /// <inheritdoc />
     public override string Titulo => "Editar conta";
 
-    [ObservableProperty] private int contaId;
-    [ObservableProperty] private string nome = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> instituicoes = [];
+    [ObservableProperty] public partial int ContaId { get; set; }
+    [ObservableProperty] public partial string Nome { get; set; } = string.Empty;
+    [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Instituicoes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private int? instituicaoId;
+    public partial int? InstituicaoId { get; set; }
 
     /// <summary>
     /// Carrega os dados da conta a ser alterada.
     /// </summary>
+    /// <param name="voltar">Função de callback utilizada para retornar à tela anterior.</param>
     /// <param name="contaId">Identificador da conta a ser carregada.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
-    [RelayCommand]
     public async Task InicializarAsync(
+        Func<CancellationToken, Task> voltar,
         int contaId,
         CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
+            _voltar = voltar;
             ContaId = contaId;
 
-            var contaTask = queryService.ObterPorIdAsync(
+            var contaTask = client.ObterPorIdAsync(
                 contaId,
                 cancellationToken);
 
-            var opcoesTask = contaOpcoesCriacaoService.ObterOpcoesCriacaoAsync(
+            var opcoesTask = client.ObterOpcoesCriacaoAsync(
                 cancellationToken);
 
             await Task.WhenAll(
@@ -79,9 +79,7 @@ internal sealed partial class ContaAlteracaoViewModel(
     /// <summary>
     /// Salva as alterações realizadas na conta.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand(CanExecute = nameof(PodeSalvar))]
     private async Task SalvarAsync(CancellationToken cancellationToken)
     {
@@ -89,7 +87,7 @@ internal sealed partial class ContaAlteracaoViewModel(
         {
             Carregando = true;
 
-            await commandService.AlterarAsync(
+            await client.AlterarAsync(
                 ContaId,
                 new ContaAlteracaoDto
                 {
@@ -98,7 +96,7 @@ internal sealed partial class ContaAlteracaoViewModel(
                 },
                 cancellationToken);
 
-            await navigation.AbrirListaAsync(cancellationToken);
+            await _voltar(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -113,6 +111,6 @@ internal sealed partial class ContaAlteracaoViewModel(
     [RelayCommand]
     private async Task CancelarAsync(CancellationToken cancellationToken)
     {
-        await navigation.AbrirListaAsync(cancellationToken);
+        await _voltar(cancellationToken);
     }
 }

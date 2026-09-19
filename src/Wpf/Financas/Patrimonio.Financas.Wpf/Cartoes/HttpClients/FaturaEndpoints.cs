@@ -9,4 +9,6 @@ internal static class FaturaEndpoints
     /// Obtém a rota base para as operações de faturas.
     /// </summary>
     public const string Base = "api/v1/financas/faturas";
+    public static string Listar(int cartaoId) => $"{Base}?cartaoId={cartaoId}";
+    public static string OpcoesPagamento() => $"{Base}/opcoes-pagamento";
 }

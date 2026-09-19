@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
-using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Dialogs;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Contas.HttpClients;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
 using System.Collections.ObjectModel;
 
@@ -14,21 +14,21 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// ViewModel responsável pela listagem de contas.
 /// </summary>
 internal sealed partial class ContaListaViewModel(
-    IContaCommandService commandService,
-    IContaQueryService queryService,
-    IDialogService dialogService,
+    ContaHttpClient client,
     ContaNavigation navigation,
-    ExceptionHandler exceptionHandler) : BaseViewModel
+    ExceptionHandler exceptionHandler,
+    IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
     public override string Titulo => "Contas";
 
-    [ObservableProperty] private ObservableCollection<ContaListaDto> contas = [];
+    [ObservableProperty]
+    public partial ObservableCollection<ContaListaDto> Contas { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirAlteracaoCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExcluirCommand))]
-    private ContaListaDto? selecionado;
+    public partial ContaListaDto? Selecionado { get; set; }
 
     private bool AlterarHabilitado => Selecionado != null && !Carregando;
 
@@ -42,7 +42,7 @@ internal sealed partial class ContaListaViewModel(
         {
             Carregando = true;
 
-            var resultado = await queryService.ListarAsync(cancellationToken);
+            var resultado = await client.ListarAsync(cancellationToken);
 
             Contas = new ObservableCollection<ContaListaDto>(resultado);
         }
@@ -76,7 +76,7 @@ internal sealed partial class ContaListaViewModel(
         {
             Carregando = true;
 
-            await commandService.ExcluirAsync(Selecionado!.Id, cancellationToken);
+            await client.ExcluirAsync(Selecionado!.Id, cancellationToken);
 
             Contas.Remove(Selecionado);
             Selecionado = null;

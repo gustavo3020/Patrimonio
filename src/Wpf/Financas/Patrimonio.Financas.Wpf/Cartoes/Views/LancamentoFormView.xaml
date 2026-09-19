@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Cartoes.Views.LancamentoFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:LancamentoAlteracaoViewModel}">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *, Auto">
+
+        <!-- DataCompra e valor -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Data"/>
+                <DatePicker SelectedDate="{Binding DataCompra}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Valor"/>
+                <TextBox Text="{Binding Valor}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Descricao e categoria -->
+        <Grid Grid.Row="1" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Descrição"/>
+                <TextBox Text="{Binding Descricao}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Categoria"/>
+                <ComboBox ItemsSource="{Binding Categorias}"
+                          SelectedValue="{Binding CategoriaId}"
+                          DisplayMemberPath="Nome"
+                          SelectedValuePath="Id"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Responsavel e estabelecimento -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Responsável"/>
+                <TextBox Text="{Binding Responsavel}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Estabelecimento"/>
+                <TextBox Text="{Binding Estabelecimento}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- NumeroParcela e TotalParcelas -->
+        <Grid Grid.Row="3" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Número Parcela"/>
+                <TextBox Text="{Binding NumeroParcela}" IsEnabled="False"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Total Parcelas"/>
+                <TextBox Text="{Binding TotalParcelas}" IsEnabled="{Binding PodeAlterarParcelas}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Espaço -->
+        <Grid Grid.Row="4"/>
+
+        <!-- Ações -->
+        <StackPanel Grid.Row="5" Style="{StaticResource ActionStackPanelStyle}">
+
+            <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

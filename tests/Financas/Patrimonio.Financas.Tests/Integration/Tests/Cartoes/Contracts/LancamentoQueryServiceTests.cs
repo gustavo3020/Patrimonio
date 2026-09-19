@@ -14,15 +14,27 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarLancamentos()
+    public async Task ListarAsync_DeveRetornarLancamentosDaFaturaBase()
     {
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var lancamentos = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var lancamentos = await service.ListarAsync(Factory.BaseData.Fatura.Id, TestContext.Current.CancellationToken);
 
         lancamentos.Should().NotBeNull();
         lancamentos.Should().Contain(c => c.Id == Factory.BaseData.Lancamento.Id);
+    }
+
+    [Fact]
+    public async Task ListarAsync_DeveRetornarListaVaziaQuandoFaturaNaoPossuiLancamentos()
+    {
+        using var scope = CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+
+        var faturas = await service.ListarAsync(0, TestContext.Current.CancellationToken);
+
+        faturas.Should().NotBeNull();
+        faturas.Should().BeEmpty();
     }
 
     // ============================================================================

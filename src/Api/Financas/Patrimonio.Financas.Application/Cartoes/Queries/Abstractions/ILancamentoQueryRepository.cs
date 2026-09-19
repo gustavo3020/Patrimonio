@@ -10,9 +10,10 @@ public interface ILancamentoQueryRepository
     /// <summary>
     /// Lista os lançamentos disponíveis.
     /// </summary>
+    /// <param name="faturaId">Identificador da fatura cujos lançamentos devem ser recuperados.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>ReadModels contendo os dados dos lançamentos.</returns>
-    Task<IReadOnlyCollection<LancamentoListaReadModel>> ListarAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<LancamentoListaReadModel>> ListarAsync(int faturaId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Obtém um lançamento pelo seu identificador.

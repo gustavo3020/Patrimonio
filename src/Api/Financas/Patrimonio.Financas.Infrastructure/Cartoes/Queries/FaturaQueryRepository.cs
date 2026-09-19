@@ -11,12 +11,15 @@ namespace Patrimonio.Financas.Infrastructure.Cartoes.Queries;
 internal sealed class FaturaQueryRepository(FinancasDbContext context) : IFaturaQueryRepository
 {
     /// <inheritdoc/>
-    public async Task<IReadOnlyCollection<FaturaListaReadModel>> ListarAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<FaturaListaReadModel>> ListarAsync(
+        int cartaoId,
+        CancellationToken cancellationToken)
     {
         return await (
             from fatura in context.Faturas
             join cartao in context.Cartoes
                 on fatura.CartaoId equals cartao.Id
+            where fatura.CartaoId == cartaoId
             select new FaturaListaReadModel
             {
                 Id = fatura.Id,
@@ -29,7 +32,7 @@ internal sealed class FaturaQueryRepository(FinancasDbContext context) : IFatura
                 DataAlteracao = fatura.DataAlteracao
             })
             .AsNoTracking()
-            .OrderByDescending(f => f.DataCriacao)
+            .OrderByDescending(f => f.DataVencimento)
             .ToListAsync(cancellationToken);
     }
 

@@ -2,10 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
-using Patrimonio.Financas.Contracts.Contas.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
-using Patrimonio.Financas.Wpf.Contas.Navigation;
+using Patrimonio.Financas.Wpf.Contas.HttpClients;
 
 namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 
@@ -13,34 +12,36 @@ namespace Patrimonio.Financas.Wpf.Contas.ViewModels;
 /// ViewModel responsável pela criação de contas.
 /// </summary>
 internal sealed partial class ContaCriacaoViewModel(
-    IContaCommandService commandService,
-    IContaOpcoesCriacaoService contaOpcoesCriacaoService,
-    ContaNavigation navigation,
+    ContaHttpClient client,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+
+    /// <inheritdoc />
     public override string Titulo => "Nova conta";
 
-    [ObservableProperty] private string nome = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> instituicoes = [];
+    [ObservableProperty] public partial string Nome { get; set; } = string.Empty;
+    [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Instituicoes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private int? instituicaoId;
+    public partial int? InstituicaoId { get; set; }
 
     /// <summary>
     /// Carrega as instituições disponíveis para seleção no formulário.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
-    [RelayCommand]
-    public async Task InicializarAsync(CancellationToken cancellationToken)
+    /// <param name="voltar">Função de callback utilizada para retornar à tela anterior.</param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
+    public async Task InicializarAsync(
+        Func<CancellationToken, Task> voltar,
+        CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
+            _voltar = voltar;
 
-            var opcoes = await contaOpcoesCriacaoService.ObterOpcoesCriacaoAsync(cancellationToken);
+            var opcoes = await client.ObterOpcoesCriacaoAsync(cancellationToken);
 
             Instituicoes = opcoes.Instituicoes;
         }
@@ -59,9 +60,7 @@ internal sealed partial class ContaCriacaoViewModel(
     /// <summary>
     /// Cria uma nova conta utilizando os dados informados no formulário.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand(CanExecute = nameof(PodeSalvar))]
     private async Task SalvarAsync(CancellationToken cancellationToken)
     {
@@ -69,7 +68,7 @@ internal sealed partial class ContaCriacaoViewModel(
         {
             Carregando = true;
 
-            await commandService.CriarAsync(
+            await client.CriarAsync(
                 new ContaCriacaoDto
                 {
                     Nome = Nome,
@@ -77,7 +76,7 @@ internal sealed partial class ContaCriacaoViewModel(
                 },
                 cancellationToken);
 
-            await navigation.AbrirListaAsync(cancellationToken);
+            await _voltar(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -92,6 +91,6 @@ internal sealed partial class ContaCriacaoViewModel(
     [RelayCommand]
     private async Task CancelarAsync(CancellationToken cancellationToken)
     {
-        await navigation.AbrirListaAsync(cancellationToken);
+        await _voltar(cancellationToken);
     }
 }

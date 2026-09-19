@@ -10,9 +10,10 @@ public interface IFaturaQueryService
     /// <summary>
     /// Retorna todas as faturas.
     /// </summary>
+    /// <param name="cartaoId">Identificador do cartão cujas faturas devem ser recuperadas.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     /// <returns>Uma coleção com as faturas encontradas.</returns>
-    Task<IReadOnlyCollection<FaturaListaDto>> ListarAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<FaturaListaDto>> ListarAsync(int cartaoId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Retorna uma fatura pelo seu identificador.

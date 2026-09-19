@@ -77,6 +77,8 @@ internal sealed class MovimentacaoCommandService(
         var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
             ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
+        entidade.Excluir();
+
         commandRepository.Remover(entidade);
 
         await commandRepository.SalvarAsync(cancellationToken);

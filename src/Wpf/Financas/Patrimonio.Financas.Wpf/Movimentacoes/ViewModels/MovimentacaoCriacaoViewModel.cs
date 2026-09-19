@@ -2,11 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Common.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
-using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
-using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
+using Patrimonio.Financas.Wpf.Movimentacoes.HttpClients;
 
 namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 
@@ -14,35 +13,35 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// ViewModel responsável pela criação de movimentações financeiras.
 /// </summary>
 internal sealed partial class MovimentacaoCriacaoViewModel(
-    IMovimentacaoCommandService commandService,
-    IMovimentacaoOpcoesCriacaoService opcoesCriacaoService,
-    MovimentacaoNavigation navigation,
+    MovimentacaoHttpClient client,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+
     /// <inheritdoc />
     public override string Titulo => "Nova movimentação";
 
-    [ObservableProperty] private DateTime data = DateTime.Today;
-    [ObservableProperty] private decimal valor;
-    [ObservableProperty] private string descricao = string.Empty;
-    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> contas = [];
-    [ObservableProperty] private IReadOnlyCollection<OpcaoDto> categorias = [];
+    [ObservableProperty] public partial DateTime Data { get; set; } = DateTime.Today;
+    [ObservableProperty] public partial decimal Valor { get; set; }
+    [ObservableProperty] public partial string Descricao { get; set; } = string.Empty;
+    [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Contas { get; set; } = [];
+    [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Categorias { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private Natureza? natureza;
+    public partial Natureza? Natureza { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private TipoMovimentacao? tipo;
+    public partial TipoMovimentacao? Tipo { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private int? contaId;
+    public partial int? ContaId { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
-    private int? categoriaId;
+    public partial int? CategoriaId { get; set; }
 
     public static IReadOnlyCollection<Natureza> Naturezas { get; } = Enum.GetValues<Natureza>();
     public static IReadOnlyCollection<TipoMovimentacao> Tipos { get; } = Enum.GetValues<TipoMovimentacao>();
@@ -50,15 +49,18 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     /// <summary>
     /// Carrega os dados necessários para o preenchimento do formulário.
     /// </summary>
+    /// <param name="voltar">Função de callback utilizada para retornar à tela anterior.</param>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
-    [RelayCommand]
-    public async Task InicializarAsync(CancellationToken cancellationToken)
+    public async Task InicializarAsync(
+        Func<CancellationToken, Task> voltar,
+        CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
+            _voltar = voltar;
 
-            var opcoes = await opcoesCriacaoService.ObterOpcoesCriacaoAsync(cancellationToken);
+            var opcoes = await client.ObterOpcoesCriacaoAsync(cancellationToken);
 
             Categorias = opcoes.Categorias;
             Contas = opcoes.Contas;
@@ -90,7 +92,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
         {
             Carregando = true;
 
-            await commandService.CriarAsync(
+            await client.CriarAsync(
                 new MovimentacaoCriacaoDto
                 {
                     Data = DateOnly.FromDateTime(Data),
@@ -103,7 +105,7 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
                 },
                 cancellationToken);
 
-            await navigation.AbrirListaAsync(cancellationToken);
+            await _voltar(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -118,6 +120,6 @@ internal sealed partial class MovimentacaoCriacaoViewModel(
     [RelayCommand]
     private async Task CancelarAsync(CancellationToken cancellationToken)
     {
-        await navigation.AbrirListaAsync(cancellationToken);
+        await _voltar(cancellationToken);
     }
 }

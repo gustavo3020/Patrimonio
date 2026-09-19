@@ -15,6 +15,9 @@
                 <Button Content="Categorias"
                         Style="{StaticResource MenuButtonStyle}"
                         Command="{Binding AbrirCategoriasCommand}"/>
+                <Button Content="Cartões"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Command="{Binding AbrirCartoesCommand}"/>
                 <Button Content="Contas"
                         Style="{StaticResource MenuButtonStyle}"
                         Command="{Binding AbrirContasCommand}"/>

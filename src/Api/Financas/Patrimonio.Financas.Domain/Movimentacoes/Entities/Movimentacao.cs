@@ -99,4 +99,10 @@ public sealed class Movimentacao : EntidadeBase
         ContaId = contaId;
         CategoriaId = categoriaId;
     }
+
+    public void Excluir()
+    {
+        if (FaturaId.HasValue)
+            throw new RegraDeNegocioException("Não é possível excluir uma movimentação associada a uma fatura.");
+    }
 }

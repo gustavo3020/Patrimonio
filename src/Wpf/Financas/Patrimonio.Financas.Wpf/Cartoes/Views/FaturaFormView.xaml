@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Cartoes.Views.FaturaFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:FaturaAlteracaoViewModel}">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <!-- DataFechamento e DataVencimento -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, *">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Data Fechamento"/>
+                <DatePicker SelectedDate="{Binding DataFechamento}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Data Vencimento"/>
+                <DatePicker SelectedDate="{Binding DataVencimento}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Espaço -->
+        <Grid Grid.Row="1"/>
+
+        <!-- Ações -->
+        <StackPanel Grid.Row="2" Style="{StaticResource ActionStackPanelStyle}">
+            <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

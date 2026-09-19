@@ -22,8 +22,10 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task Listar_DeveRetornarOkComLancamentos()
     {
+        var faturaId = Factory.BaseData.Fatura.Id;
+
         var resposta = await Client.GetAsync(
-            RotaBase,
+            $"{RotaBase}?faturaId={faturaId}",
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.OK);

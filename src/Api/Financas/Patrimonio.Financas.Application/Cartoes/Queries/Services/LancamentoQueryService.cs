@@ -15,11 +15,11 @@ internal sealed class LancamentoQueryService(
     ILogger<LancamentoQueryService> logger) : ILancamentoQueryService
 {
     /// <inheritdoc />
-    public async Task<IReadOnlyCollection<LancamentoListaDto>> ListarAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<LancamentoListaDto>> ListarAsync(int faturaId, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Listando lançamentos.");
+        logger.LogInformation("Listando lançamentos para a fatura ID {FaturaId}.", faturaId);
 
-        var lancamentos = await queryRepository.ListarAsync(cancellationToken);
+        var lancamentos = await queryRepository.ListarAsync(faturaId, cancellationToken);
 
         return [.. lancamentos.Select(LancamentoMapper.Mapear)];
     }

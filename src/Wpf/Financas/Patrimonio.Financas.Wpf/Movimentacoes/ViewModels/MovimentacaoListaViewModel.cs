@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
-using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.Wpf.Common.Dialogs;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Movimentacoes.HttpClients;
 using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
 using System.Collections.ObjectModel;
 
@@ -14,21 +14,21 @@ namespace Patrimonio.Financas.Wpf.Movimentacoes.ViewModels;
 /// ViewModel responsável pela listagem de movimentações financeiras.
 /// </summary>
 internal sealed partial class MovimentacaoListaViewModel(
-    IMovimentacaoCommandService commandService,
-    IMovimentacaoQueryService queryService,
-    IDialogService dialogService,
+    MovimentacaoHttpClient client,
     MovimentacaoNavigation navigation,
-    ExceptionHandler exceptionHandler) : BaseViewModel
+    ExceptionHandler exceptionHandler,
+    IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
     public override string Titulo => "Movimentações";
 
-    [ObservableProperty] private ObservableCollection<MovimentacaoListaDto> movimentacoes = [];
+    [ObservableProperty]
+    public partial ObservableCollection<MovimentacaoListaDto> Movimentacoes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirAlteracaoCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExcluirCommand))]
-    private MovimentacaoListaDto? selecionado;
+    public partial MovimentacaoListaDto? Selecionado { get; set; }
 
     private bool AlterarHabilitado => Selecionado != null && !Carregando;
 
@@ -36,14 +36,13 @@ internal sealed partial class MovimentacaoListaViewModel(
     /// Carrega as movimentações financeiras disponíveis.
     /// </summary>
     /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
-    [RelayCommand]
     public async Task InicializarAsync(CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
 
-            var resultado = await queryService.ListarAsync(cancellationToken);
+            var resultado = await client.ListarAsync(cancellationToken);
 
             Movimentacoes = new ObservableCollection<MovimentacaoListaDto>(resultado);
         }
@@ -77,7 +76,7 @@ internal sealed partial class MovimentacaoListaViewModel(
         {
             Carregando = true;
 
-            await commandService.ExcluirAsync(Selecionado!.Id, cancellationToken);
+            await client.ExcluirAsync(Selecionado!.Id, cancellationToken);
 
             Movimentacoes.Remove(Selecionado);
             Selecionado = null;

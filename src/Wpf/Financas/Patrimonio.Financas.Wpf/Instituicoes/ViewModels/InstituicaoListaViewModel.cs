@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
-using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Dialogs;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
+using Patrimonio.Financas.Wpf.Instituicoes.HttpClients;
 using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
 using System.Collections.ObjectModel;
 
@@ -14,37 +14,35 @@ namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 /// ViewModel responsável pela listagem de instituições.
 /// </summary>
 internal sealed partial class InstituicaoListaViewModel(
-    IInstituicaoCommandService commandService,
-    IInstituicaoQueryService queryService,
-    IDialogService dialogService,
+    InstituicaoHttpClient client,
     InstituicaoNavigation navigation,
-    ExceptionHandler exceptionHandler) : BaseViewModel
+    ExceptionHandler exceptionHandler,
+    IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
     public override string Titulo => "Instituições";
 
-    [ObservableProperty] private ObservableCollection<InstituicaoListaDto> instituicoes = [];
+    [ObservableProperty]
+    public partial ObservableCollection<InstituicaoListaDto> Instituicoes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirAlteracaoCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExcluirCommand))]
-    private InstituicaoListaDto? selecionado;
+    public partial InstituicaoListaDto? Selecionado { get; set; }
 
     private bool AlterarHabilitado => Selecionado != null && !Carregando;
 
     /// <summary>
     /// Carrega as instituições disponíveis.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public async Task InicializarAsync(CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
 
-            var resultado = await queryService.ListarAsync(cancellationToken);
+            var resultado = await client.ListarAsync(cancellationToken);
 
             Instituicoes = new ObservableCollection<InstituicaoListaDto>(resultado);
         }
@@ -78,7 +76,7 @@ internal sealed partial class InstituicaoListaViewModel(
         {
             Carregando = true;
 
-            await commandService.ExcluirAsync(Selecionado!.Id, cancellationToken);
+            await client.ExcluirAsync(Selecionado!.Id, cancellationToken);
 
             Instituicoes.Remove(Selecionado);
             Selecionado = null;

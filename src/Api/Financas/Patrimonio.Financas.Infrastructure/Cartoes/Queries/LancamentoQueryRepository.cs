@@ -11,12 +11,15 @@ namespace Patrimonio.Financas.Infrastructure.Cartoes.Queries;
 internal sealed class LancamentoQueryRepository(FinancasDbContext context) : ILancamentoQueryRepository
 {
     /// <inheritdoc/>
-    public async Task<IReadOnlyCollection<LancamentoListaReadModel>> ListarAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<LancamentoListaReadModel>> ListarAsync(
+        int faturaId,
+        CancellationToken cancellationToken)
     {
         return await (
             from lancamento in context.Lancamentos
             join categoria in context.Categorias
                 on lancamento.CategoriaId equals categoria.Id
+            where lancamento.FaturaId == faturaId
             select new LancamentoListaReadModel
             {
                 Id = lancamento.Id,
@@ -32,7 +35,7 @@ internal sealed class LancamentoQueryRepository(FinancasDbContext context) : ILa
                 DataAlteracao = lancamento.DataAlteracao
             })
             .AsNoTracking()
-            .OrderByDescending(l => l.DataCriacao)
+            .OrderByDescending(l => l.DataCompra)
             .ToListAsync(cancellationToken);
     }
 

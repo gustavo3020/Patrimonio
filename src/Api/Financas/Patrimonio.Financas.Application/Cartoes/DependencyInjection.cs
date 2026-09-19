@@ -24,10 +24,12 @@ internal static class DependencyInjection
 
         // Fatura
         services.AddScoped<IFaturaCommandService, FaturaCommandService>()
+                .AddScoped<IFaturaOpcoesPagamentoService, FaturaOpcoesPagamentoService>()
                 .AddScoped<IFaturaQueryService, FaturaQueryService>();
 
         // Lancamento
         services.AddScoped<ILancamentoCommandService, LancamentoCommandService>()
+                .AddScoped<ILancamentoOpcoesCriacaoService, LancamentoOpcoesCriacaoService>()
                 .AddScoped<ILancamentoQueryService, LancamentoQueryService>();
 
         return services;

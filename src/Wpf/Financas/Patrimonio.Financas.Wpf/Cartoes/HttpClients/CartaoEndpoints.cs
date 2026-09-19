@@ -9,4 +9,5 @@ internal static class CartaoEndpoints
     /// Obtém a rota base para as operações de cartões.
     /// </summary>
     public const string Base = "api/v1/financas/cartoes";
+    public static string OpcoesCriacao() => $"{Base}/opcoes-criacao";
 }

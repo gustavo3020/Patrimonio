@@ -22,8 +22,10 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     [Fact]
     public async Task Listar_DeveRetornarOkComFaturas()
     {
+        var cartaoId = Factory.BaseData.Cartao.Id;
+
         var resposta = await Client.GetAsync(
-            RotaBase,
+            $"{RotaBase}?cartaoId={cartaoId}",
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.OK);
