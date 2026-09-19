@@ -12,6 +12,7 @@ public sealed record FaturaListaDto : LeituraDtoBase
     public required DateOnly DataFechamento { get; init; }
     public required DateOnly DataVencimento { get; init; }
     public required StatusFatura Status { get; init; }
+    public required decimal ValorTotal { get; init; }
     public required DateOnly? DataPagamento { get; init; }
 
     // Relacionamentos.

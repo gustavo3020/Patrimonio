@@ -21,7 +21,7 @@ internal sealed partial class FaturaListaViewModel(
 {
     private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
     private int _cartaoId;
-    private string _cartaoNome;
+    private string _cartaoNome = string.Empty;
 
     /// <inheritdoc />
     public override string Titulo => $"Faturas do cartão {_cartaoNome}";

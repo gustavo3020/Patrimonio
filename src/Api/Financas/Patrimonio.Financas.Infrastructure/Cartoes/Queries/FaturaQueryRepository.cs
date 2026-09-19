@@ -26,6 +26,9 @@ internal sealed class FaturaQueryRepository(FinancasDbContext context) : IFatura
                 DataFechamento = fatura.DataFechamento,
                 DataVencimento = fatura.DataVencimento,
                 Status = fatura.Status,
+                ValorTotal = context.Lancamentos
+                    .Where(l => l.FaturaId == fatura.Id)
+                    .Sum(l => l.Valor.Valor),
                 DataPagamento = fatura.DataPagamento,
                 CartaoNome = cartao.Nome.Valor,
                 DataCriacao = fatura.DataCriacao,

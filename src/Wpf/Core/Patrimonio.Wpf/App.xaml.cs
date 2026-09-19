@@ -44,8 +44,10 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        var window = _host.Services.GetRequiredService<MainWindow>();
+        var appNavigation = _host.Services.GetRequiredService<AppNavigation>();
+        appNavigation.Inicializar();
 
+        var window = _host.Services.GetRequiredService<MainWindow>();
         window.Show();
     }
 

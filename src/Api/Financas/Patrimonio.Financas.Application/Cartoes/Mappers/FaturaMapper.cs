@@ -16,6 +16,7 @@ internal static class FaturaMapper
             DataFechamento = fatura.DataFechamento,
             DataVencimento = fatura.DataVencimento,
             Status = fatura.Status,
+            ValorTotal = fatura.ValorTotal,
             DataPagamento = fatura.DataPagamento,
             CartaoNome = fatura.CartaoNome,
             DataCriacao = fatura.DataCriacao,

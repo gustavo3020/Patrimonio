@@ -52,7 +52,7 @@
     <!-- Botão de menu -->
     <Style x:Key="MenuButtonStyle" TargetType="Button">
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Padding" Value="6,5"/>
         <Setter Property="Margin" Value="0,0,0,4"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>

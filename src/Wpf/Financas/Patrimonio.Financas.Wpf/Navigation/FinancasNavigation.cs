@@ -5,6 +5,7 @@ using Patrimonio.Financas.Wpf.Common.Navigation;
 using Patrimonio.Financas.Wpf.Contas.Navigation;
 using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
 using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
+using System.Windows.Controls;
 
 namespace Patrimonio.Financas.Wpf.Navigation;
 
@@ -18,6 +19,13 @@ public sealed partial class FinancasNavigation(
     InstituicaoNavigation instituicaoNavigation,
     MovimentacaoNavigation movimentacaoNavigation) : NavigationBase
 {
+    public UserControl? Menu { get; private set; }
+
+    public void Inicializar()
+    {
+        Menu = new FinancasNavigationView { DataContext = this };
+    }
+
     /// <summary>
     /// Abre a funcionalidade de categorias.
     /// </summary>
