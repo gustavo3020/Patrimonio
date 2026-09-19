@@ -4,9 +4,9 @@ using Patrimonio.Financas.Application.Movimentacoes.Mappers;
 using Patrimonio.Financas.Application.Movimentacoes.Queries.Abstractions;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
+using Patrimonio.Financas.Domain.Common.ValueObjects;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
-using Patrimonio.Financas.Domain.Movimentacoes.ValueObjects;
 
 namespace Patrimonio.Financas.Application.Movimentacoes.Commands.Services;
 
@@ -23,12 +23,16 @@ internal sealed class MovimentacaoCommandService(
     {
         logger.LogInformation("Criando movimentação para a data {Data}.", dto.Data);
 
+        var descricao = string.IsNullOrWhiteSpace(dto.Descricao)
+            ? null
+            : new Descricao(dto.Descricao);
+
         var entidade = Movimentacao.Criar(
             dto.Data,
             new Dinheiro(dto.Valor),
             dto.Natureza,
             dto.Tipo,
-            dto.Descricao,
+            descricao,
             dto.ContaId,
             dto.CategoriaId);
 
@@ -49,13 +53,18 @@ internal sealed class MovimentacaoCommandService(
         var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
             ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
 
-        entidade.AlterarData(dto.Data);
-        entidade.AlterarValor(new Dinheiro(dto.Valor));
-        entidade.AlterarNatureza(dto.Natureza);
-        entidade.AlterarTipo(dto.Tipo);
-        entidade.AlterarDescricao(dto.Descricao);
-        entidade.AlterarConta(dto.ContaId);
-        entidade.AlterarCategoria(dto.CategoriaId);
+        var descricao = string.IsNullOrWhiteSpace(dto.Descricao)
+            ? null
+            : new Descricao(dto.Descricao);
+
+        entidade.Alterar(
+            dto.Data,
+            new Dinheiro(dto.Valor),
+            dto.Natureza,
+            dto.Tipo,
+            descricao,
+            dto.ContaId,
+            dto.CategoriaId);
 
         await commandRepository.SalvarAsync(cancellationToken);
     }
@@ -67,6 +76,8 @@ internal sealed class MovimentacaoCommandService(
 
         var entidade = await commandRepository.ObterPorIdAsync(movimentacaoId, cancellationToken)
             ?? throw new RecursoNaoEncontradoException($"Movimentação com Id {movimentacaoId} não encontrada.");
+
+        entidade.Excluir();
 
         commandRepository.Remover(entidade);
 

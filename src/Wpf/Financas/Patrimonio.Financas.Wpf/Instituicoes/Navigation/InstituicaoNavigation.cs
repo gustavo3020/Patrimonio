@@ -17,7 +17,7 @@ public sealed partial class InstituicaoNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<InstituicaoAlteracaoViewModel>();
 
-        await viewModel.InicializarAsync(instituicaoId, cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, instituicaoId, cancellationToken);
 
         ConteudoAtual = viewModel;
     }
@@ -28,6 +28,8 @@ public sealed partial class InstituicaoNavigation(
     public void AbrirCriacao()
     {
         var viewModel = serviceProvider.GetRequiredService<InstituicaoCriacaoViewModel>();
+
+        viewModel.Inicializar(voltar: AbrirListaAsync);
 
         ConteudoAtual = viewModel;
     }

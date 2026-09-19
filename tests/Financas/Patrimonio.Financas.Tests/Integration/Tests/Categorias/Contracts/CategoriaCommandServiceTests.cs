@@ -42,7 +42,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var dto = CriarDto();
 
-        var criado = await service.CriarAsync(dto, CancellationToken.None);
+        var criado = await service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         criado.Should().NotBeNull();
         criado.Nome.Should().NotBeNullOrWhiteSpace();
@@ -57,9 +57,9 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var dto = CriarDto();
 
-        await service.CriarAsync(dto, CancellationToken.None);
+        await service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        var action = () => service.CriarAsync(dto, CancellationToken.None);
+        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -76,11 +76,11 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var categoria = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var categoria = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.AlterarAsync(categoria.Id, dtoAlterar, CancellationToken.None);
+        await command.AlterarAsync(categoria.Id, dtoAlterar, TestContext.Current.CancellationToken);
 
-        var alterado = await query.ObterPorIdAsync(categoria.Id, CancellationToken.None);
+        var alterado = await query.ObterPorIdAsync(categoria.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
         alterado.Nome.Should().Be(dtoAlterar.Nome);
@@ -96,12 +96,12 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
             Nome = Factory.BaseData.Categoria.Nome
         };
 
-        var categoria = await service.CriarAsync(CriarDto(), CancellationToken.None);
+        var categoria = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
         var action = () => service.AlterarAsync(
             categoria.Id,
             dto,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -115,7 +115,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         var action = () => service.AlterarAsync(
             int.MaxValue,
             AlterarDto(),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
@@ -131,11 +131,11 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), CancellationToken.None);
+        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
 
-        await command.ExcluirAsync(criado.Id, CancellationToken.None);
+        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, CancellationToken.None);
+        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
@@ -145,7 +145,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
         using var scope = CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Categoria.Id, CancellationToken.None);
+        var action = () => service.ExcluirAsync(Factory.BaseData.Categoria.Id, TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<ConflitoException>();
     }
@@ -158,7 +158,7 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
 
         var action = () => service.ExcluirAsync(
             int.MaxValue,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

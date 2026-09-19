@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Patrimonio.Financas.Domain.Cartoes.Entities;
 using Patrimonio.Financas.Domain.Categorias.Entities;
 using Patrimonio.Financas.Domain.Contas.Entities;
 using Patrimonio.Financas.Domain.Movimentacoes.Entities;
@@ -26,8 +27,13 @@ internal sealed class MovimentacaoConfiguration : IEntityTypeConfiguration<Movim
                  .IsRequired();
         });
 
-        builder.Property(m => m.Descricao)
-               .HasMaxLength(500);
+        builder.ComplexProperty(l => l.Descricao, descricao =>
+        {
+            descricao.Property(d => d.Valor)
+                     .HasColumnName("Descricao")
+                     .HasMaxLength(500)
+                     .IsRequired();
+        });
 
         builder.HasOne<Categoria>()
                .WithMany()
@@ -37,6 +43,11 @@ internal sealed class MovimentacaoConfiguration : IEntityTypeConfiguration<Movim
         builder.HasOne<Conta>()
                .WithMany()
                .HasForeignKey(m => m.ContaId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Fatura>()
+               .WithMany()
+               .HasForeignKey(m => m.FaturaId)
                .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Domain.Exceptions;
+using Patrimonio.Financas.Infrastructure.Cartoes;
 using Patrimonio.Financas.Infrastructure.Categorias;
 using Patrimonio.Financas.Infrastructure.Common.Exceptions;
 using Patrimonio.Financas.Infrastructure.Contas;
@@ -48,7 +49,8 @@ public static class DependencyInjection
         });
 
         // Funcionalidades
-        services.AddCategoriasInfrastructure()
+        services.AddCartoesInfrastructure()
+                .AddCategoriasInfrastructure()
                 .AddContasInfrastructure()
                 .AddInstituicoesInfrastructure()
                 .AddMovimentacoesInfrastructure();

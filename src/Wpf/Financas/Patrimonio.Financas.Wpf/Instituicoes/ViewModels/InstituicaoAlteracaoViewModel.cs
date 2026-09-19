@@ -1,10 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
-using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
-using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
+using Patrimonio.Financas.Wpf.Instituicoes.HttpClients;
 
 namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 
@@ -12,36 +11,35 @@ namespace Patrimonio.Financas.Wpf.Instituicoes.ViewModels;
 /// ViewModel responsável pela alteração de instituições.
 /// </summary>
 internal sealed partial class InstituicaoAlteracaoViewModel(
-    IInstituicaoCommandService commandService,
-    IInstituicaoQueryService queryService,
-    InstituicaoNavigation navigation,
+    InstituicaoHttpClient client,
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+
     /// <inheritdoc />
     public override string Titulo => "Editar instituição";
 
-    [ObservableProperty] private int instituicaoId;
-    [ObservableProperty] private string nome = string.Empty;
+    [ObservableProperty] public partial int InstituicaoId { get; set; }
+    [ObservableProperty] public partial string Nome { get; set; } = string.Empty;
 
     /// <summary>
     /// Carrega os dados da instituição a ser alterada.
     /// </summary>
-    /// <param name="instituicaoId">
-    /// Identificador da instituição a ser carregada.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="voltar">Função de callback utilizada para retornar à tela anterior.</param>
+    /// <param name="instituicaoId">Identificador da instituição a ser carregada.</param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public async Task InicializarAsync(
+        Func<CancellationToken, Task> voltar,
         int instituicaoId,
         CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
+            _voltar = voltar;
             InstituicaoId = instituicaoId;
 
-            var instituicao = await queryService.ObterPorIdAsync(
+            var instituicao = await client.ObterPorIdAsync(
                 instituicaoId,
                 cancellationToken);
 
@@ -60,9 +58,7 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
     /// <summary>
     /// Salva as alterações realizadas na instituição.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     [RelayCommand]
     private async Task SalvarAsync(
         CancellationToken cancellationToken)
@@ -71,7 +67,7 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
         {
             Carregando = true;
 
-            await commandService.AlterarAsync(
+            await client.AlterarAsync(
                 InstituicaoId,
                 new InstituicaoAlteracaoDto
                 {
@@ -79,7 +75,7 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
                 },
                 cancellationToken);
 
-            await navigation.AbrirListaAsync(cancellationToken);
+            await _voltar(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -94,6 +90,6 @@ internal sealed partial class InstituicaoAlteracaoViewModel(
     [RelayCommand]
     private async Task CancelarAsync(CancellationToken cancellationToken)
     {
-        await navigation.AbrirListaAsync(cancellationToken);
+        await _voltar(cancellationToken);
     }
 }

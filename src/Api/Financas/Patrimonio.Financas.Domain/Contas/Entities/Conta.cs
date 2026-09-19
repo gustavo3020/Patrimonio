@@ -8,21 +8,21 @@ namespace Patrimonio.Financas.Domain.Contas.Entities;
 /// </summary>
 public sealed class Conta : EntidadeBase
 {
-    // Dados próprios.
-    public Nome Nome { get; private set; }
-
-    // Relacionamentos.
-    public int InstituicaoId { get; private set; }
-
-    private Conta()
-    {
-    }
-
     private Conta(Nome nome, int instituicaoId)
     {
         Nome = nome;
         InstituicaoId = instituicaoId;
     }
+
+    private Conta()
+    {
+    }
+
+    // Dados próprios.
+    public Nome Nome { get; private set; }
+
+    // Relacionamentos.
+    public int InstituicaoId { get; private set; }
 
     /// <summary>
     /// Cria uma nova conta.

@@ -18,13 +18,13 @@ internal sealed class ContaSeeder(
 
         try
         {
-            conta = await queryService.ObterPorIdAsync(1, CancellationToken.None);
+            conta = await queryService.ObterPorIdAsync(1, TestContext.Current.CancellationToken);
         }
         catch (RecursoNaoEncontradoException)
         {
             var contaDto = Criar(data.Instituicao.Id);
 
-            conta = await commandService.CriarAsync(contaDto, CancellationToken.None);
+            conta = await commandService.CriarAsync(contaDto, TestContext.Current.CancellationToken);
         }
 
         data.Conta = conta;

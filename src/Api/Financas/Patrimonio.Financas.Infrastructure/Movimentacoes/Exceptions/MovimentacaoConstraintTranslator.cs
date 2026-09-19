@@ -12,7 +12,8 @@ internal sealed class MovimentacaoConstraintTranslator : IConstraintTranslator
     {
         // Chaves estrangeiras
         ["FK_Movimentacoes_Categorias_CategoriaId"] = "Não é possível excluir a categoria pois existem movimentações vinculadas.",
-        ["FK_Movimentacoes_Contas_ContaId"] = "Não é possível excluir a conta pois existem movimentações vinculadas."
+        ["FK_Movimentacoes_Contas_ContaId"] = "Não é possível excluir a conta pois existem movimentações vinculadas.",
+        ["FK_Movimentacoes_Faturas_FaturaId"] = "Não é possível excluir a fatura pois existem movimentações vinculadas."
     };
 
     /// <inheritdoc/>

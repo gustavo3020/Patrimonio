@@ -17,7 +17,7 @@ public sealed partial class CategoriaNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<CategoriaAlteracaoViewModel>();
 
-        await viewModel.InicializarAsync(categoriaId, cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, categoriaId, cancellationToken);
 
         ConteudoAtual = viewModel;
     }
@@ -28,6 +28,8 @@ public sealed partial class CategoriaNavigation(
     public void AbrirCriacao()
     {
         var viewModel = serviceProvider.GetRequiredService<CategoriaCriacaoViewModel>();
+
+        viewModel.Inicializar(voltar: AbrirListaAsync);
 
         ConteudoAtual = viewModel;
     }

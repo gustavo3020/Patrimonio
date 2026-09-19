@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Patrimonio.Financas.Domain.Cartoes.Entities;
 using Patrimonio.Financas.Domain.Categorias.Entities;
 using Patrimonio.Financas.Domain.Contas.Entities;
 using Patrimonio.Financas.Domain.Instituicoes.Entities;
@@ -13,9 +14,12 @@ namespace Patrimonio.Financas.Infrastructure.Persistence;
 internal sealed class FinancasDbContext(DbContextOptions<FinancasDbContext> options) : DbContext(options)
 {
     // Coleções
+    public DbSet<Cartao> Cartoes => Set<Cartao>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Conta> Contas => Set<Conta>();
+    public DbSet<Fatura> Faturas => Set<Fatura>();
     public DbSet<Instituicao> Instituicoes => Set<Instituicao>();
+    public DbSet<Lancamento> Lancamentos => Set<Lancamento>();
     public DbSet<Movimentacao> Movimentacoes => Set<Movimentacao>();
 
     /// <summary>

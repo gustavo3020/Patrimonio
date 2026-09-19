@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Movimentacoes.HttpClients;
 using Patrimonio.Financas.Wpf.Movimentacoes.Navigation;
@@ -20,21 +19,7 @@ internal static class DependencyInjection
     public static IServiceCollection AddMovimentacoesWpf(this IServiceCollection services)
     {
         // HTTP Clients
-        services.AddHttpClient<MovimentacaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
-
-        services.AddHttpClient<MovimentacaoOpcoesCriacaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
-
-        // Services
-        services.AddTransient<IMovimentacaoCommandService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
-
-        services.AddTransient<IMovimentacaoOpcoesCriacaoService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoOpcoesCriacaoHttpClient>());
-
-        services.AddTransient<IMovimentacaoQueryService>(
-            serviceProvider => serviceProvider.GetRequiredService<MovimentacaoHttpClient>());
+        services.AddHttpClient<MovimentacaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
         // ViewModels
         services.AddTransient<MovimentacaoAlteracaoViewModel>();

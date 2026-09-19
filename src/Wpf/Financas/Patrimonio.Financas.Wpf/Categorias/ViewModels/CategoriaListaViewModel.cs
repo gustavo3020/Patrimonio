@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
-using Patrimonio.Financas.Contracts.Categorias.Services;
+using Patrimonio.Financas.Wpf.Categorias.HttpClients;
 using Patrimonio.Financas.Wpf.Categorias.Navigation;
 using Patrimonio.Financas.Wpf.Common.Dialogs;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
@@ -14,37 +14,35 @@ namespace Patrimonio.Financas.Wpf.Categorias.ViewModels;
 /// ViewModel responsável pela listagem de categorias.
 /// </summary>
 internal sealed partial class CategoriaListaViewModel(
-    ICategoriaCommandService commandService,
-    ICategoriaQueryService queryService,
-    IDialogService dialogService,
+    CategoriaHttpClient client,
     CategoriaNavigation navigation,
-    ExceptionHandler exceptionHandler) : BaseViewModel
+    ExceptionHandler exceptionHandler,
+    IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
     public override string Titulo => "Categorias";
 
-    [ObservableProperty] private ObservableCollection<CategoriaListaDto> categorias = [];
+    [ObservableProperty]
+    public partial ObservableCollection<CategoriaListaDto> Categorias { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirAlteracaoCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExcluirCommand))]
-    private CategoriaListaDto? selecionado;
+    public partial CategoriaListaDto? Selecionado { get; set; }
 
     private bool AlterarHabilitado => Selecionado != null && !Carregando;
 
     /// <summary>
     /// Carrega as categorias disponíveis.
     /// </summary>
-    /// <param name="cancellationToken">
-    /// Token utilizado para cancelar a operação.
-    /// </param>
+    /// <param name="cancellationToken">Token utilizado para cancelar a operação.</param>
     public async Task InicializarAsync(CancellationToken cancellationToken)
     {
         try
         {
             Carregando = true;
 
-            var resultado = await queryService.ListarAsync(cancellationToken);
+            var resultado = await client.ListarAsync(cancellationToken);
 
             Categorias = new ObservableCollection<CategoriaListaDto>(resultado);
         }
@@ -78,7 +76,7 @@ internal sealed partial class CategoriaListaViewModel(
         {
             Carregando = true;
 
-            await commandService.ExcluirAsync(Selecionado!.Id, cancellationToken);
+            await client.ExcluirAsync(Selecionado!.Id, cancellationToken);
 
             Categorias.Remove(Selecionado);
             Selecionado = null;

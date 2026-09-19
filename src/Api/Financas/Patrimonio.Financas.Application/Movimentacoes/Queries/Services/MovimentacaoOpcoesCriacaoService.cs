@@ -9,7 +9,7 @@ namespace Patrimonio.Financas.Application.Movimentacoes.Queries.Services;
 /// <summary>
 /// Implementa as operações para obtenção das opções necessárias à criação de uma movimentação.
 /// </summary>
-internal class MovimentacaoOpcoesCriacaoService(
+internal sealed class MovimentacaoOpcoesCriacaoService(
     ICategoriaLookupRepository categoriaLookupRepository,
     IContaLookupRepository contaLookupRepository) : IMovimentacaoOpcoesCriacaoService
 {

@@ -17,7 +17,7 @@ public sealed partial class ContaNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<ContaAlteracaoViewModel>();
 
-        await viewModel.InicializarAsync(contaId, cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, contaId, cancellationToken);
 
         ConteudoAtual = viewModel;
     }
@@ -29,7 +29,7 @@ public sealed partial class ContaNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<ContaCriacaoViewModel>();
 
-        await viewModel.InicializarAsync(cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, cancellationToken);
 
         ConteudoAtual = viewModel;
     }

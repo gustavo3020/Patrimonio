@@ -15,5 +15,5 @@ internal abstract partial class BaseViewModel : ObservableObject
     /// <summary>
     /// Indica se o ViewModel está executando uma operação assíncrona.
     /// </summary>
-    [ObservableProperty] protected bool carregando;
+    [ObservableProperty] protected partial bool Carregando { get; set; }
 }

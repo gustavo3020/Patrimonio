@@ -22,7 +22,7 @@ internal sealed class CategoriaQueryRepository(FinancasDbContext context) : ICat
                 DataCriacao = c.DataCriacao,
                 DataAlteracao = c.DataAlteracao
             })
-            .OrderByDescending(c => c.DataCriacao)
+            .OrderBy(c => c.Nome)
             .ToListAsync(cancellationToken);
     }
 

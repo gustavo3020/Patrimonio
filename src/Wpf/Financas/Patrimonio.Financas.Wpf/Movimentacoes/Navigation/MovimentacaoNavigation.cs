@@ -17,7 +17,7 @@ public sealed partial class MovimentacaoNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<MovimentacaoAlteracaoViewModel>();
 
-        await viewModel.InicializarAsync(movimentacaoId, cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, movimentacaoId, cancellationToken);
 
         ConteudoAtual = viewModel;
     }
@@ -29,7 +29,7 @@ public sealed partial class MovimentacaoNavigation(
     {
         var viewModel = serviceProvider.GetRequiredService<MovimentacaoCriacaoViewModel>();
 
-        await viewModel.InicializarAsync(cancellationToken);
+        await viewModel.InicializarAsync(voltar: AbrirListaAsync, cancellationToken);
 
         ConteudoAtual = viewModel;
     }

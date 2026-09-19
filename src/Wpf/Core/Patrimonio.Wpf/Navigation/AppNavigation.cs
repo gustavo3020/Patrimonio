@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using Patrimonio.Financas.Wpf.Common.Navigation;
+﻿using Patrimonio.Financas.Wpf.Common.Navigation;
 using Patrimonio.Financas.Wpf.Navigation;
 
 namespace Patrimonio.Wpf.Navigation;
@@ -12,12 +11,18 @@ public sealed partial class AppNavigation(
 {
     public string Titulo { get; } = "Patrimonio";
 
-    /// <summary>
-    /// Abre o módulo de finanças.
-    /// </summary>
-    [RelayCommand]
-    private void AbrirFinancas()
+    public FinancasNavigation FinancasNavigation { get; } = financasNavigation;
+
+    public void Inicializar()
     {
-        ConteudoAtual = financasNavigation;
+        FinancasNavigation.Inicializar();
+
+        FinancasNavigation.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(FinancasNavigation.ConteudoAtual))
+            {
+                ConteudoAtual = FinancasNavigation.ConteudoAtual;
+            }
+        };
     }
 }

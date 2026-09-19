@@ -23,6 +23,16 @@
         <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Contas}"
                   SelectedItem="{Binding Selecionado}">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Alterar"
+                              Command="{Binding AbrirAlteracaoCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem Header="Excluir"
+                              Command="{Binding ExcluirCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
 
             <DataGrid.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding ExcluirCommand}" />

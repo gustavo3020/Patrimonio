@@ -8,17 +8,17 @@ namespace Patrimonio.Financas.Domain.Categorias.Entities;
 /// </summary>
 public sealed class Categoria : EntidadeBase
 {
-    // Dados próprios.
-    public Nome Nome { get; private set; }
+    private Categoria(Nome nome)
+    {
+        Nome = nome;
+    }
 
     private Categoria()
     {
     }
 
-    private Categoria(Nome nome)
-    {
-        Nome = nome;
-    }
+    // Dados próprios.
+    public Nome Nome { get; private set; }
 
     /// <summary>
     /// Cria uma nova categoria.

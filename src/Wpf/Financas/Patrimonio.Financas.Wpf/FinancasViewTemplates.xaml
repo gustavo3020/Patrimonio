@@ -3,6 +3,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Categorias/ViewTemplates.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Cartoes/ViewTemplates.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Contas/ViewTemplates.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Instituicoes/ViewTemplates.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Patrimonio.Financas.Wpf;component/Movimentacoes/ViewTemplates.xaml" />

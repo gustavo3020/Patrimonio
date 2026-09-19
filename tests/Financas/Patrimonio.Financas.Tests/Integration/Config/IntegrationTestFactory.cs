@@ -47,9 +47,12 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
 
         builder.ConfigureServices(services =>
         {
+            services.AddScoped<CartaoSeeder>();
             services.AddScoped<CategoriaSeeder>();
             services.AddScoped<ContaSeeder>();
+            services.AddScoped<FaturaSeeder>();
             services.AddScoped<InstituicaoSeeder>();
+            services.AddScoped<LancamentoSeeder>();
             services.AddScoped<MovimentacaoSeeder>();
         });
     }
@@ -80,6 +83,9 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
         await scope.ServiceProvider.GetRequiredService<InstituicaoSeeder>().SeedAsync(BaseData);
         await scope.ServiceProvider.GetRequiredService<ContaSeeder>().SeedAsync(BaseData);
         await scope.ServiceProvider.GetRequiredService<MovimentacaoSeeder>().SeedAsync(BaseData);
+        await scope.ServiceProvider.GetRequiredService<CartaoSeeder>().SeedAsync(BaseData);
+        await scope.ServiceProvider.GetRequiredService<FaturaSeeder>().SeedAsync(BaseData);
+        await scope.ServiceProvider.GetRequiredService<LancamentoSeeder>().SeedAsync(BaseData);
     }
 
     public override async ValueTask DisposeAsync()

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Wpf.Cartoes;
 using Patrimonio.Financas.Wpf.Categorias;
 using Patrimonio.Financas.Wpf.Common.Dialogs;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
@@ -28,7 +29,8 @@ public static class DependencyInjection
                 .AddSingleton<IDialogService, DialogService>();
 
         // Funcionalidades
-        services.AddCategoriasWpf()
+        services.AddCartoesWpf()
+                .AddCategoriasWpf()
                 .AddContasWpf()
                 .AddInstituicoesWpf()
                 .AddMovimentacoesWpf();

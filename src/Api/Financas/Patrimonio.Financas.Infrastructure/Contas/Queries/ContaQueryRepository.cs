@@ -26,7 +26,7 @@ internal sealed class ContaQueryRepository(FinancasDbContext context) : IContaQu
                 DataAlteracao = conta.DataAlteracao
             })
             .AsNoTracking()
-            .OrderByDescending(c => c.DataCriacao)
+            .OrderBy(c => c.Nome)
             .ToListAsync(cancellationToken);
     }
 

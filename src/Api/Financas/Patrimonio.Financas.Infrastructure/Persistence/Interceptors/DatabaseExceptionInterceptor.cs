@@ -28,17 +28,4 @@ internal sealed class DatabaseExceptionInterceptor(
 
         return Task.CompletedTask;
     }
-
-    /// <inheritdoc/>
-    public override void SaveChangesFailed(
-        DbContextErrorEventData eventData)
-    {
-        if (eventData.Exception is DbUpdateException
-            {
-                InnerException: PostgresException postgresException
-            })
-        {
-            throw translator.Traduzir(postgresException);
-        }
-    }
 }

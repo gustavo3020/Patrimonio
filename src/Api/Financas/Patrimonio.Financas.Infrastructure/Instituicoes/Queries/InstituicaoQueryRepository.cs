@@ -22,7 +22,7 @@ internal sealed class InstituicaoQueryRepository(FinancasDbContext context) : II
                 DataCriacao = c.DataCriacao,
                 DataAlteracao = c.DataAlteracao
             })
-            .OrderByDescending(c => c.DataCriacao)
+            .OrderBy(c => c.Nome)
             .ToListAsync(cancellationToken);
     }
 

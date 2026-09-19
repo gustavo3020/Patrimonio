@@ -24,6 +24,172 @@ namespace Patrimonio.Financas.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Cartao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Bandeira")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("DataAlteracao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("DataCriacao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("InstituicaoId")
+                        .HasColumnType("integer");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "DiaFechamento", "Patrimonio.Financas.Domain.Cartoes.Entities.Cartao.DiaFechamento#DiaDoMes", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Valor")
+                                .HasColumnType("integer")
+                                .HasColumnName("DiaFechamento");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "DiaVencimento", "Patrimonio.Financas.Domain.Cartoes.Entities.Cartao.DiaVencimento#DiaDoMes", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Valor")
+                                .HasColumnType("integer")
+                                .HasColumnName("DiaVencimento");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Limite", "Patrimonio.Financas.Domain.Cartoes.Entities.Cartao.Limite#Dinheiro", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Valor")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("numeric(18,2)")
+                                .HasColumnName("Limite");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstituicaoId");
+
+                    b.ToTable("Cartoes", "financas");
+                });
+
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Fatura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CartaoId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("DataAlteracao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("DataCriacao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("DataFechamento")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("DataPagamento")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataVencimento")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CartaoId");
+
+                    b.ToTable("Faturas", "financas");
+                });
+
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("DataAlteracao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("DataCompra")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("DataCriacao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FaturaId")
+                        .HasColumnType("integer");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Descricao", "Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento.Descricao#Descricao", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)")
+                                .HasColumnName("Descricao");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Estabelecimento", "Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento.Estabelecimento#Estabelecimento", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)")
+                                .HasColumnName("Estabelecimento");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Responsavel", "Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento.Responsavel#Responsavel", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("Responsavel");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Valor", "Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento.Valor#Dinheiro", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Valor")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("numeric(18,2)")
+                                .HasColumnName("Valor");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoriaId");
+
+                    b.HasIndex("FaturaId");
+
+                    b.ToTable("Lancamentos", "financas");
+                });
+
             modelBuilder.Entity("Patrimonio.Financas.Domain.Categorias.Entities.Categoria", b =>
                 {
                     b.Property<int>("Id")
@@ -109,15 +275,23 @@ namespace Patrimonio.Financas.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("DataCriacao")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                    b.Property<int?>("FaturaId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Natureza")
                         .HasColumnType("integer");
 
                     b.Property<int>("Tipo")
                         .HasColumnType("integer");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Descricao", "Patrimonio.Financas.Domain.Movimentacoes.Entities.Movimentacao.Descricao#Descricao", b1 =>
+                        {
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)")
+                                .HasColumnName("Descricao");
+                        });
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Valor", "Patrimonio.Financas.Domain.Movimentacoes.Entities.Movimentacao.Valor#Dinheiro", b1 =>
                         {
@@ -135,7 +309,101 @@ namespace Patrimonio.Financas.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ContaId");
 
+                    b.HasIndex("FaturaId");
+
                     b.ToTable("Movimentacoes", "financas");
+                });
+
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Cartao", b =>
+                {
+                    b.HasOne("Patrimonio.Financas.Domain.Instituicoes.Entities.Instituicao", null)
+                        .WithMany()
+                        .HasForeignKey("InstituicaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Patrimonio.Financas.Domain.Common.ValueObjects.Nome", "Nome", b1 =>
+                        {
+                            b1.Property<int>("CartaoId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Normalizado")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("NomeNormalizado");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("Nome");
+
+                            b1.HasKey("CartaoId");
+
+                            b1.HasIndex("Normalizado")
+                                .IsUnique();
+
+                            b1.ToTable("Cartoes", "financas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CartaoId");
+                        });
+
+                    b.Navigation("Nome")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Fatura", b =>
+                {
+                    b.HasOne("Patrimonio.Financas.Domain.Cartoes.Entities.Cartao", null)
+                        .WithMany()
+                        .HasForeignKey("CartaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Patrimonio.Financas.Domain.Cartoes.Entities.Lancamento", b =>
+                {
+                    b.HasOne("Patrimonio.Financas.Domain.Categorias.Entities.Categoria", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Patrimonio.Financas.Domain.Cartoes.Entities.Fatura", null)
+                        .WithMany()
+                        .HasForeignKey("FaturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Patrimonio.Financas.Domain.Cartoes.ValueObjects.Parcelamento", "Parcelamento", b1 =>
+                        {
+                            b1.Property<int>("LancamentoId")
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("GrupoId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("GrupoId");
+
+                            b1.Property<int>("NumeroParcela")
+                                .HasColumnType("integer")
+                                .HasColumnName("NumeroParcela");
+
+                            b1.Property<int>("TotalParcelas")
+                                .HasColumnType("integer")
+                                .HasColumnName("TotalParcelas");
+
+                            b1.HasKey("LancamentoId");
+
+                            b1.ToTable("Lancamentos", "financas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("LancamentoId");
+                        });
+
+                    b.Navigation("Parcelamento")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Patrimonio.Financas.Domain.Categorias.Entities.Categoria", b =>
@@ -259,6 +527,11 @@ namespace Patrimonio.Financas.Infrastructure.Persistence.Migrations
                         .HasForeignKey("ContaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Patrimonio.Financas.Domain.Cartoes.Entities.Fatura", null)
+                        .WithMany()
+                        .HasForeignKey("FaturaId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

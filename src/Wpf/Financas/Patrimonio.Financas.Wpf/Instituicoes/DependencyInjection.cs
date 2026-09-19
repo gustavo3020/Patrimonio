@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Wpf.Common.Http;
 using Patrimonio.Financas.Wpf.Instituicoes.HttpClients;
 using Patrimonio.Financas.Wpf.Instituicoes.Navigation;
@@ -20,15 +19,7 @@ internal static class DependencyInjection
     public static IServiceCollection AddInstituicoesWpf(this IServiceCollection services)
     {
         // HTTP Clients
-        services.AddHttpClient<InstituicaoHttpClient>()
-            .AddHttpMessageHandler<ApiResponseHandler>();
-
-        // Services
-        services.AddTransient<IInstituicaoCommandService>(
-            serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
-
-        services.AddTransient<IInstituicaoQueryService>(
-            serviceProvider => serviceProvider.GetRequiredService<InstituicaoHttpClient>());
+        services.AddHttpClient<InstituicaoHttpClient>().AddHttpMessageHandler<ApiResponseHandler>();
 
         // ViewModels
         services.AddTransient<InstituicaoAlteracaoViewModel>();

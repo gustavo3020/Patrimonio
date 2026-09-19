@@ -5,28 +5,23 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Navigation"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance nav:FinancasNavigation}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DataContext="{d:DesignInstance nav:FinancasNavigation}">
     
-    <Grid ColumnDefinitions="120,*">
-        <!-- Navegação do módulo -->
-        <Border Grid.Column="0" Style="{StaticResource RightBorderStyle}">
-            <StackPanel>
-                <Button Content="Categorias"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirCategoriasCommand}"/>
-                <Button Content="Contas"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirContasCommand}"/>
-                <Button Content="Instituições"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirInstituicoesCommand}"/>
-                <Button Content="Movimentações"
-                        Style="{StaticResource MenuButtonStyle}"
-                        Command="{Binding AbrirMovimentacoesCommand}"/>
-            </StackPanel>
-        </Border>
-        <!-- Conteúdo do módulo -->
-        <ContentControl Grid.Column="1" Content="{Binding ConteudoAtual}"/>
-    </Grid>
+    <StackPanel>
+        <Button Content="Categorias"
+                Style="{StaticResource MenuButtonStyle}"
+                Command="{Binding AbrirCategoriasCommand}"/>
+        <Button Content="Cartões"
+                Style="{StaticResource MenuButtonStyle}"
+                Command="{Binding AbrirCartoesCommand}"/>
+        <Button Content="Contas"
+                Style="{StaticResource MenuButtonStyle}"
+                Command="{Binding AbrirContasCommand}"/>
+        <Button Content="Instituições"
+                Style="{StaticResource MenuButtonStyle}"
+                Command="{Binding AbrirInstituicoesCommand}"/>
+        <Button Content="Movimentações"
+                Style="{StaticResource MenuButtonStyle}"
+                Command="{Binding AbrirMovimentacoesCommand}"/>
+    </StackPanel>
 </UserControl>

@@ -8,7 +8,7 @@ namespace Patrimonio.Financas.Application.Contas.Queries.Services;
 /// <summary>
 /// Implementa as operações para obtenção das opções necessárias à criação de uma conta.
 /// </summary>
-internal class ContaOpcoesCriacaoService(
+internal sealed class ContaOpcoesCriacaoService(
     IInstituicaoLookupRepository instituicaoLookupRepository) : IContaOpcoesCriacaoService
 {
     /// <inheritdoc/>

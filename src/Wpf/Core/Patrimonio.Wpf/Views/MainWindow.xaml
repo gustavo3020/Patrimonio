@@ -19,15 +19,13 @@
         </Border>
 
         <!-- Área principal -->
-        <Grid Grid.Row="1" ColumnDefinitions="120, *">
+        <Grid Grid.Row="1" ColumnDefinitions="150, *">
 
             <!-- Barra lateral -->
             <Border Grid.Column="0" Style="{StaticResource RightBorderStyle}">
-                <StackPanel>
-                    <Button Content="Finanças"
-                            Style="{StaticResource MenuButtonStyle}"
-                            Command="{Binding AbrirFinancasCommand}"/>
-                </StackPanel>
+                <Expander Header="Finanças" IsExpanded="False">
+                    <ContentControl Content="{Binding FinancasNavigation.Menu}" />
+                </Expander>
             </Border>
 
             <!-- Conteúdo -->
