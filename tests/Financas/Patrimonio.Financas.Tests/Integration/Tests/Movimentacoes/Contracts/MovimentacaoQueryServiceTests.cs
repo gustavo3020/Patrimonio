@@ -14,12 +14,12 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarMovimentacoes()
+    public async Task ListarAsync_DeveListarMovimentacoes_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var movimentacoes = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var movimentacoes = await query.ListarAsync(TestContext.Current.CancellationToken);
 
         movimentacoes.Should().NotBeNull();
         movimentacoes.Should().Contain(m => m.Id == Factory.BaseData.Movimentacao.Id);
@@ -30,15 +30,15 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterMovimentacaoPorId()
+    public async Task ObterPorIdAsync_DeveObterMovimentacaoPorId_QuandoMovimentacaoExiste()
     {
         using var scope = CreateScope();
-
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
-
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
         var movimentacaoEsperada = Factory.BaseData.Movimentacao;
 
-        var movimentacao = await service.ObterPorIdAsync(movimentacaoEsperada.Id, TestContext.Current.CancellationToken);
+        var movimentacao = await query.ObterPorIdAsync(
+            movimentacaoEsperada.Id,
+            TestContext.Current.CancellationToken);
 
         movimentacao.Should().NotBeNull();
         movimentacao.Id.Should().Be(movimentacaoEsperada.Id);
@@ -48,13 +48,14 @@ public sealed class MovimentacaoQueryServiceTests(IntegrationTestFactory factory
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterMovimentacaoInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoMovimentacaoInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

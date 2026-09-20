@@ -6,6 +6,7 @@ using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Tests.Integration.Base;
 using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Cartoes.Contracts;
 
@@ -17,35 +18,35 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
     // ============================================================================
 
     [Fact]
-    public async Task CriarAsync_DeveCriarLancamentoERetornarDto()
+    public async Task CriarAsync_DeveCriarLancamento_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
 
-        var lancamentoDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
-        var criado = await lancamentoCommand.CriarAsync(lancamentoDto, TestContext.Current.CancellationToken);
+        var lancamento = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        criado.Should().NotBeNull();
-        criado.Descricao.Should().NotBeNullOrWhiteSpace();
-        criado.Id.Should().BeGreaterThan(0);
-        criado.Descricao.Should().Be(lancamentoDto.Descricao);
-        criado.Valor.Should().Be(lancamentoDto.Valor);
-        criado.DataCompra.Should().Be(lancamentoDto.DataCompra);
-        criado.Estabelecimento.Should().Be(lancamentoDto.Estabelecimento);
-        criado.Responsavel.Should().Be(lancamentoDto.Responsavel);
-        criado.NumeroParcela.Should().Be(1);
-        criado.TotalParcelas.Should().Be(lancamentoDto.TotalParcelas);
-        criado.FaturaId.Should().Be(lancamentoDto.FaturaId);
-        criado.CategoriaId.Should().Be(lancamentoDto.CategoriaId);
+        lancamento.Should().NotBeNull();
+        lancamento.Descricao.Should().NotBeNullOrWhiteSpace();
+        lancamento.Id.Should().BeGreaterThan(0);
+        lancamento.Descricao.Should().Be(dto.Descricao);
+        lancamento.Valor.Should().Be(dto.Valor);
+        lancamento.DataCompra.Should().Be(dto.DataCompra);
+        lancamento.Estabelecimento.Should().Be(dto.Estabelecimento);
+        lancamento.Responsavel.Should().Be(dto.Responsavel);
+        lancamento.NumeroParcela.Should().Be(1);
+        lancamento.TotalParcelas.Should().Be(dto.TotalParcelas);
+        lancamento.FaturaId.Should().Be(dto.FaturaId);
+        lancamento.CategoriaId.Should().Be(dto.CategoriaId);
     }
 
     [Fact]
-    public async Task CriarAsync_DeveCriarLancamentoParceladoERetornarDto()
+    public async Task CriarAsync_DeveCriarLancamentoParcelado_QuandoDadosValidos()
     {
         using var scope = CreateScope();
         var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
         var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
         var cartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
         var cartao = await cartaoCommand.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
@@ -71,87 +72,77 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
         }, TestContext.Current.CancellationToken);
 
         // 3. Criar lançamento parcelado em 3x
-        var criarDto = new LancamentoCriacaoDto
-        {
-            Descricao = "Compra parcelada",
-            Valor = 100,
-            DataCompra = new DateOnly(2026, 9, 10),
-            Estabelecimento = "Loja Teste",
-            Responsavel = "Usuário Teste",
-            TotalParcelas = 3,
-            FaturaId = faturaInicial.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = LancamentoDtoBuilder.Criar(
+            faturaInicial.Id,
+            Factory.BaseData.Categoria.Id,
+            descricao: "Compra parcelada",
+            totalParcelas: 3);
 
-        var criado = await lancamentoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var criado = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
         // 4. Validações
         criado.Should().NotBeNull();
-        criado.Descricao.Should().Be(criarDto.Descricao);
+        criado.Descricao.Should().Be(dto.Descricao);
         criado.Valor.Should().Be(33.34m);
-        criado.DataCompra.Should().Be(criarDto.DataCompra);
-        criado.Estabelecimento.Should().Be(criarDto.Estabelecimento);
-        criado.Responsavel.Should().Be(criarDto.Responsavel);
+        criado.DataCompra.Should().Be(dto.DataCompra);
+        criado.Estabelecimento.Should().Be(dto.Estabelecimento);
+        criado.Responsavel.Should().Be(dto.Responsavel);
         criado.NumeroParcela.Should().Be(1);
         criado.TotalParcelas.Should().Be(3);
-        criado.FaturaId.Should().Be(criarDto.FaturaId);
-        criado.CategoriaId.Should().Be(criarDto.CategoriaId);
+        criado.FaturaId.Should().Be(dto.FaturaId);
+        criado.CategoriaId.Should().Be(dto.CategoriaId);
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoInformarFaturaInexistente()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoFaturaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-        var criarDto = LancamentoDtoBuilder.Criar(int.MaxValue, Factory.BaseData.Categoria.Id);
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Criar(int.MaxValue, Factory.BaseData.Categoria.Id);
 
-        var action = () => service.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, int.MaxValue);
 
-        var criarDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, int.MaxValue);
-        var action = () => lancamentoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoCriarLancamentoEmFaturaFechada()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoFaturaFechada()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var fatura = await CriarFaturaFechadaAsync(cartaoCommand, faturaCommand);
+        var fatura = await FaturaFixture.CriarFechadaAsync(Factory);
+        var dto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
 
-        var criarDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        var action = () => lancamentoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoCriarLancamentoEmFaturaPaga()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoFaturaPaga()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var fatura = await CriarFaturaPagaAsync(cartaoCommand, faturaCommand, lancamentoCommand);
+        var fatura = await FaturaFixture.CriarPagaAsync(Factory);
+        var dto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
 
-        var criarDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        var action = () => lancamentoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
     // ============================================================================
@@ -159,98 +150,94 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
     // ============================================================================
 
     [Fact]
-    public async Task AlterarAsync_DeveAlterarLancamento()
+    public async Task AlterarAsync_DeveAlterarLancamento_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-        var lancamentoQuery = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamento = await lancamentoCommand.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
+        var lancamento = await LancamentoFixture.CriarAsync(Factory);
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
-        var alterarLancamentoDto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
-        await lancamentoCommand.AlterarAsync(lancamento.Id, alterarLancamentoDto, TestContext.Current.CancellationToken);
+        await command.AlterarAsync(lancamento.Id, dto, TestContext.Current.CancellationToken);
 
-        var alterado = await lancamentoQuery.ObterPorIdAsync(lancamento.Id, TestContext.Current.CancellationToken);
+        var alterado = await query.ObterPorIdAsync(lancamento.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
-        alterado.Descricao.Should().Be(alterarLancamentoDto.Descricao);
-        alterado.Valor.Should().Be(alterarLancamentoDto.Valor);
-        alterado.DataCompra.Should().Be(alterarLancamentoDto.DataCompra);
-        alterado.Estabelecimento.Should().Be(alterarLancamentoDto.Estabelecimento);
-        alterado.Responsavel.Should().Be(alterarLancamentoDto.Responsavel);
+        alterado.Descricao.Should().Be(dto.Descricao);
+        alterado.Valor.Should().Be(dto.Valor);
+        alterado.DataCompra.Should().Be(dto.DataCompra);
+        alterado.Estabelecimento.Should().Be(dto.Estabelecimento);
+        alterado.Responsavel.Should().Be(dto.Responsavel);
         alterado.NumeroParcela.Should().Be(lancamento.NumeroParcela);
         alterado.TotalParcelas.Should().Be(lancamento.TotalParcelas);
         alterado.FaturaId.Should().Be(lancamento.FaturaId);
-        alterado.CategoriaId.Should().Be(alterarLancamentoDto.CategoriaId);
+        alterado.CategoriaId.Should().Be(dto.CategoriaId);
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamento = await service.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
+        var dto = LancamentoDtoBuilder.Alterar(int.MaxValue);
 
-        var alterarLancamentoDto = LancamentoDtoBuilder.Alterar(int.MaxValue);
-        var action = () => service.AlterarAsync(
-            lancamento.Id,
-            alterarLancamentoDto,
+        var acao = () => command.AlterarAsync(
+            Factory.BaseData.Lancamento.Id,
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarLancamentoInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoLancamentoInexistente()
     {
         using var scope = CreateScope();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
-        var action = () => lancamentoCommand.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             int.MaxValue,
-            LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id),
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarLancamentoDeFaturaFechada()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoAlterarLancamentoDeFaturaFechada()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
-        var lancamento = await CriarLancamentoEmFaturaFechadaAsync(cartaoCommand, faturaCommand, lancamentoCommand);
+        var lancamento = await LancamentoFixture.CriarEmFaturaFechadaAsync(Factory);
 
-        var action = () => lancamentoCommand.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             lancamento.Id,
-            LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id),
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarLancamentoDeFaturaPaga()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoAlterarLancamentoDeFaturaPaga()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
-        var lancamento = await CriarLancamentoEmFaturaPagaAsync(cartaoCommand, faturaCommand, lancamentoCommand);
+        var lancamento = await LancamentoFixture.CriarEmFaturaPagaAsync(Factory);
 
-        var action = () => lancamentoCommand.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             lancamento.Id,
-            LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id),
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
     // ============================================================================
@@ -258,151 +245,62 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
     // ============================================================================
 
     [Fact]
-    public async Task ExcluirAsync_DeveExcluirLancamento()
+    public async Task ExcluirAsync_DeveExcluirLancamento_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var criarDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-        var lancamentoQuery = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var dto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
 
-        var criado = await lancamentoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
+        var lancamento = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await lancamentoCommand.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
+        await command.ExcluirAsync(lancamento.Id, TestContext.Current.CancellationToken);
 
-        var action = () => lancamentoQuery.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        var acao = () => query.ObterPorIdAsync(lancamento.Id, TestContext.Current.CancellationToken);
+
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirLancamentoInexistente()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoLancamentoInexistente()
     {
         using var scope = CreateScope();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var action = () => lancamentoCommand.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             int.MaxValue,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirLancamentoEmFaturaFechada()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoLancamentoDeFaturaFechada()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var lancamento = await CriarLancamentoEmFaturaFechadaAsync(cartaoCommand, faturaCommand, lancamentoCommand);
+        var lancamento = await LancamentoFixture.CriarEmFaturaFechadaAsync(Factory);
 
-        var action = () => lancamentoCommand.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             lancamento.Id,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirLancamentoEmFaturaPaga()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoLancamentoDeFaturaPaga()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
 
-        var lancamento = await CriarLancamentoEmFaturaPagaAsync(cartaoCommand, faturaCommand, lancamentoCommand);
+        var lancamento = await LancamentoFixture.CriarEmFaturaPagaAsync(Factory);
 
-        var action = () => lancamentoCommand.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             lancamento.Id,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RegraDeNegocioException>();
-    }
-
-    // ============================================================================
-    // MÉTODOS PRIVADOS
-    // ============================================================================
-    private async Task<FaturaDetalheDto> CriarCartaoEFaturaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand)
-    {
-        var cartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
-
-        var faturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-        return await faturaCommand.CriarAsync(faturaDto, TestContext.Current.CancellationToken);
-    }
-
-    private async Task<FaturaDetalheDto> CriarFaturaFechadaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand)
-    {
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        return fatura;
-    }
-
-    private async Task<FaturaDetalheDto> CriarFaturaPagaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand,
-        ILancamentoCommandService lancamentoCommand)
-    {
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        var lancamentoDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        await lancamentoCommand.CriarAsync(lancamentoDto, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        var pagamentoDto = new FaturaPagamentoDto
-        {
-            DataPagamento = fatura.DataVencimento.AddDays(5),
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
-        await faturaCommand.PagarAsync(fatura.Id, pagamentoDto, TestContext.Current.CancellationToken);
-
-        return fatura;
-    }
-
-    private async Task<LancamentoDetalheDto> CriarLancamentoEmFaturaFechadaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand,
-        ILancamentoCommandService lancamentoCommand)
-    {
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamento = await lancamentoCommand.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        return lancamento;
-    }
-
-    private async Task<LancamentoDetalheDto> CriarLancamentoEmFaturaPagaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand,
-        ILancamentoCommandService lancamentoCommand)
-    {
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamento = await lancamentoCommand.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        var pagarDto = new FaturaPagamentoDto
-        {
-            DataPagamento = fatura.DataVencimento.AddDays(5),
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
-        await faturaCommand.PagarAsync(fatura.Id, pagarDto, TestContext.Current.CancellationToken);
-
-        return lancamento;
+        await acao.Should().ThrowAsync<RegraDeNegocioException>();
     }
 }

@@ -7,7 +7,7 @@ namespace Patrimonio.Financas.Tests.Unit.Contas.Domain.Entities;
 public sealed class ContaTests
 {
     [Fact]
-    public void DeveCriarConta()
+    public void Criar_DeveCriarConta_QuandoDadosValidos()
     {
         var nome = new Nome("Conta Corrente");
 
@@ -18,7 +18,7 @@ public sealed class ContaTests
     }
 
     [Fact]
-    public void DeveAlterarNome()
+    public void Alterar_DeveAlterarNome_QuandoDadosValidos()
     {
         var nome = new Nome("Conta Corrente");
 
@@ -32,7 +32,7 @@ public sealed class ContaTests
     }
 
     [Fact]
-    public void DeveAlterarInstituicao()
+    public void Alterar_DeveAlterarInstituicao_QuandoDadosValidos()
     {
         var nome = new Nome("Conta Corrente");
 

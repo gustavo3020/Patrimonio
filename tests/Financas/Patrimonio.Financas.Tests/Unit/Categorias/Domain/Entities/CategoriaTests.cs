@@ -7,7 +7,7 @@ namespace Patrimonio.Financas.Tests.Unit.Categorias.Domain.Entities;
 public sealed class CategoriaTests
 {
     [Fact]
-    public void DeveCriarCategoria()
+    public void Criar_DeveCriarCategoria_QuandoDadosValidos()
     {
         var nome = new Nome("Salário");
 
@@ -17,7 +17,7 @@ public sealed class CategoriaTests
     }
 
     [Fact]
-    public void DeveAlterarNome()
+    public void Alterar_DeveAlterarNome_QuandoDadosValidos()
     {
         var nome = new Nome("Alimentação");
         var categoria = Categoria.Criar(nome);

@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
-using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -14,43 +15,11 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     private const string RotaBase = "/api/v1/financas/movimentacoes";
 
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private MovimentacaoCriacaoDto CriarDto()
-    {
-        return new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
-    }
-
-    private MovimentacaoAlteracaoDto AlterarDto()
-    {
-        return new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now).AddDays(5),
-            Valor = 1000.00m,
-            Natureza = Natureza.Entrada,
-            Tipo = TipoMovimentacao.Credito,
-            Descricao = $"Movimentação alterada {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
-    }
-
-    // ============================================================================
     // GET /api/v1/financas/movimentacoes
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComMovimentacoes()
+    public async Task Listar_DeveRetornarOk_QuandoDadosValidos()
     {
         var resposta = await Client.GetAsync(
             RotaBase,
@@ -70,7 +39,7 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComMovimentacao()
+    public async Task ObterPorId_DeveRetornarOk_QuandoMovimentacaoExiste()
     {
         var movimentacaoEsperada = Factory.BaseData.Movimentacao;
 
@@ -89,7 +58,7 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaMovimentacaoInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoMovimentacaoInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -103,9 +72,11 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComMovimentacaoCriada()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var dto = CriarDto();
+        var dto = MovimentacaoDtoBuilder.Criar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -126,18 +97,12 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarBadRequestAoEnviarValorNegativo()
+    public async Task Criar_DeveRetornarBadRequest_QuandoValorNegativo()
     {
-        var dto = new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = -500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = "Dto inválido",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var dto = MovimentacaoDtoBuilder.Criar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id,
+            valor: -500.00m);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -148,18 +113,11 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoInformarCategoriaInexistente()
+    public async Task Criar_DeveRetornarConflict_QuandoCategoriaInexistente()
     {
-        var dto = new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = int.MaxValue,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var dto = MovimentacaoDtoBuilder.Criar(
+            int.MaxValue,
+            Factory.BaseData.Conta.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -174,59 +132,44 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var criarDto = CriarDto();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            criarDto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var movimentacao = await criarResponse.Content
-            .ReadFromJsonAsync<MovimentacaoDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        movimentacao.Should().NotBeNull();
-
-        var alterarDto = AlterarDto();
+        var movimentacao = await MovimentacaoFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{movimentacao.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestAoEnviarValorNegativo()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoValorNegativo()
     {
-        var alterarDto = new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = -500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = "Dto inválido",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id,
+            valor: -500.00m);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Movimentacao.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaMovimentacaoInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoMovimentacaoInexistente()
     {
-        var dto = AlterarDto();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -237,18 +180,11 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarConflictAoInformarCategoriaInexistente()
+    public async Task Alterar_DeveRetornarConflict_QuandoCategoriaInexistente()
     {
-        var dto = new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = int.MaxValue,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            int.MaxValue,
+            Factory.BaseData.Conta.Id);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Movimentacao.Id}",
@@ -263,22 +199,9 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var dto = CriarDto();
-
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            dto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var movimentacao = await criarResponse.Content
-            .ReadFromJsonAsync<MovimentacaoDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        movimentacao.Should().NotBeNull();
+        var movimentacao = await MovimentacaoFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{movimentacao.Id}",
@@ -288,7 +211,7 @@ public sealed class MovimentacoesControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaMovimentacaoInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoMovimentacaoInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",

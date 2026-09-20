@@ -21,7 +21,7 @@ public sealed class LancamentoTests
     }
 
     [Fact]
-    public void DeveCriarLancamento()
+    public void Criar_DeveCriarLancamento_QuandoDadosValidos()
     {
         // Arrange
         var descricao = new Descricao("Lancamento Teste");
@@ -56,7 +56,7 @@ public sealed class LancamentoTests
     }
 
     [Fact]
-    public void DeveAlterarLancamento()
+    public void Alterar_DeveAlterarLancamento_QuandoDadosValidos()
     {
         // Arrange
         var lancamento = CriarLancamento();

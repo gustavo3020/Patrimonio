@@ -6,7 +6,7 @@ namespace Patrimonio.Financas.Tests.Unit.Cartoes.Domain.Services;
 public sealed class ParcelamentoServiceTests
 {
     [Fact]
-    public void DeveDividir100Em3ParcelasCorretamente()
+    public void CalcularParcelas_DeveDividir100Em3ParcelasCorretamente_QuandoDadosValidos()
     {
         var parcelas = ParcelamentoService.CalcularParcelas(100m, 3);
 
@@ -18,7 +18,7 @@ public sealed class ParcelamentoServiceTests
     }
 
     [Fact]
-    public void DeveDividir100_01Em3ParcelasCorretamente()
+    public void CalcularParcelas_DeveDividir100_01Em3ParcelasCorretamente_QuandoDadosValidos()
     {
         var parcelas = ParcelamentoService.CalcularParcelas(100.01m, 3);
 
@@ -32,7 +32,7 @@ public sealed class ParcelamentoServiceTests
     [Theory]
     [InlineData(-1)]
     [InlineData(0)]
-    public void DeveLancarExcecaoQuandoTotalParcelasForMenorQueUm(int totalParcelas)
+    public void CalcularParcelas_DeveLancarExcecao_QuandoTotalParcelasMenorQueUm(int totalParcelas)
     {
         Assert.Throws<RegraDeNegocioException>(() => ParcelamentoService.CalcularParcelas(100m, totalParcelas));
     }

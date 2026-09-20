@@ -10,7 +10,7 @@ public sealed class ParcelamentoTests
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public void DeveCriarParcelamentoComNumeroValido(int numeroParcela)
+    public void Criar_DeveCriarParcelamento_QuandoNumeroValido(int numeroParcela)
     {
         // Arrange
         var grupoId = Guid.NewGuid();
@@ -26,7 +26,7 @@ public sealed class ParcelamentoTests
     }
 
     [Fact]
-    public void DeveRejeitarGrupoIdVazio()
+    public void Criar_DeveLancarExcecao_QuandoGrupoIdVazio()
     {
         // Arrange
         var grupoId = Guid.Empty;
@@ -44,7 +44,7 @@ public sealed class ParcelamentoTests
     [Theory]
     [InlineData(-1)]
     [InlineData(0)]
-    public void DeveRejeitarNumeroParcelaInvalido(int numeroParcela)
+    public void Criar_DeveLancarExcecao_QuandoNumeroParcelaInvalido(int numeroParcela)
     {
         // Arrange
         var grupoId = Guid.NewGuid();
@@ -61,7 +61,7 @@ public sealed class ParcelamentoTests
     [Theory]
     [InlineData(-1)]
     [InlineData(0)]
-    public void DeveRejeitarTotalParcelasInvalido(int totalParcelas)
+    public void Criar_DeveLancarExcecao_QuandoTotalParcelasInvalido(int totalParcelas)
     {
         // Arrange
         var grupoId = Guid.NewGuid();
@@ -76,7 +76,7 @@ public sealed class ParcelamentoTests
     }
 
     [Fact]
-    public void DeveRejeitarNumeroParcelaMaiorQueTotalParcelas()
+    public void Criar_DeveLancarExcecao_QuandoNumeroParcelaMaiorQueTotalParcelas()
     {
         // Arrange
         var grupoId = Guid.NewGuid();

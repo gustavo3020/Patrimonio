@@ -8,7 +8,7 @@ namespace Patrimonio.Financas.Tests.Unit.Cartoes.Domain.Entities;
 public sealed class CartaoTests
 {
     [Fact]
-    public void DeveCriarCartao()
+    public void Criar_DeveCriarCartao_QuandoDadosValidos()
     {
         // Arrange
         var nome = new Nome("Cartão Teste");
@@ -31,7 +31,7 @@ public sealed class CartaoTests
     }
 
     [Fact]
-    public void DeveAlterarCampos()
+    public void Alterar_DeveAlterarCartao_QuandoDadosValidos()
     {
         // Arrange
         var nome = new Nome("Cartão Teste");

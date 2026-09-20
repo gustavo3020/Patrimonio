@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
-using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Tests.Integration.Base;
 using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -20,7 +19,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComFaturas()
+    public async Task Listar_DeveRetornarOk_QuandoCartaoTemFaturas()
     {
         var cartaoId = Factory.BaseData.Cartao.Id;
 
@@ -42,7 +41,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComFatura()
+    public async Task ObterPorId_DeveRetornarOk_QuandoFaturaExiste()
     {
         var faturaEsperada = Factory.BaseData.Fatura;
 
@@ -62,7 +61,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaFaturaInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoFaturaInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -76,15 +75,15 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComFaturaCriada()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var cartao = await CriarCartaoAsync();
+        var cartao = await CartaoFixture.CriarAsync(Factory);
 
-        var criarDto = FaturaDtoBuilder.Criar(cartao.Id);
+        var dto = FaturaDtoBuilder.Criar(cartao.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -95,38 +94,36 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
 
         fatura.Should().NotBeNull();
         fatura.Id.Should().BeGreaterThan(0);
-        fatura.DataFechamento.Should().Be(criarDto.DataFechamento);
-        fatura.DataVencimento.Should().Be(criarDto.DataVencimento);
+        fatura.DataFechamento.Should().Be(dto.DataFechamento);
+        fatura.DataVencimento.Should().Be(dto.DataVencimento);
 
         resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveRetornarBadRequestQuandoDataFechamentoMaiorQueDataVencimento()
+    public async Task Criar_DeveRetornarBadRequest_QuandoDataFechamentoMaiorQueDataVencimento()
     {
-        var criarDto = new FaturaCriacaoDto
-        {
-            DataFechamento = new DateOnly(2024, 1, 11),
-            DataVencimento = new DateOnly(2024, 1, 6),
-            CartaoId = Factory.BaseData.Cartao.Id
-        };
+        var dto = FaturaDtoBuilder.Criar(
+            Factory.BaseData.Cartao.Id,
+            dataFechamento: new DateOnly(2024, 1, 11),
+            dataVencimento: new DateOnly(2024, 1, 6));
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoEnviarCartaoInexistente()
+    public async Task Criar_DeveRetornarConflict_QuandoCartaoInexistente()
     {
-        var criarDto = FaturaDtoBuilder.Criar(int.MaxValue);
+        var dto = FaturaDtoBuilder.Criar(int.MaxValue);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -137,45 +134,43 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var fatura = await CriarCartaoEFaturaAsync();
+        var dto = FaturaDtoBuilder.Alterar();
 
-        var alterarDto = FaturaDtoBuilder.Alterar();
+        var fatura = await FaturaFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{fatura.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestQuandoDataFechamentoMaiorQueDataVencimento()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoDataFechamentoMaiorQueDataVencimento()
     {
-        var alterarDto = new FaturaAlteracaoDto
-        {
-            DataFechamento = new DateOnly(2024, 1, 11),
-            DataVencimento = new DateOnly(2024, 1, 6)
-        };
+        var dto = FaturaDtoBuilder.Alterar(
+            dataFechamento: new DateOnly(2024, 1, 11),
+            dataVencimento: new DateOnly(2024, 1, 6));
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Fatura.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaFaturaInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoFaturaInexistente()
     {
-        var alterarDto = FaturaDtoBuilder.Alterar();
+        var dto = FaturaDtoBuilder.Alterar();
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -186,9 +181,9 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var fatura = await CriarCartaoEFaturaAsync();
+        var fatura = await FaturaFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{fatura.Id}",
@@ -198,9 +193,9 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarBadRequestParaFaturaFechada()
+    public async Task Excluir_DeveRetornarBadRequest_QuandoFechada()
     {
-        var fatura = await CriarFaturaFechadaAsync();
+        var fatura = await FaturaFixture.CriarFechadaAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{fatura.Id}",
@@ -210,7 +205,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaFaturaInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoFaturaInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -220,7 +215,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarConflictAoExcluirFaturaBase()
+    public async Task Excluir_DeveRetornarConflict_QuandoFaturaBase()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Fatura.Id}",
@@ -234,9 +229,9 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Fechar_DeveRetornarNoContent()
+    public async Task Fechar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var fatura = await CriarCartaoEFaturaAsync();
+        var fatura = await FaturaFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsync(
             $"{RotaBase}/{fatura.Id}/fechar",
@@ -247,9 +242,9 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Fechar_DeveRetornarBadRequestParaFaturaFechada()
+    public async Task Fechar_DeveRetornarBadRequest_QuandoFechada()
     {
-        var fatura = await CriarFaturaFechadaAsync();
+        var fatura = await FaturaFixture.CriarFechadaAsync(Factory);
 
         var resposta = await Client.PutAsync(
             $"{RotaBase}/{fatura.Id}/fechar",
@@ -260,7 +255,7 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Fechar_DeveRetornarNotFoundParaFaturaInexistente()
+    public async Task Fechar_DeveRetornarNotFound_QuandoFaturaInexistente()
     {
         var resposta = await Client.PutAsync(
             $"{RotaBase}/{int.MaxValue}/fechar",
@@ -275,135 +270,53 @@ public sealed class FaturaControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Pagar_DeveRetornarNoContent()
+    public async Task Pagar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var fatura = await CriarFaturaFechadaComLancamentoAsync();
+        var fatura = await FaturaFixture.CriarFechadaComLancamentoAsync(Factory);
 
-        var pagarDto = new FaturaPagamentoDto
-        {
-            DataPagamento = fatura.DataFechamento.AddDays(5),
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = FaturaDtoBuilder.Pagar(
+            Factory.BaseData.Conta.Id,
+            Factory.BaseData.Categoria.Id,
+            fatura.DataFechamento.AddDays(5));
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{fatura.Id}/pagar",
-            pagarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Pagar_DeveRetornarBadRequestParaFaturaAberta()
+    public async Task Pagar_DeveRetornarBadRequest_QuandoAberta()
     {
-        var fatura = await CriarCartaoEFaturaAsync();
+        var fatura = await FaturaFixture.CriarAsync(Factory);
 
-        var pagarDto = new FaturaPagamentoDto
-        {
-            DataPagamento = fatura.DataFechamento.AddDays(5),
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = FaturaDtoBuilder.Pagar(
+            Factory.BaseData.Conta.Id,
+            Factory.BaseData.Categoria.Id,
+            fatura.DataFechamento.AddDays(5));
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{fatura.Id}/pagar",
-            pagarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Pagar_DeveRetornarNotFoundParaFaturaInexistente()
+    public async Task Pagar_DeveRetornarNotFound_QuandoFaturaInexistente()
     {
-        var pagarDto = new FaturaPagamentoDto
-        {
-            DataPagamento = new DateOnly(2026, 9, 10),
-            ContaId = Factory.BaseData.Conta.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = FaturaDtoBuilder.Pagar(
+            Factory.BaseData.Conta.Id,
+            Factory.BaseData.Categoria.Id);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}/pagar",
-            pagarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    // ============================================================================
-    // MÉTODOS PRIVADOS
-    // ============================================================================
-
-    private async Task<CartaoDetalheDto> CriarCartaoAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-
-        var criarCartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        return await cartaoCommand.CriarAsync(criarCartaoDto, TestContext.Current.CancellationToken);
-    }
-
-    private async Task<FaturaDetalheDto> CriarCartaoEFaturaAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-
-        var criarCartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(criarCartaoDto, TestContext.Current.CancellationToken);
-
-        var criarFaturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-        return await faturaCommand.CriarAsync(criarFaturaDto, TestContext.Current.CancellationToken);
-    }
-
-    private async Task<FaturaDetalheDto> CriarFaturaFechadaAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-
-        var criarCartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(criarCartaoDto, TestContext.Current.CancellationToken);
-
-        var criarFaturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-        var fatura = await faturaCommand.CriarAsync(criarFaturaDto, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        return fatura;
-    }
-
-    private async Task<FaturaDetalheDto> CriarFaturaFechadaComLancamentoAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-
-        var criarCartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(criarCartaoDto, TestContext.Current.CancellationToken);
-
-        var criarFaturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-        var fatura = await faturaCommand.CriarAsync(criarFaturaDto, TestContext.Current.CancellationToken);
-
-        var dtoLancamento = new LancamentoCriacaoDto
-        {
-            Descricao = $"Lancamento {Guid.NewGuid()}",
-            Valor = 100.00m,
-            DataCompra = new DateOnly(2026, 9, 1),
-            Estabelecimento = "Estabelecimento Teste",
-            Responsavel = "Responsavel Teste",
-            TotalParcelas = 1,
-            FaturaId = fatura.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
-
-        await lancamentoCommand.CriarAsync(dtoLancamento, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        return fatura;
     }
 }

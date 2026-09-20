@@ -6,7 +6,7 @@ namespace Patrimonio.Financas.Tests.Unit.Common.Domain.ValueObjects;
 public sealed class NomeTests
 {
     [Fact]
-    public void DeveCriarNomeValido()
+    public void Criar_DeveCriarNomeValido_QuandoDadosValidos()
     {
         var nome = new Nome("Nome Teste");
 
@@ -15,7 +15,7 @@ public sealed class NomeTests
     }
 
     [Fact]
-    public void DoisNomesComMesmoValorDevemSerIguais()
+    public void Igualdade_DeveConsiderarIgual_QuandoMesmoValor()
     {
         var a = new Nome("Nome Teste");
         var b = new Nome("Nome Teste");
@@ -25,7 +25,7 @@ public sealed class NomeTests
     }
 
     [Fact]
-    public void DoisNomesComValoresDiferentesNaoDevemSerIguais()
+    public void Igualdade_DeveConsiderarDiferente_QuandoValoresDiferentes()
     {
         var a = new Nome("Nome Teste");
         var b = new Nome("Outro Nome");
@@ -34,7 +34,7 @@ public sealed class NomeTests
     }
 
     [Fact]
-    public void ToStringDeveRetornarValorComoTexto()
+    public void ToString_DeveRetornarValorComoTexto_QuandoChamado()
     {
         var nome = new Nome("Nome Teste");
 

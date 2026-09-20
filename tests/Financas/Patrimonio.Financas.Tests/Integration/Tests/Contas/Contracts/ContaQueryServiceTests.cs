@@ -14,12 +14,12 @@ public sealed class ContaQueryServiceTests(IntegrationTestFactory factory) : Int
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarContas()
+    public async Task ListarAsync_DeveListarContas_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
 
-        var contas = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var contas = await query.ListarAsync(TestContext.Current.CancellationToken);
 
         contas.Should().NotBeNull();
         contas.Should().Contain(c => c.Id == Factory.BaseData.Conta.Id);
@@ -30,15 +30,15 @@ public sealed class ContaQueryServiceTests(IntegrationTestFactory factory) : Int
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterContaPorId()
+    public async Task ObterPorIdAsync_DeveObterContaPorId_QuandoContaExiste()
     {
         using var scope = CreateScope();
-
-        var service = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
-
+        var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
         var contaEsperada = Factory.BaseData.Conta;
 
-        var conta = await service.ObterPorIdAsync(contaEsperada.Id, TestContext.Current.CancellationToken);
+        var conta = await query.ObterPorIdAsync(
+            contaEsperada.Id,
+            TestContext.Current.CancellationToken);
 
         conta.Should().NotBeNull();
         conta.Id.Should().Be(contaEsperada.Id);
@@ -47,13 +47,14 @@ public sealed class ContaQueryServiceTests(IntegrationTestFactory factory) : Int
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterContaInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoContaInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<IContaQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

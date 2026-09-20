@@ -14,12 +14,12 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarCategorias()
+    public async Task ListarAsync_DeveListarCategorias_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var categorias = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var categorias = await query.ListarAsync(TestContext.Current.CancellationToken);
 
         categorias.Should().NotBeNull();
         categorias.Should().Contain(c => c.Id == Factory.BaseData.Categoria.Id);
@@ -30,15 +30,15 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterCategoriaPorId()
+    public async Task ObterPorIdAsync_DeveObterCategoriaPorId_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
-
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
         var categoriaEsperada = Factory.BaseData.Categoria;
 
-        var categoria = await service.ObterPorIdAsync(categoriaEsperada.Id, TestContext.Current.CancellationToken);
+        var categoria = await query.ObterPorIdAsync(
+            categoriaEsperada.Id,
+            TestContext.Current.CancellationToken);
 
         categoria.Should().NotBeNull();
         categoria.Id.Should().Be(categoriaEsperada.Id);
@@ -46,13 +46,14 @@ public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) :
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterCategoriaInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

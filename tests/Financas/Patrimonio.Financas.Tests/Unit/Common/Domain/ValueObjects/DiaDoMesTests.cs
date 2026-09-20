@@ -10,7 +10,7 @@ public sealed class DiaDoMesTests
     [InlineData(1)]
     [InlineData(15)]
     [InlineData(31)]
-    public void DeveCriarDiaDoMesComValorValido(int valor)
+    public void Criar_DeveCriarDiaDoMes_QuandoValorValido(int valor)
     {
         // Act
         var dia = new DiaDoMes(valor);
@@ -23,7 +23,7 @@ public sealed class DiaDoMesTests
     [InlineData(-10)]
     [InlineData(0)]
     [InlineData(32)]
-    public void DeveRejeitarDiaDoMesInvalido(int valorInvalido)
+    public void Criar_DeveLancarExcecao_QuandoValorInvalido(int valorInvalido)
     {
         // Act
         var acao = () => new DiaDoMes(valorInvalido);
@@ -33,7 +33,7 @@ public sealed class DiaDoMesTests
     }
 
     [Fact]
-    public void DoisDiasDoMesComMesmoValorDevemSerIguais()
+    public void Igualdade_DeveConsiderarIgual_QuandoMesmoValor()
     {
         // Arrange
         var dia1 = new DiaDoMes(10);
@@ -45,7 +45,7 @@ public sealed class DiaDoMesTests
     }
 
     [Fact]
-    public void DoisDiasDoMesComValoresDiferentesNaoDevemSerIguais()
+    public void Igualdade_DeveConsiderarDiferente_QuandoValoresDiferentes()
     {
         // Arrange
         var dia1 = new DiaDoMes(10);
@@ -56,7 +56,7 @@ public sealed class DiaDoMesTests
     }
 
     [Fact]
-    public void ToStringDeveRetornarValorComoTexto()
+    public void ToString_DeveRetornarValorComoTexto_QuandoChamado()
     {
         new DiaDoMes(12).ToString().Should().Be("12");
     }

@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -13,31 +15,11 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     private const string RotaBase = "/api/v1/financas/categorias";
 
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private static CategoriaCriacaoDto CriarDto()
-    {
-        return new CategoriaCriacaoDto
-        {
-            Nome = $"Categoria {Guid.NewGuid()}"
-        };
-    }
-
-    private static CategoriaAlteracaoDto AlterarDto()
-    {
-        return new CategoriaAlteracaoDto
-        {
-            Nome = $"Categoria alterada {Guid.NewGuid()}"
-        };
-    }
-
-    // ============================================================================
     // GET /api/v1/financas/categorias
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComCategorias()
+    public async Task Listar_DeveRetornarOkComCategorias_QuandoDadosValidos()
     {
         var resposta = await Client.GetAsync(
             RotaBase,
@@ -57,7 +39,7 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComCategoria()
+    public async Task ObterPorId_DeveRetornarOkComCategoria_QuandoDadosValidos()
     {
         var categoriaEsperada = Factory.BaseData.Categoria;
 
@@ -76,7 +58,7 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaCategoriaInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoCategoriaInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -90,9 +72,9 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComCategoriaCriada()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var dto = CriarDto();
+        var dto = CategoriaDtoBuilder.Criar();
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -113,12 +95,9 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Criar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var dto = new CategoriaCriacaoDto
-        {
-            Nome = string.Empty
-        };
+        var dto = CategoriaDtoBuilder.Criar(string.Empty);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -129,23 +108,16 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Criar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var dto = CriarDto();
+        var dto = CategoriaDtoBuilder.Criar(Factory.BaseData.Categoria.Nome);
 
-        var primeiraResposta = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        primeiraResposta.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var segundaResposta = await Client.PostAsJsonAsync(
-            RotaBase,
-            dto,
-            TestContext.Current.CancellationToken);
-
-        segundaResposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -153,53 +125,37 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var criarDto = CriarDto();
+        var dto = CategoriaDtoBuilder.Alterar();
 
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            criarDto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var categoria = await criarResponse.Content
-            .ReadFromJsonAsync<CategoriaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        categoria.Should().NotBeNull();
-
-        var alterarDto = AlterarDto();
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{categoria.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var alterarDto = new CategoriaAlteracaoDto
-        {
-            Nome = string.Empty
-        };
+        var dto = CategoriaDtoBuilder.Alterar(string.Empty);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Categoria.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaCategoriaInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoCategoriaInexistente()
     {
-        var dto = AlterarDto();
+        var dto = CategoriaDtoBuilder.Alterar();
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -210,31 +166,15 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Alterar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var dtoCriacao = CriarDto();
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            dtoCriacao,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var categoria = await criarResponse.Content
-            .ReadFromJsonAsync<CategoriaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        categoria.Should().NotBeNull();
-
-        var dtoAlteracao = new CategoriaAlteracaoDto
-        {
-            Nome = Factory.BaseData.Categoria.Nome
-        };
+        var dto = CategoriaDtoBuilder.Alterar(Factory.BaseData.Categoria.Nome);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{categoria.Id}",
-            dtoAlteracao,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -245,22 +185,9 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var dto = CriarDto();
-
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            dto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var categoria = await criarResponse.Content
-            .ReadFromJsonAsync<CategoriaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        categoria.Should().NotBeNull();
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{categoria.Id}",
@@ -270,7 +197,7 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaCategoriaInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoCategoriaInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -280,7 +207,7 @@ public sealed class CategoriasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarConflictAoExcluirCategoriaBase()
+    public async Task Excluir_DeveRetornarConflict_QuandoCategoriaBase()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Categoria.Id}",

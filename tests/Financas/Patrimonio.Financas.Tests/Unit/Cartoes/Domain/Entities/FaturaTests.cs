@@ -16,7 +16,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveCriarFatura()
+    public void Criar_DeveCriarFatura_QuandoDadosValidos()
     {
         // Act
         var fatura = CriarFatura();
@@ -30,7 +30,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveAlterarCampos()
+    public void Alterar_DeveAlterarFatura_QuandoDadosValidos()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -46,7 +46,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveFecharFatura()
+    public void Fechar_DeveFecharFatura_QuandoDadosValidos()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -59,7 +59,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DevePagarFatura()
+    public void Pagar_DevePagarFatura_QuandoDadosValidos()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -76,7 +76,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoDataFechamentoForPosteriorADataVencimento()
+    public void Criar_DeveLancarExcecao_QuandoDataFechamentoPosteriorADataVencimento()
     {
         // Arrange
         var dataFechamento = new DateOnly(2026, 8, 16);
@@ -91,7 +91,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoAlterarFaturaComDataFechamentoPosteriorADataVencimento()
+    public void Alterar_DeveLancarExcecao_QuandoDataFechamentoPosteriorADataVencimento()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -108,7 +108,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoAlterarFaturaFechada()
+    public void Alterar_DeveLancarExcecao_QuandoFaturaFechada()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -124,7 +124,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoExcluirFaturaFechada()
+    public void Excluir_DeveLancarExcecao_QuandoFaturaFechada()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -138,7 +138,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoExcluirFaturaPaga()
+    public void Excluir_DeveLancarExcecao_QuandoFaturaPaga()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -153,7 +153,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoFecharFaturaJaFechada()
+    public void Fechar_DeveLancarExcecao_QuandoFechada()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -167,7 +167,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoFecharFaturaJaPaga()
+    public void Fechar_DeveLancarExcecao_QuandoPaga()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -184,7 +184,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoPagarFaturaNaoFechada()
+    public void Pagar_DeveLancarExcecao_QuandoAberta()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -200,7 +200,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoPagarFaturaJaPaga()
+    public void Pagar_DeveLancarExcecao_QuandoPaga()
     {
         // Arrange
         var fatura = CriarFatura();
@@ -218,7 +218,7 @@ public sealed class FaturaTests
     }
 
     [Fact]
-    public void DeveLancarExcecaoQuandoPagarFaturaComDataPagamentoAnteriorADataFechamento()
+    public void Pagar_DeveLancarExcecao_QuandoDataPagamentoAnteriorADataFechamento()
     {
         // Arrange
         var fatura = CriarFatura();
