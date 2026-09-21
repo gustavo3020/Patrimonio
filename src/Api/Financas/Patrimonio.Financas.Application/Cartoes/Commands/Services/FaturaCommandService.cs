@@ -26,7 +26,7 @@ internal sealed class FaturaCommandService(
     /// <inheritdoc />
     public async Task<FaturaDetalheDto> CriarAsync(FaturaCriacaoDto dto, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Criando fatura.");
+        logger.LogInformation("Criando fatura para o cartão ID {CartaoId}.", dto.CartaoId);
 
         var entidade = Fatura.Criar(dto.DataFechamento, dto.DataVencimento, dto.CartaoId);
 

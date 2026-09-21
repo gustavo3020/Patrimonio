@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Cartoes.Dtos;
+using Patrimonio.Financas.Application.Cartoes.Lookups.Abstractions;
 using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Tests.Integration.Base;
@@ -44,53 +44,33 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
     public async Task CriarAsync_DeveCriarLancamentoParcelado_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
         var command = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
+        var faturaLookup = scope.ServiceProvider.GetRequiredService<IFaturaLookupRepository>();
 
-        var cartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
+        var fatura = await FaturaFixture.CriarAsync(Factory);
 
-        var faturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-
-        // 1. Criar fatura inicial
-        var faturaInicial = await faturaCommand.CriarAsync(faturaDto, TestContext.Current.CancellationToken);
-
-        // 2. Criar subsequentes (+1 mês e +2 meses)
-        await faturaCommand.CriarAsync(new FaturaCriacaoDto
-        {
-            DataFechamento = faturaInicial.DataFechamento.AddMonths(1),
-            DataVencimento = faturaInicial.DataVencimento.AddMonths(1),
-            CartaoId = faturaInicial.CartaoId
-        }, TestContext.Current.CancellationToken);
-
-        await faturaCommand.CriarAsync(new FaturaCriacaoDto
-        {
-            DataFechamento = faturaInicial.DataFechamento.AddMonths(2),
-            DataVencimento = faturaInicial.DataVencimento.AddMonths(2),
-            CartaoId = faturaInicial.CartaoId
-        }, TestContext.Current.CancellationToken);
-
-        // 3. Criar lançamento parcelado em 3x
         var dto = LancamentoDtoBuilder.Criar(
-            faturaInicial.Id,
+            fatura.Id,
             Factory.BaseData.Categoria.Id,
             descricao: "Compra parcelada",
             totalParcelas: 3);
 
-        var criado = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var lancamento = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var faturas = await faturaLookup.ListarPorCartaoAsync(
+            fatura.CartaoId,
+            TestContext.Current.CancellationToken);
 
-        // 4. Validações
-        criado.Should().NotBeNull();
-        criado.Descricao.Should().Be(dto.Descricao);
-        criado.Valor.Should().Be(33.34m);
-        criado.DataCompra.Should().Be(dto.DataCompra);
-        criado.Estabelecimento.Should().Be(dto.Estabelecimento);
-        criado.Responsavel.Should().Be(dto.Responsavel);
-        criado.NumeroParcela.Should().Be(1);
-        criado.TotalParcelas.Should().Be(3);
-        criado.FaturaId.Should().Be(dto.FaturaId);
-        criado.CategoriaId.Should().Be(dto.CategoriaId);
+        lancamento.Should().NotBeNull();
+        lancamento.Descricao.Should().Be(dto.Descricao);
+        lancamento.Valor.Should().Be(33.34m);
+        lancamento.DataCompra.Should().Be(dto.DataCompra);
+        lancamento.Estabelecimento.Should().Be(dto.Estabelecimento);
+        lancamento.Responsavel.Should().Be(dto.Responsavel);
+        lancamento.NumeroParcela.Should().Be(1);
+        lancamento.TotalParcelas.Should().Be(3);
+        lancamento.FaturaId.Should().Be(dto.FaturaId);
+        lancamento.CategoriaId.Should().Be(dto.CategoriaId);
+        faturas.Count.Should().Be(3);
     }
 
     [Fact]
