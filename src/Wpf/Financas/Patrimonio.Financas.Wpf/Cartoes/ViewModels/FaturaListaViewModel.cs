@@ -19,15 +19,21 @@ internal sealed partial class FaturaListaViewModel(
     ExceptionHandler exceptionHandler,
     IDialogService dialogService) : BaseViewModel
 {
-    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
-    private int _cartaoId;
-    private string _cartaoNome = string.Empty;
-
     /// <inheritdoc />
-    public override string Titulo => $"Faturas do cartão {_cartaoNome}";
+    public override string Titulo => $"Faturas do cartão {_cartaoNome} ({Faturas.Count})";
+
+    partial void OnFaturasChanged(ObservableCollection<FaturaListaDto> value)
+    {
+        value.CollectionChanged += (_, __) => OnPropertyChanged(nameof(Titulo));
+        OnPropertyChanged(nameof(Titulo));
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<FaturaListaDto> Faturas { get; set; } = [];
+
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+    private int _cartaoId;
+    private string _cartaoNome = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirPagamentoCommand))]

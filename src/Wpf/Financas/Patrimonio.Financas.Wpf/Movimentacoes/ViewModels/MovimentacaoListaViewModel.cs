@@ -20,7 +20,13 @@ internal sealed partial class MovimentacaoListaViewModel(
     IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
-    public override string Titulo => "Movimentações";
+    public override string Titulo => $"Movimentações ({Movimentacoes.Count})";
+
+    partial void OnMovimentacoesChanged(ObservableCollection<MovimentacaoListaDto> value)
+    {
+        value.CollectionChanged += (_, __) => OnPropertyChanged(nameof(Titulo));
+        OnPropertyChanged(nameof(Titulo));
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<MovimentacaoListaDto> Movimentacoes { get; set; } = [];

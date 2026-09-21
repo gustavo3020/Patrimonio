@@ -20,7 +20,13 @@ internal sealed partial class CartaoListaViewModel(
     IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
-    public override string Titulo => "Cartões";
+    public override string Titulo => $"Cartões ({Cartoes.Count})";
+
+    partial void OnCartoesChanged(ObservableCollection<CartaoListaDto> value)
+    {
+        value.CollectionChanged += (_, __) => OnPropertyChanged(nameof(Titulo));
+        OnPropertyChanged(nameof(Titulo));
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<CartaoListaDto> Cartoes { get; set; } = [];
