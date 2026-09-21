@@ -1,64 +1,45 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Instituicoes.Dtos;
 using Patrimonio.Financas.Contracts.Instituicoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Instituicoes.Contracts;
 
 public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
 {
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private static InstituicaoCriacaoDto CriarDto()
-    {
-        return new InstituicaoCriacaoDto
-        {
-            Nome = $"Instituição {Guid.NewGuid()}"
-        };
-    }
-
-    private static InstituicaoAlteracaoDto AlterarDto()
-    {
-        return new InstituicaoAlteracaoDto
-        {
-            Nome = $"Instituição alterada {Guid.NewGuid()}"
-        };
-    }
-
-    // ============================================================================
     // CriarAsync
     // ============================================================================
 
     [Fact]
-    public async Task CriarAsync_DeveCriarInstituicaoERetornarDto()
+    public async Task CriarAsync_DeveCriarInstituicao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var dto = InstituicaoDtoBuilder.Criar();
 
-        var criado = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var instituicao = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        criado.Should().NotBeNull();
-        criado.Nome.Should().NotBeNullOrWhiteSpace();
-        criado.Id.Should().BeGreaterThan(0);
+        instituicao.Should().NotBeNull();
+        instituicao.Nome.Should().NotBeNullOrWhiteSpace();
+        instituicao.Id.Should().BeGreaterThan(0);
+        instituicao.Nome.Should().Be(dto.Nome);
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoDuplicarNome()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoDuplicarNome()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
-        var dto = CriarDto();
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var dto = InstituicaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Nome);
 
-        await service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
-
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     // ============================================================================
@@ -66,55 +47,53 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
     // ============================================================================
 
     [Fact]
-    public async Task AlterarAsync_DeveAlterarInstituicao()
+    public async Task AlterarAsync_DeveAlterarInstituicao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
+        var dto = InstituicaoDtoBuilder.Alterar();
 
-        var instituicao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var instituicao = await InstituicaoFixture.CriarAsync(Factory);
 
-        await command.AlterarAsync(instituicao.Id, dtoAlterar, TestContext.Current.CancellationToken);
+        await command.AlterarAsync(instituicao.Id, dto, TestContext.Current.CancellationToken);
 
         var alterado = await query.ObterPorIdAsync(instituicao.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
-        alterado.Nome.Should().Be(dtoAlterar.Nome);
+        alterado.Nome.Should().Be(dto.Nome);
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoDuplicarNome()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoDuplicarNome()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
-        var dto = new InstituicaoAlteracaoDto
-        {
-            Nome = Factory.BaseData.Instituicao.Nome
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var dto = InstituicaoDtoBuilder.Alterar(Factory.BaseData.Instituicao.Nome);
 
-        var instituicao = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var instituicao = await InstituicaoFixture.CriarAsync(Factory);
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             instituicao.Id,
             dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarInstituicaoInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoInstituicaoInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var dto = InstituicaoDtoBuilder.Alterar();
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             int.MaxValue,
-            AlterarDto(),
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     // ============================================================================
@@ -122,41 +101,41 @@ public sealed class InstituicaoCommandServiceTests(IntegrationTestFactory factor
     // ============================================================================
 
     [Fact]
-    public async Task ExcluirAsync_DeveExcluirInstituicao()
+    public async Task ExcluirAsync_DeveExcluirInstituicao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
         var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IInstituicaoQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var instituicao = await InstituicaoFixture.CriarAsync(Factory);
 
-        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
+        await command.ExcluirAsync(instituicao.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        var acao = () => query.ObterPorIdAsync(instituicao.Id, TestContext.Current.CancellationToken);
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirInstituicaoBase()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoInstituicaoBase()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Instituicao.Id, TestContext.Current.CancellationToken);
+        var acao = () => command.ExcluirAsync(Factory.BaseData.Instituicao.Id, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirInstituicaoInexistente()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoInstituicaoInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IInstituicaoCommandService>();
 
-        var action = () => service.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             int.MaxValue,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 }

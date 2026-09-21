@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
-using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Tests.Integration.Base;
 using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -20,7 +19,7 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComLancamentos()
+    public async Task Listar_DeveRetornarOk_QuandoFaturaTemLancamentos()
     {
         var faturaId = Factory.BaseData.Fatura.Id;
 
@@ -42,7 +41,7 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComLancamento()
+    public async Task ObterPorId_DeveRetornarOk_QuandoLancamentoExiste()
     {
         var lancamentoEsperado = Factory.BaseData.Lancamento;
 
@@ -61,7 +60,7 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaLancamentoInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoLancamentoInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -75,13 +74,15 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComLancamentoCriado()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var criarDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, Factory.BaseData.Categoria.Id);
+        var dto = LancamentoDtoBuilder.Criar(
+            Factory.BaseData.Fatura.Id,
+            Factory.BaseData.Categoria.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -92,42 +93,37 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
 
         lancamento.Should().NotBeNull();
         lancamento.Id.Should().BeGreaterThan(0);
-        lancamento.Descricao.Should().Be(criarDto.Descricao);
+        lancamento.Descricao.Should().Be(dto.Descricao);
 
         resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarBadRequestAoEnviarDescricaoVazia()
+    public async Task Criar_DeveRetornarBadRequest_QuandoDescricaoVazia()
     {
-        var criarDto = new LancamentoCriacaoDto
-        {
-            Descricao = string.Empty,
-            Valor = 100.00m,
-            DataCompra = new DateOnly(2026, 9, 1),
-            Estabelecimento = "Estabelecimento Teste",
-            Responsavel = "Responsavel Teste",
-            TotalParcelas = 1,
-            FaturaId = Factory.BaseData.Fatura.Id,
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = LancamentoDtoBuilder.Criar(
+            Factory.BaseData.Fatura.Id,
+            Factory.BaseData.Categoria.Id,
+            descricao: string.Empty);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoInformarCategoriaInexistente()
+    public async Task Criar_DeveRetornarConflict_QuandoCategoriaInexistente()
     {
-        var criarDto = LancamentoDtoBuilder.Criar(Factory.BaseData.Fatura.Id, int.MaxValue);
+        var dto = LancamentoDtoBuilder.Criar(
+            Factory.BaseData.Fatura.Id,
+            int.MaxValue);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -138,62 +134,56 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var lancamento = await CriarAsync();
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
-        var alterarDto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
+        var lancamento = await LancamentoFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{lancamento.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestAoEnviarDescricaoVazia()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoDescricaoVazia()
     {
-        var alterarDto = new LancamentoAlteracaoDto
-        {
-            Descricao = string.Empty,
-            Valor = 100.00m,
-            DataCompra = new DateOnly(2026, 9, 1),
-            Estabelecimento = "Estabelecimento Teste",
-            Responsavel = "Responsavel Teste",
-            CategoriaId = Factory.BaseData.Categoria.Id
-        };
+        var dto = LancamentoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            descricao: string.Empty);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Lancamento.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaLancamentoInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoLancamentoInexistente()
     {
-        var alterarDto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
+        var dto = LancamentoDtoBuilder.Alterar(Factory.BaseData.Categoria.Id);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarConflictAoInformarCategoriaInexistente()
+    public async Task Alterar_DeveRetornarConflict_QuandoCategoriaInexistente()
     {
-        var alterarDto = LancamentoDtoBuilder.Alterar(int.MaxValue);
+        var dto = LancamentoDtoBuilder.Alterar(int.MaxValue);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Lancamento.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -204,9 +194,9 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var lancamento = await CriarAsync();
+        var lancamento = await LancamentoFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{lancamento.Id}",
@@ -216,9 +206,9 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarBadRequestAoExcluirLancamentoEmFaturaFechada()
+    public async Task Excluir_DeveRetornarBadRequest_QuandoExcluirLancamentoEmFaturaFechada()
     {
-        var lancamento = await CriarLancamentoEmFaturaFechadaAsync();
+        var lancamento = await LancamentoFixture.CriarEmFaturaFechadaAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{lancamento.Id}",
@@ -228,58 +218,12 @@ public sealed class LancamentoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaLancamentoInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoLancamentoInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    // ============================================================================
-    // MÉTODOS PRIVADOS
-    // ============================================================================
-    private async Task<FaturaDetalheDto> CriarCartaoEFaturaAsync(
-        ICartaoCommandService cartaoCommand,
-        IFaturaCommandService faturaCommand)
-    {
-        var cartaoDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        var cartao = await cartaoCommand.CriarAsync(cartaoDto, TestContext.Current.CancellationToken);
-
-        var faturaDto = FaturaDtoBuilder.Criar(cartao.Id);
-        var fatura = await faturaCommand.CriarAsync(faturaDto, TestContext.Current.CancellationToken);
-
-        return fatura;
-    }
-
-    private async Task<LancamentoDetalheDto> CriarAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        return await lancamentoCommand.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
-    }
-
-    private async Task<LancamentoDetalheDto> CriarLancamentoEmFaturaFechadaAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-        var faturaCommand = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
-        var lancamentoCommand = scope.ServiceProvider.GetRequiredService<ILancamentoCommandService>();
-
-        var fatura = await CriarCartaoEFaturaAsync(cartaoCommand, faturaCommand);
-
-        var criarLancamentoDto = LancamentoDtoBuilder.Criar(fatura.Id, Factory.BaseData.Categoria.Id);
-        var lancamento = await lancamentoCommand.CriarAsync(criarLancamentoDto, TestContext.Current.CancellationToken);
-
-        await faturaCommand.FecharAsync(fatura.Id, TestContext.Current.CancellationToken);
-
-        return lancamento;
     }
 }

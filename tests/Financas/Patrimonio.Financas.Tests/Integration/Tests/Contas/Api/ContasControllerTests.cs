@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Patrimonio.Financas.Contracts.Contas.Dtos;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -13,33 +15,11 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     private const string RotaBase = "/api/v1/financas/contas";
 
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private ContaCriacaoDto CriarDto()
-    {
-        return new ContaCriacaoDto
-        {
-            Nome = $"Conta {Guid.NewGuid()}",
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
-    }
-
-    private ContaAlteracaoDto AlterarDto()
-    {
-        return new ContaAlteracaoDto
-        {
-            Nome = $"Conta alterada {Guid.NewGuid()}",
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
-    }
-
-    // ============================================================================
     // GET /api/v1/financas/contas
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComContas()
+    public async Task Listar_DeveRetornarOk_QuandoDadosValidos()
     {
         var resposta = await Client.GetAsync(
             RotaBase,
@@ -59,7 +39,7 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComConta()
+    public async Task ObterPorId_DeveRetornarOk_QuandoContaExiste()
     {
         var contaEsperada = Factory.BaseData.Conta;
 
@@ -78,7 +58,7 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaContaInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoContaInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -92,9 +72,9 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComContaCriada()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var dto = CriarDto();
+        var dto = ContaDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -115,13 +95,11 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Criar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var dto = new ContaCriacaoDto
-        {
-            Nome = string.Empty,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
+        var dto = ContaDtoBuilder.Criar(
+            Factory.BaseData.Instituicao.Id,
+            nome: string.Empty);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
@@ -132,23 +110,18 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Criar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var dto = CriarDto();
+        var dto = ContaDtoBuilder.Criar(
+            Factory.BaseData.Instituicao.Id,
+            nome: Factory.BaseData.Conta.Nome);
 
-        var primeiraResposta = await Client.PostAsJsonAsync(
+        var resposta = await Client.PostAsJsonAsync(
             RotaBase,
             dto,
             TestContext.Current.CancellationToken);
 
-        primeiraResposta.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var segundaResposta = await Client.PostAsJsonAsync(
-            RotaBase,
-            dto,
-            TestContext.Current.CancellationToken);
-
-        segundaResposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ============================================================================
@@ -156,54 +129,39 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var criarDto = CriarDto();
+        var dto = ContaDtoBuilder.Alterar(Factory.BaseData.Instituicao.Id);
 
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            criarDto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var conta = await criarResponse.Content
-            .ReadFromJsonAsync<ContaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        conta.Should().NotBeNull();
-
-        var alterarDto = AlterarDto();
+        var conta = await ContaFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{conta.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var alterarDto = new ContaAlteracaoDto
-        {
-            Nome = string.Empty,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
+        var dto = ContaDtoBuilder.Alterar(
+            Factory.BaseData.Instituicao.Id,
+            nome: string.Empty);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Conta.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaContaInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoContaInexistente()
     {
-        var dto = AlterarDto();
+        var dto = ContaDtoBuilder.Alterar(Factory.BaseData.Instituicao.Id);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -214,32 +172,17 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Alterar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var dtoCriacao = CriarDto();
+        var conta = await ContaFixture.CriarAsync(Factory);
 
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            dtoCriacao,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var conta = await criarResponse.Content
-            .ReadFromJsonAsync<ContaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        conta.Should().NotBeNull();
-
-        var dtoAlteracao = new ContaAlteracaoDto
-        {
-            Nome = Factory.BaseData.Conta.Nome,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
+        var dto = ContaDtoBuilder.Alterar(
+            Factory.BaseData.Instituicao.Id,
+            nome: Factory.BaseData.Conta.Nome);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{conta.Id}",
-            dtoAlteracao,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -250,22 +193,9 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var dto = CriarDto();
-
-        var criarResponse = await Client.PostAsJsonAsync(
-            RotaBase,
-            dto,
-            TestContext.Current.CancellationToken);
-
-        criarResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var conta = await criarResponse.Content
-            .ReadFromJsonAsync<ContaDetalheDto>(
-                TestContext.Current.CancellationToken);
-
-        conta.Should().NotBeNull();
+        var conta = await ContaFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{conta.Id}",
@@ -275,7 +205,7 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaContaInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoContaInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -285,7 +215,7 @@ public sealed class ContasControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarConflictAoExcluirContaBase()
+    public async Task Excluir_DeveRetornarConflict_QuandoContaBase()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Conta.Id}",

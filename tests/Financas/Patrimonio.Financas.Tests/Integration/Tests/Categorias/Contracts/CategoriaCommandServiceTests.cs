@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Categorias.Dtos;
 using Patrimonio.Financas.Contracts.Categorias.Services;
 using Patrimonio.Financas.Domain.Exceptions;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Categorias.Contracts;
 
@@ -12,56 +13,34 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
     : IntegrationTestBase(factory)
 {
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private static CategoriaCriacaoDto CriarDto()
-    {
-        return new CategoriaCriacaoDto
-        {
-            Nome = $"Categoria {Guid.NewGuid()}"
-        };
-    }
-
-    private static CategoriaAlteracaoDto AlterarDto()
-    {
-        return new CategoriaAlteracaoDto
-        {
-            Nome = $"Categoria alterada {Guid.NewGuid()}"
-        };
-    }
-
-    // ============================================================================
     // CriarAsync
     // ============================================================================
 
     [Fact]
-    public async Task CriarAsync_DeveCriarCategoriaERetornarDto()
+    public async Task CriarAsync_DeveCriarCategoria_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
-        var dto = CriarDto();
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var dto = CategoriaDtoBuilder.Criar();
 
-        var criado = await service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var categoria = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        criado.Should().NotBeNull();
-        criado.Nome.Should().NotBeNullOrWhiteSpace();
-        criado.Id.Should().BeGreaterThan(0);
-        criado.Nome.Should().Be(dto.Nome);
+        categoria.Should().NotBeNull();
+        categoria.Nome.Should().NotBeNullOrWhiteSpace();
+        categoria.Id.Should().BeGreaterThan(0);
+        categoria.Nome.Should().Be(dto.Nome);
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoDuplicarNome()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoDuplicarNome()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
-        var dto = CriarDto();
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var dto = CategoriaDtoBuilder.Criar(Factory.BaseData.Categoria.Nome);
 
-        await service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
-
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     // ============================================================================
@@ -69,55 +48,52 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task AlterarAsync_DeveAlterarCategoria()
+    public async Task AlterarAsync_DeveAlterarCategoria_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
+        var dto = CategoriaDtoBuilder.Alterar();
 
-        var categoria = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
-        await command.AlterarAsync(categoria.Id, dtoAlterar, TestContext.Current.CancellationToken);
+        await command.AlterarAsync(categoria.Id, dto, TestContext.Current.CancellationToken);
 
         var alterado = await query.ObterPorIdAsync(categoria.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
-        alterado.Nome.Should().Be(dtoAlterar.Nome);
+        alterado.Nome.Should().Be(dto.Nome);
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoDuplicarNome()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoDuplicarNome()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
-        var dto = new CategoriaAlteracaoDto
-        {
-            Nome = Factory.BaseData.Categoria.Nome
-        };
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var dto = CategoriaDtoBuilder.Alterar(Factory.BaseData.Categoria.Nome);
 
-        var categoria = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             categoria.Id,
             dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarCategoriaInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             int.MaxValue,
-            AlterarDto(),
+            CategoriaDtoBuilder.Alterar(),
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     // ============================================================================
@@ -125,41 +101,41 @@ public sealed class CategoriaCommandServiceTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ExcluirAsync_DeveExcluirCategoria()
+    public async Task ExcluirAsync_DeveExcluirCategoria_QuandoDadosValidos()
     {
         using var scope = CreateScope();
         var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var categoria = await CategoriaFixture.CriarAsync(Factory);
 
-        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
+        await command.ExcluirAsync(categoria.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        var acao = () => query.ObterPorIdAsync(categoria.Id, TestContext.Current.CancellationToken);
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirCategoriaBase()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoCategoriaBase()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
 
-        var action = () => service.ExcluirAsync(Factory.BaseData.Categoria.Id, TestContext.Current.CancellationToken);
+        var acao = () => command.ExcluirAsync(Factory.BaseData.Categoria.Id, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirCategoriaInexistente()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<ICategoriaCommandService>();
 
-        var action = () => service.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             int.MaxValue,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 }

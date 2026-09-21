@@ -14,24 +14,28 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveRetornarFaturasDoCartaoBase()
+    public async Task ListarAsync_DeveRetornarFaturasDoCartaoBase_QuandoCartaoTemFaturas()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var faturas = await service.ListarAsync(Factory.BaseData.Cartao.Id, TestContext.Current.CancellationToken);
+        var faturas = await query.ListarAsync(
+            Factory.BaseData.Cartao.Id,
+            TestContext.Current.CancellationToken);
 
         faturas.Should().NotBeNull();
         faturas.Should().Contain(c => c.Id == Factory.BaseData.Fatura.Id);
     }
 
     [Fact]
-    public async Task ListarAsync_DeveRetornarListaVaziaQuandoCartaoNaoPossuiFaturas()
+    public async Task ListarAsync_DeveRetornarListaVazia_QuandoCartaoNaoPossuiFaturas()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var faturas = await service.ListarAsync(0, TestContext.Current.CancellationToken);
+        var faturas = await query.ListarAsync(
+            0,
+            TestContext.Current.CancellationToken);
 
         faturas.Should().NotBeNull();
         faturas.Should().BeEmpty();
@@ -42,15 +46,15 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterFaturaPorId()
+    public async Task ObterPorIdAsync_DeveObterFaturaPorId_QuandoFaturaExiste()
     {
         using var scope = CreateScope();
-
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
-
+        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
         var faturaEsperada = Factory.BaseData.Fatura;
 
-        var fatura = await service.ObterPorIdAsync(faturaEsperada.Id, TestContext.Current.CancellationToken);
+        var fatura = await query.ObterPorIdAsync(
+            faturaEsperada.Id,
+            TestContext.Current.CancellationToken);
 
         fatura.Should().NotBeNull();
         fatura.Id.Should().Be(faturaEsperada.Id);
@@ -58,13 +62,14 @@ public sealed class FaturaQueryServiceTests(IntegrationTestFactory factory) : In
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterFaturaInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoFaturaInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<IFaturaQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

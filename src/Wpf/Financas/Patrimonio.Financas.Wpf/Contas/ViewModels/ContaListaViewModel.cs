@@ -20,7 +20,13 @@ internal sealed partial class ContaListaViewModel(
     IDialogService dialogService) : BaseViewModel
 {
     /// <inheritdoc />
-    public override string Titulo => "Contas";
+    public override string Titulo => $"Contas ({Contas.Count})";
+
+    partial void OnContasChanged(ObservableCollection<ContaListaDto> value)
+    {
+        value.CollectionChanged += (_, __) => OnPropertyChanged(nameof(Titulo));
+        OnPropertyChanged(nameof(Titulo));
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<ContaListaDto> Contas { get; set; } = [];

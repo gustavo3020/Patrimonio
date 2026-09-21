@@ -9,7 +9,7 @@ namespace Patrimonio.Financas.Tests.Unit.Movimentacoes.Domain.Entities;
 public sealed class MovimentacaoTests
 {
     [Fact]
-    public void DeveCriarMovimentacao()
+    public void Criar_DeveCriarMovimentacao_QuandoDadosValidos()
     {
         // Arrange
         var data = new DateOnly(2026, 8, 15);
@@ -37,7 +37,7 @@ public sealed class MovimentacaoTests
     }
 
     [Fact]
-    public void DevePermitirDescricaoNula()
+    public void Criar_DeveCriarMovimentacao_QuandoDescricaoNula()
     {
         // Act
         var movimentacao = Movimentacao.Criar(
@@ -54,7 +54,7 @@ public sealed class MovimentacaoTests
     }
 
     [Fact]
-    public void DeveAlterarMovimentacao()
+    public void Alterar_DeveAlterarMovimentacao_QuandoDadosValidos()
     {
         // Arrange
         var movimentacao = CriarMovimentacao();
@@ -83,7 +83,7 @@ public sealed class MovimentacaoTests
     }
 
     [Fact]
-    public void DeveRejeitarAlteracaoSeMovimentacaoAssociadaAFatura()
+    public void Alterar_DeveRejeitarAlteracao_QuandoAssociadaAFatura()
     {
         // Arrange
         var movimentacao = Movimentacao.Criar(

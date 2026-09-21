@@ -6,7 +6,7 @@ namespace Patrimonio.Financas.Tests.Unit.Common.Domain.Entities;
 public sealed class EntidadeBaseTests
 {
     [Fact]
-    public void DeveInicializarDataCriacao()
+    public void Inicializacao_DeveInicializarDataCriacao_QuandoCriada()
     {
         var antes = DateTimeOffset.UtcNow;
 
@@ -21,7 +21,7 @@ public sealed class EntidadeBaseTests
     }
 
     [Fact]
-    public void DeveInicializarDataAlteracao()
+    public void Inicializacao_DeveInicializarDataAlteracao_QuandoCriada()
     {
         var antes = DateTimeOffset.UtcNow;
 
@@ -36,7 +36,7 @@ public sealed class EntidadeBaseTests
     }
 
     [Fact]
-    public void DeveAtualizarDataAlteracao()
+    public void Atualizar_DeveAtualizarDataAlteracao_QuandoAtualizado()
     {
         var entidade = new EntidadeTeste();
 

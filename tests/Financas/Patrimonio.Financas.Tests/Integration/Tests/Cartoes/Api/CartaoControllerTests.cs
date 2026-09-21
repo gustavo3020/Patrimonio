@@ -1,11 +1,9 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
-using Patrimonio.Financas.Contracts.Cartoes.Services;
-using Patrimonio.Financas.SharedKernel.Cartoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
 using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -21,7 +19,7 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Listar_DeveRetornarOkComCartoes()
+    public async Task Listar_DeveRetornarOk_QuandoDadosValidos()
     {
         var resposta = await Client.GetAsync(
             RotaBase,
@@ -41,7 +39,7 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarOkComCartao()
+    public async Task ObterPorId_DeveRetornarOk_QuandoCartaoExiste()
     {
         var cartaoEsperado = Factory.BaseData.Cartao;
 
@@ -65,7 +63,7 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task ObterPorId_DeveRetornarNotFoundParaCartaoInexistente()
+    public async Task ObterPorId_DeveRetornarNotFound_QuandoCartaoInexistente()
     {
         var resposta = await Client.GetAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -79,13 +77,13 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Criar_DeveRetornarCreatedComCartaoCriado()
+    public async Task Criar_DeveRetornarCreated_QuandoDadosValidos()
     {
-        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
+        var dto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -96,48 +94,36 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
 
         cartao.Should().NotBeNull();
         cartao.Id.Should().BeGreaterThan(0);
-        cartao.Nome.Should().Be(criarDto.Nome);
+        cartao.Nome.Should().Be(dto.Nome);
 
         resposta.Headers.Location.Should().NotBeNull();
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Criar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var criarDto = new CartaoCriacaoDto
-        {
-            Nome = string.Empty,
-            Bandeira = BandeiraCartao.Mastercard,
-            Limite = 5000,
-            DiaFechamento = 15,
-            DiaVencimento = 20,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
+        var dto = CartaoDtoBuilder.Criar(
+            Factory.BaseData.Instituicao.Id,
+            nome: String.Empty);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Criar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var criarDto = new CartaoCriacaoDto
-        {
-            Nome = Factory.BaseData.Cartao.Nome,
-            Bandeira = BandeiraCartao.Mastercard,
-            Limite = 5000,
-            DiaFechamento = 15,
-            DiaVencimento = 20,
-            InstituicaoId = Factory.BaseData.Instituicao.Id
-        };
+        var dto = CartaoDtoBuilder.Criar(
+            Factory.BaseData.Instituicao.Id,
+            nome: Factory.BaseData.Cartao.Nome);
 
         var resposta = await Client.PostAsJsonAsync(
             RotaBase,
-            criarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -148,42 +134,35 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Alterar_DeveRetornarNoContent()
+    public async Task Alterar_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var cartao = await CriarAsync();
+        var dto = CartaoDtoBuilder.Alterar();
 
-        var alterarDto = CartaoDtoBuilder.Alterar();
+        var cartao = await CartaoFixture.CriarAsync(Factory);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{cartao.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarBadRequestAoEnviarNomeVazio()
+    public async Task Alterar_DeveRetornarBadRequest_QuandoNomeVazio()
     {
-        var alterarDto = new CartaoAlteracaoDto
-        {
-            Nome = string.Empty,
-            Bandeira = BandeiraCartao.Mastercard,
-            Limite = 5000,
-            DiaFechamento = 15,
-            DiaVencimento = 20
-        };
+        var dto = CartaoDtoBuilder.Alterar(nome: String.Empty);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{Factory.BaseData.Cartao.Id}",
-            alterarDto,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarNotFoundParaCartaoInexistente()
+    public async Task Alterar_DeveRetornarNotFound_QuandoCartaoInexistente()
     {
         var dto = CartaoDtoBuilder.Alterar();
 
@@ -196,22 +175,15 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Alterar_DeveRetornarConflictAoDuplicarNome()
+    public async Task Alterar_DeveRetornarConflict_QuandoDuplicarNome()
     {
-        var cartao = await CriarAsync();
+        var cartao = await CartaoFixture.CriarAsync(Factory);
 
-        var dtoAlteracao = new CartaoAlteracaoDto
-        {
-            Nome = Factory.BaseData.Cartao.Nome,
-            Bandeira = BandeiraCartao.Mastercard,
-            Limite = 5000,
-            DiaFechamento = 15,
-            DiaVencimento = 20
-        };
+        var dto = CartaoDtoBuilder.Alterar(nome: Factory.BaseData.Cartao.Nome);
 
         var resposta = await Client.PutAsJsonAsync(
             $"{RotaBase}/{cartao.Id}",
-            dtoAlteracao,
+            dto,
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -222,9 +194,9 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     // ============================================================================
 
     [Fact]
-    public async Task Excluir_DeveRetornarNoContent()
+    public async Task Excluir_DeveRetornarNoContent_QuandoDadosValidos()
     {
-        var cartao = await CriarAsync();
+        var cartao = await CartaoFixture.CriarAsync(Factory);
 
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{cartao.Id}",
@@ -234,7 +206,7 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarNotFoundParaCartaoInexistente()
+    public async Task Excluir_DeveRetornarNotFound_QuandoCartaoInexistente()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{int.MaxValue}",
@@ -244,25 +216,12 @@ public sealed class CartaoControllerTests(IntegrationTestFactory factory)
     }
 
     [Fact]
-    public async Task Excluir_DeveRetornarConflictAoExcluirCartaoBase()
+    public async Task Excluir_DeveRetornarConflict_QuandoCartaoBase()
     {
         var resposta = await Client.DeleteAsync(
             $"{RotaBase}/{Factory.BaseData.Cartao.Id}",
             TestContext.Current.CancellationToken);
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Conflict);
-    }
-
-    // ============================================================================
-    // MÉTODOS PRIVADOS
-    // ============================================================================
-
-    private async Task<CartaoDetalheDto> CriarAsync()
-    {
-        using var scope = CreateScope();
-        var cartaoCommand = scope.ServiceProvider.GetRequiredService<ICartaoCommandService>();
-
-        var criarDto = CartaoDtoBuilder.Criar(Factory.BaseData.Instituicao.Id);
-        return await cartaoCommand.CriarAsync(criarDto, TestContext.Current.CancellationToken);
     }
 }

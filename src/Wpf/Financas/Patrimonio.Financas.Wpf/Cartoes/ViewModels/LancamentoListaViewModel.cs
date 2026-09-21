@@ -19,14 +19,20 @@ internal sealed partial class LancamentoListaViewModel(
     ExceptionHandler exceptionHandler,
     IDialogService dialogService) : BaseViewModel
 {
-    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
-    private DateOnly _dataVencimento;
-
     /// <inheritdoc />
-    public override string Titulo => $"Lançamentos da fatura vencendo em {_dataVencimento}";
+    public override string Titulo => $"Lançamentos da fatura vencendo em {_dataVencimento} ({Lancamentos.Count})";
+
+    partial void OnLancamentosChanged(ObservableCollection<LancamentoListaDto> value)
+    {
+        value.CollectionChanged += (_, __) => OnPropertyChanged(nameof(Titulo));
+        OnPropertyChanged(nameof(Titulo));
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<LancamentoListaDto> Lancamentos { get; set; } = [];
+
+    private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+    private DateOnly _dataVencimento;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AbrirAlteracaoCommand))]

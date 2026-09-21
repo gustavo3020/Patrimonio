@@ -1,125 +1,83 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Patrimonio.Financas.Contracts.Movimentacoes.Dtos;
 using Patrimonio.Financas.Contracts.Movimentacoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
-using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Builders;
 using Patrimonio.Financas.Tests.Integration.Config;
+using Patrimonio.Financas.Tests.Integration.Fixtures;
 
 namespace Patrimonio.Financas.Tests.Integration.Tests.Movimentacoes.Contracts;
 
 public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
 {
     // ============================================================================
-    // DTOs
-    // ============================================================================
-
-    private MovimentacaoCriacaoDto CriarDto()
-    {
-        return new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
-    }
-
-    private MovimentacaoAlteracaoDto AlterarDto()
-    {
-        return new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now).AddDays(5),
-            Valor = 1000.00m,
-            Natureza = Natureza.Entrada,
-            Tipo = TipoMovimentacao.Credito,
-            Descricao = $"Movimentação alterada {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
-    }
-
-    // ============================================================================
     // CriarAsync
     // ============================================================================
 
     [Fact]
-    public async Task CriarAsync_DeveCriarMovimentacaoERetornarDto()
+    public async Task CriarAsync_DeveCriarMovimentacao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Criar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
-        var criado = await service.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var movimentacao = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        criado.Should().NotBeNull();
-        criado.Descricao.Should().NotBeNullOrWhiteSpace();
-        criado.Id.Should().BeGreaterThan(0);
+        movimentacao.Should().NotBeNull();
+        movimentacao.Descricao.Should().NotBeNullOrWhiteSpace();
+        movimentacao.Id.Should().BeGreaterThan(0);
+        movimentacao.Data.Should().Be(dto.Data);
+        movimentacao.Valor.Should().Be(dto.Valor);
+        movimentacao.Natureza.Should().Be(dto.Natureza);
+        movimentacao.Tipo.Should().Be(dto.Tipo);
+        movimentacao.Descricao.Should().Be(dto.Descricao);
+        movimentacao.CategoriaId.Should().Be(dto.CategoriaId);
+        movimentacao.ContaId.Should().Be(dto.ContaId);
     }
 
     [Fact]
-    public async Task CriarAsync_DeveAceitarDescricaoNula()
+    public async Task CriarAsync_DeveCriarMovimentacao_QuandoDescricaoNula()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
-        var dto = new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = string.Empty,
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Criar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id,
+            descricao: string.Empty);
 
-        var criado = await service.CriarAsync(dto, TestContext.Current.CancellationToken);
-        criado.Descricao.Should().BeNullOrEmpty();
+        var movimentacao = await command.CriarAsync(dto, TestContext.Current.CancellationToken);
+        movimentacao.Descricao.Should().BeNullOrEmpty();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
-        var dto = new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = int.MaxValue,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Criar(
+            int.MaxValue,
+            Factory.BaseData.Conta.Id);
 
-        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task CriarAsync_DeveLancarExcecaoAoInformarContaInexistente()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoContaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
-        var dto = new MovimentacaoCriacaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = int.MaxValue
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Criar(
+            Factory.BaseData.Categoria.Id,
+            int.MaxValue);
 
-        var action = () => service.CriarAsync(dto, TestContext.Current.CancellationToken);
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     // ============================================================================
@@ -127,47 +85,43 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
     // ============================================================================
 
     [Fact]
-    public async Task AlterarAsync_DeveAlterarMovimentacao()
+    public async Task AlterarAsync_DeveAlterarMovimentacao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var dtoAlterar = AlterarDto();
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
-        var movimentacao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var movimentacao = await MovimentacaoFixture.CriarAsync(Factory);
 
-        await command.AlterarAsync(movimentacao.Id, dtoAlterar, TestContext.Current.CancellationToken);
+        await command.AlterarAsync(movimentacao.Id, dto, TestContext.Current.CancellationToken);
 
         var alterado = await query.ObterPorIdAsync(movimentacao.Id, TestContext.Current.CancellationToken);
 
         alterado.Should().NotBeNull();
-        alterado.Data.Should().Be(dtoAlterar.Data);
-        alterado.Valor.Should().Be(dtoAlterar.Valor);
-        alterado.Natureza.Should().Be(dtoAlterar.Natureza);
-        alterado.Tipo.Should().Be(dtoAlterar.Tipo);
-        alterado.Descricao.Should().Be(dtoAlterar.Descricao);
-        alterado.CategoriaId.Should().Be(dtoAlterar.CategoriaId);
-        alterado.ContaId.Should().Be(dtoAlterar.ContaId);
+        alterado.Data.Should().Be(dto.Data);
+        alterado.Valor.Should().Be(dto.Valor);
+        alterado.Natureza.Should().Be(dto.Natureza);
+        alterado.Tipo.Should().Be(dto.Tipo);
+        alterado.Descricao.Should().Be(dto.Descricao);
+        alterado.CategoriaId.Should().Be(dto.CategoriaId);
+        alterado.ContaId.Should().Be(dto.ContaId);
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveAceitarDescricaoNula()
+    public async Task AlterarAsync_DeveAlterarMovimentacao_QuandoDescricaoNula()
     {
         using var scope = CreateScope();
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
-        var dto = new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = string.Empty,
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id,
+            descricao: string.Empty);
 
-        var movimentacao = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var movimentacao = await MovimentacaoFixture.CriarAsync(Factory);
 
         await command.AlterarAsync(movimentacao.Id, dto, TestContext.Current.CancellationToken);
 
@@ -176,65 +130,54 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoAlterarMovimentacaoInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoMovimentacaoInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            Factory.BaseData.Conta.Id);
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             int.MaxValue,
-            AlterarDto(),
+            dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoInformarCategoriaInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
-        var dto = new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = int.MaxValue,
-            ContaId = Factory.BaseData.Conta.Id
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            int.MaxValue,
+            Factory.BaseData.Conta.Id);
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             Factory.BaseData.Movimentacao.Id,
             dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     [Fact]
-    public async Task AlterarAsync_DeveLancarExcecaoAoInformarContaInexistente()
+    public async Task AlterarAsync_DeveLancarExcecao_QuandoContaInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
-        var dto = new MovimentacaoAlteracaoDto
-        {
-            Data = DateOnly.FromDateTime(DateTime.Now),
-            Valor = 500.00m,
-            Natureza = Natureza.Saida,
-            Tipo = TipoMovimentacao.Pix,
-            Descricao = $"Movimentação {Guid.NewGuid()}",
-            CategoriaId = Factory.BaseData.Categoria.Id,
-            ContaId = int.MaxValue
-        };
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var dto = MovimentacaoDtoBuilder.Alterar(
+            Factory.BaseData.Categoria.Id,
+            int.MaxValue);
 
-        var action = () => service.AlterarAsync(
+        var acao = () => command.AlterarAsync(
             Factory.BaseData.Movimentacao.Id,
             dto,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<ConflitoException>();
+        await acao.Should().ThrowAsync<ConflitoException>();
     }
 
     // ============================================================================
@@ -242,30 +185,30 @@ public sealed class MovimentacaoCommandServiceTests(IntegrationTestFactory facto
     // ============================================================================
 
     [Fact]
-    public async Task ExcluirAsync_DeveExcluirMovimentacao()
+    public async Task ExcluirAsync_DeveExcluirMovimentacao_QuandoDadosValidos()
     {
         using var scope = CreateScope();
         var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
         var query = scope.ServiceProvider.GetRequiredService<IMovimentacaoQueryService>();
 
-        var criado = await command.CriarAsync(CriarDto(), TestContext.Current.CancellationToken);
+        var movimentacao = await MovimentacaoFixture.CriarAsync(Factory);
 
-        await command.ExcluirAsync(criado.Id, TestContext.Current.CancellationToken);
+        await command.ExcluirAsync(movimentacao.Id, TestContext.Current.CancellationToken);
 
-        var action = () => query.ObterPorIdAsync(criado.Id, TestContext.Current.CancellationToken);
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        var acao = () => query.ObterPorIdAsync(movimentacao.Id, TestContext.Current.CancellationToken);
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 
     [Fact]
-    public async Task ExcluirAsync_DeveLancarExcecaoAoExcluirMovimentacaoInexistente()
+    public async Task ExcluirAsync_DeveLancarExcecao_QuandoMovimentacaoInexistente()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
+        var command = scope.ServiceProvider.GetRequiredService<IMovimentacaoCommandService>();
 
-        var action = () => service.ExcluirAsync(
+        var acao = () => command.ExcluirAsync(
             int.MaxValue,
             TestContext.Current.CancellationToken);
 
-        await action.Should().ThrowAsync<RecursoNaoEncontradoException>();
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }
 }

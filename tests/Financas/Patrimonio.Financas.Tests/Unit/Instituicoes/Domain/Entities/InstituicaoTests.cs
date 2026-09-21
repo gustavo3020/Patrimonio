@@ -7,7 +7,7 @@ namespace Patrimonio.Financas.Tests.Unit.Instituicoes.Domain.Entities;
 public sealed class InstituicaoTests
 {
     [Fact]
-    public void DeveCriarInstituicao()
+    public void Criar_DeveCriarInstituicao_QuandoDadosValidos()
     {
         var nome = new Nome("Banco do Brasil");
 
@@ -17,7 +17,7 @@ public sealed class InstituicaoTests
     }
 
     [Fact]
-    public void DeveAlterarNome()
+    public void Alterar_DeveAlterarNome_QuandoDadosValidos()
     {
         var nome = new Nome("Banco do Brasil");
 

@@ -11,7 +11,7 @@ public sealed class TextoTests
     [Theory]
     [InlineData("Texto Teste")]
     [InlineData("  Texto Teste  ")]
-    public void DeveCriarTextoValido(string valor)
+    public void Criar_DeveCriarTexto_QuandoValorValido(string valor)
     {
         var texto = new TextoTeste(valor);
 
@@ -21,7 +21,7 @@ public sealed class TextoTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void DeveRejeitarTextoInvalido(string valorInvalido)
+    public void Criar_DeveLancarExcecao_QuandoValorInvalido(string valorInvalido)
     {
         var acao = () => new TextoTeste(valorInvalido);
 
@@ -29,7 +29,7 @@ public sealed class TextoTests
     }
 
     [Fact]
-    public void DeveAceitarTextoComExatamente200Caracteres()
+    public void Criar_DeveAceitarTextoComExatamente200Caracteres_QuandoTamanhoMaximo()
     {
         var valor = new string('A', 200);
 
@@ -39,7 +39,7 @@ public sealed class TextoTests
     }
 
     [Fact]
-    public void DeveRejeitarTextoComMaisDe200Caracteres()
+    public void Criar_DeveLancarExcecao_QuandoMaiorQueMaximo()
     {
         var valor = new string('A', 201);
 

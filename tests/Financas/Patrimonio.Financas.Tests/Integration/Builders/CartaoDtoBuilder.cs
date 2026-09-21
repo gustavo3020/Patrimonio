@@ -5,11 +5,11 @@ namespace Patrimonio.Financas.Tests.Integration.Builders;
 
 internal static class CartaoDtoBuilder
 {
-    public static CartaoCriacaoDto Criar(int instituicaoId)
+    public static CartaoCriacaoDto Criar(int instituicaoId, string? nome = null)
     {
         return new CartaoCriacaoDto
         {
-            Nome = $"Cartão {Guid.NewGuid()}",
+            Nome = nome ?? $"Cartão {Guid.NewGuid()}",
             Bandeira = BandeiraCartao.Mastercard,
             Limite = 3000,
             DiaFechamento = 25,
@@ -18,11 +18,11 @@ internal static class CartaoDtoBuilder
         };
     }
 
-    public static CartaoAlteracaoDto Alterar()
+    public static CartaoAlteracaoDto Alterar(string? nome = null)
     {
         return new CartaoAlteracaoDto
         {
-            Nome = $"Cartão alterado {Guid.NewGuid()}",
+            Nome = nome ?? $"Cartão alterado {Guid.NewGuid()}",
             Bandeira = BandeiraCartao.Visa,
             Limite = 1000,
             DiaFechamento = 10,

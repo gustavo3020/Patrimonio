@@ -14,12 +14,12 @@ public sealed class CartaoQueryServiceTests(IntegrationTestFactory factory) : In
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveListarCartoes()
+    public async Task ListarAsync_DeveListarCartoes_QuandoDadosValidos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var cartoes = await service.ListarAsync(TestContext.Current.CancellationToken);
+        var cartoes = await query.ListarAsync(TestContext.Current.CancellationToken);
 
         cartoes.Should().NotBeNull();
         cartoes.Should().Contain(c => c.Id == Factory.BaseData.Cartao.Id);
@@ -30,29 +30,30 @@ public sealed class CartaoQueryServiceTests(IntegrationTestFactory factory) : In
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterCartaoPorId()
+    public async Task ObterPorIdAsync_DeveObterCartaoPorId_QuandoCartaoExiste()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
+        var cartaoEsperado = Factory.BaseData.Cartao;
 
-        var service = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
-
-        var cartaoEsperada = Factory.BaseData.Cartao;
-
-        var cartao = await service.ObterPorIdAsync(cartaoEsperada.Id, TestContext.Current.CancellationToken);
+        var cartao = await query.ObterPorIdAsync(
+            cartaoEsperado.Id,
+            TestContext.Current.CancellationToken);
 
         cartao.Should().NotBeNull();
-        cartao.Id.Should().Be(cartaoEsperada.Id);
-        cartao.Nome.Should().Be(cartaoEsperada.Nome);
+        cartao.Id.Should().Be(cartaoEsperado.Id);
+        cartao.Nome.Should().Be(cartaoEsperado.Nome);
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterCartaoInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoCartaoInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<ICartaoQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

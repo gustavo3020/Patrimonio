@@ -6,7 +6,7 @@ namespace Patrimonio.Financas.Tests.Unit.Common.Domain.ValueObjects;
 public sealed class DescricaoTests
 {
     [Fact]
-    public void DeveCriarDescricaoValida()
+    public void Criar_DeveCriarDescricaoValida_QuandoDadosValidos()
     {
         var descricao = new Descricao("Descrição Teste");
 
@@ -14,7 +14,7 @@ public sealed class DescricaoTests
     }
 
     [Fact]
-    public void DoisDescricaosComMesmoValorDevemSerIguais()
+    public void Igualdade_DeveConsiderarIgual_QuandoMesmoValor()
     {
         var a = new Descricao("Descrição Teste");
         var b = new Descricao("Descrição Teste");
@@ -24,7 +24,7 @@ public sealed class DescricaoTests
     }
 
     [Fact]
-    public void DoisDescricaosComValoresDiferentesNaoDevemSerIguais()
+    public void Igualdade_DeveConsiderarDiferente_QuandoValoresDiferentes()
     {
         var a = new Descricao("Descrição Teste");
         var b = new Descricao("Outra Descrição");
@@ -33,7 +33,7 @@ public sealed class DescricaoTests
     }
 
     [Fact]
-    public void ToStringDeveRetornarValorComoTexto()
+    public void ToString_DeveRetornarValorComoTexto_QuandoChamado()
     {
         var nome = new Descricao("Descrição Teste");
 

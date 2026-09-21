@@ -14,24 +14,26 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
     // ============================================================================
 
     [Fact]
-    public async Task ListarAsync_DeveRetornarLancamentosDaFaturaBase()
+    public async Task ListarAsync_DeveRetornarLancamentosDaFaturaBase_QuandoFaturaTemLancamentos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var lancamentos = await service.ListarAsync(Factory.BaseData.Fatura.Id, TestContext.Current.CancellationToken);
+        var lancamentos = await query.ListarAsync(
+            Factory.BaseData.Fatura.Id,
+            TestContext.Current.CancellationToken);
 
         lancamentos.Should().NotBeNull();
         lancamentos.Should().Contain(c => c.Id == Factory.BaseData.Lancamento.Id);
     }
 
     [Fact]
-    public async Task ListarAsync_DeveRetornarListaVaziaQuandoFaturaNaoPossuiLancamentos()
+    public async Task ListarAsync_DeveRetornarListaVazia_QuandoFaturaNaoPossuiLancamentos()
     {
         using var scope = CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var faturas = await service.ListarAsync(0, TestContext.Current.CancellationToken);
+        var faturas = await query.ListarAsync(0, TestContext.Current.CancellationToken);
 
         faturas.Should().NotBeNull();
         faturas.Should().BeEmpty();
@@ -42,29 +44,30 @@ public sealed class LancamentoQueryServiceTests(IntegrationTestFactory factory) 
     // ============================================================================
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveObterLancamentoPorId()
+    public async Task ObterPorIdAsync_DeveObterLancamentoPorId_QuandoLancamentoExiste()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
+        var lancamentoEsperado = Factory.BaseData.Lancamento;
 
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
-
-        var lancamentoEsperada = Factory.BaseData.Lancamento;
-
-        var lancamento = await service.ObterPorIdAsync(lancamentoEsperada.Id, TestContext.Current.CancellationToken);
+        var lancamento = await query.ObterPorIdAsync(
+            lancamentoEsperado.Id,
+            TestContext.Current.CancellationToken);
 
         lancamento.Should().NotBeNull();
-        lancamento.Id.Should().Be(lancamentoEsperada.Id);
-        lancamento.Descricao.Should().Be(lancamentoEsperada.Descricao);
+        lancamento.Id.Should().Be(lancamentoEsperado.Id);
+        lancamento.Descricao.Should().Be(lancamentoEsperado.Descricao);
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExcecaoAoObterLancamentoInexistente()
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoLancamentoInexistente()
     {
         using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
 
-        var service = scope.ServiceProvider.GetRequiredService<ILancamentoQueryService>();
-
-        var acao = () => service.ObterPorIdAsync(int.MaxValue, TestContext.Current.CancellationToken);
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
 
         await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
     }

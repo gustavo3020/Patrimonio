@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Patrimonio.Financas.Application.Cartoes.Commands.Abstractions;
 using Patrimonio.Financas.Application.Cartoes.Lookups.Abstractions;
+using Patrimonio.Financas.Application.Cartoes.Lookups.ReadModels;
 using Patrimonio.Financas.Application.Cartoes.Mappers;
 using Patrimonio.Financas.Application.Cartoes.Queries.Abstractions;
+using Patrimonio.Financas.Application.Cartoes.Queries.ReadModels;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
 using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Cartoes.Entities;
@@ -22,6 +24,7 @@ internal sealed class LancamentoCommandService(
     ILancamentoQueryRepository queryRepository,
     IFaturaLookupRepository faturaLookupRepository,
     IFaturaQueryRepository faturaQueryRepository,
+    IFaturaCommandService faturaCommandService,
     ILogger<LancamentoCommandService> logger) : ILancamentoCommandService
 {
     /// <inheritdoc />
@@ -29,38 +32,17 @@ internal sealed class LancamentoCommandService(
     {
         logger.LogInformation("Criando lançamentos {Descricao}.", dto.Descricao);
 
-        var grupoId = Guid.NewGuid();
-        Lancamento? primeiraParcela = null;
-
-        var primeiraFatura = await faturaQueryRepository.ObterPorIdAsync(dto.FaturaId, cancellationToken)
-            ?? throw new RecursoNaoEncontradoException($"Fatura com Id {dto.FaturaId} não encontrada.");
-
-        if (primeiraFatura.Status != StatusFatura.Aberta)
-            throw new RegraDeNegocioException($"Só é possível criar um lançamento associado a uma fatura que esteja aberta.");
-
+        var primeiraFatura = await ValidarFaturaInicial(dto.FaturaId, cancellationToken);
         var faturas = await faturaLookupRepository.ListarPorCartaoAsync(primeiraFatura.CartaoId, cancellationToken);
-
         var parcelas = ParcelamentoService.CalcularParcelas(dto.Valor, dto.TotalParcelas);
+
+        Lancamento? primeiraParcela = null;
+        var grupoId = Guid.NewGuid();
 
         for (int numeroParcela = 1; numeroParcela <= dto.TotalParcelas; numeroParcela++)
         {
-            var valorParcela = parcelas[numeroParcela - 1];
-            var dataVencimento = primeiraFatura.DataVencimento.AddMonths(numeroParcela - 1);
-
-            var fatura = faturas
-                .FirstOrDefault(f => f.DataVencimento == dataVencimento)
-                ?? throw new RecursoNaoEncontradoException($"Fatura não encontrada para {dataVencimento:MM/yyyy}.");
-
-            var entidade = Lancamento.Criar(
-                new Descricao(dto.Descricao),
-                new Dinheiro(valorParcela),
-                dto.DataCompra,
-                new Estabelecimento(dto.Estabelecimento),
-                new Responsavel(dto.Responsavel),
-                new Parcelamento(grupoId, numeroParcela, dto.TotalParcelas),
-                fatura.Id,
-                dto.CategoriaId
-            );
+            var fatura = await ObterOuCriarFatura(faturas, primeiraFatura, numeroParcela, cancellationToken);
+            var entidade = CriarLancamento(dto, parcelas[numeroParcela - 1], numeroParcela, fatura.Id, grupoId);
 
             commandRepository.Adicionar(entidade);
 
@@ -70,9 +52,8 @@ internal sealed class LancamentoCommandService(
 
         await commandRepository.SalvarAsync(cancellationToken);
 
-        var entidadeDetalhe = await queryRepository.ObterPorIdAsync(primeiraParcela!.Id, cancellationToken);
-
-        return LancamentoMapper.Mapear(entidadeDetalhe!);
+        var detalhe = await queryRepository.ObterPorIdAsync(primeiraParcela!.Id, cancellationToken);
+        return LancamentoMapper.Mapear(detalhe!);
     }
 
     /// <inheritdoc />
@@ -118,5 +99,70 @@ internal sealed class LancamentoCommandService(
         commandRepository.Remover(entidade);
 
         await commandRepository.SalvarAsync(cancellationToken);
+    }
+
+    // ============================
+    // Métodos privados auxiliares
+    // ============================
+
+    private async Task<FaturaDetalheReadModel> ValidarFaturaInicial(int faturaId, CancellationToken cancellationToken)
+    {
+        var fatura = await faturaQueryRepository.ObterPorIdAsync(faturaId, cancellationToken)
+            ?? throw new RecursoNaoEncontradoException($"Fatura com Id {faturaId} não encontrada.");
+
+        if (fatura.Status != StatusFatura.Aberta)
+            throw new RegraDeNegocioException("Só é possível criar um lançamento em fatura aberta.");
+
+        return fatura;
+    }
+
+    private async Task<FaturaOpcaoReadModel> ObterOuCriarFatura(
+        IEnumerable<FaturaOpcaoReadModel> faturas,
+        FaturaDetalheReadModel primeiraFatura,
+        int numeroParcela,
+        CancellationToken cancellationToken)
+    {
+        var dataFechamento = primeiraFatura.DataFechamento.AddMonths(numeroParcela - 1);
+        var dataVencimento = primeiraFatura.DataVencimento.AddMonths(numeroParcela - 1);
+
+        var fatura = faturas.FirstOrDefault(f => f.DataVencimento == dataVencimento);
+
+        if (fatura == null)
+        {
+            var criarFaturaDto = new FaturaCriacaoDto
+            {
+                DataFechamento = dataFechamento,
+                DataVencimento = dataVencimento,
+                CartaoId = primeiraFatura.CartaoId
+            };
+
+            var faturaDetalhe = await faturaCommandService.CriarAsync(criarFaturaDto, cancellationToken);
+            fatura = new FaturaOpcaoReadModel
+            {
+                Id = faturaDetalhe.Id,
+                DataVencimento = faturaDetalhe.DataVencimento
+            };
+        }
+
+        return fatura;
+    }
+
+    private static Lancamento CriarLancamento(
+        LancamentoCriacaoDto dto,
+        decimal valorParcela,
+        int numeroParcela,
+        int faturaId,
+        Guid grupoId)
+    {
+        return Lancamento.Criar(
+            new Descricao(dto.Descricao),
+            new Dinheiro(valorParcela),
+            dto.DataCompra,
+            new Estabelecimento(dto.Estabelecimento),
+            new Responsavel(dto.Responsavel),
+            new Parcelamento(grupoId, numeroParcela, dto.TotalParcelas),
+            faturaId,
+            dto.CategoriaId
+        );
     }
 }

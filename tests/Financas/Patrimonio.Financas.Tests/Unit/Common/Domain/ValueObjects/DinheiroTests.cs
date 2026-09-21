@@ -10,7 +10,7 @@ public sealed class DinheiroTests
     [InlineData(150.75)]
     [InlineData(150.7)]
     [InlineData(150)]
-    public void DeveCriarDinheiroComValorValido(decimal valor)
+    public void Criar_DeveCriarDinheiro_QuandoValorValido(decimal valor)
     {
         // Act
         var dinheiro = new Dinheiro(valor);
@@ -23,7 +23,7 @@ public sealed class DinheiroTests
     [InlineData(-30)]
     [InlineData(0)]
     [InlineData(150.756)]
-    public void DeveRejeitarDinheiroComValorInvalido(decimal valorInvalido)
+    public void Criar_DeveLancarExcecao_QuandoValorInvalido(decimal valorInvalido)
     {
         // Act
         var acao = () => new Dinheiro(valorInvalido);
@@ -33,7 +33,7 @@ public sealed class DinheiroTests
     }
 
     [Fact]
-    public void DeveFormatarValorComDuasCasasDecimais()
+    public void ToString_DeveFormatarValorComDuasCasasDecimais_QuandoChamado()
     {
         // Act
         var dinheiro = new Dinheiro(150m);
@@ -43,7 +43,7 @@ public sealed class DinheiroTests
     }
 
     [Fact]
-    public void DoisDinheirosComMesmoValorDevemSerIguais()
+    public void Igualdade_DeveConsiderarIgual_QuandoMesmoValor()
     {
         // Arrange
         var a = new Dinheiro(150.75m);
@@ -55,7 +55,7 @@ public sealed class DinheiroTests
     }
 
     [Fact]
-    public void DoisDinheirosComValoresDiferentesNaoDevemSerIguais()
+    public void Igualdade_DeveConsiderarDiferente_QuandoValoresDiferentes()
     {
         // Arrange
         var a = new Dinheiro(150.75m);
@@ -66,7 +66,7 @@ public sealed class DinheiroTests
     }
 
     [Fact]
-    public void ToStringDeveRetornarValorComoTexto()
+    public void ToString_DeveRetornarValorComoTexto_QuandoChamado()
     {
         new Dinheiro(150.75m).ToString().Should().Be("150.75");
     }
