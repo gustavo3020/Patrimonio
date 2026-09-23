@@ -1,6 +1,7 @@
 ﻿using Patrimonio.Financas.Contracts.Cartoes.Dtos;
 using Patrimonio.Financas.Contracts.Cartoes.Services;
 using Patrimonio.Financas.Domain.Exceptions;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Tests.Integration.Base;
 
 namespace Patrimonio.Financas.Tests.Integration.Seeders;
@@ -40,6 +41,7 @@ internal sealed class LancamentoSeeder(
             Estabelecimento = "Estabelecimento de teste",
             Responsavel = "Responsável de teste",
             TotalParcelas = 1,
+            Natureza = Natureza.Saida,
             FaturaId = faturaId,
             CategoriaId = categoriaId
         };

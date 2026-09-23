@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
 using Patrimonio.Financas.Contracts.Common.Dtos;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Wpf.Cartoes.HttpClients;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
@@ -28,11 +29,14 @@ internal sealed partial class LancamentoAlteracaoViewModel(
     [ObservableProperty] public partial string Responsavel { get; set; } = string.Empty;
     [ObservableProperty] public partial int NumeroParcela { get; set; }
     [ObservableProperty] public partial int TotalParcelas { get; set; }
+    [ObservableProperty] public partial Natureza Natureza { get; set; }
     [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Categorias { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
     public partial int? CategoriaId { get; set; }
+
+    public static IReadOnlyCollection<Natureza> Naturezas { get; } = Enum.GetValues<Natureza>();
 
     /// <summary>
     /// Carrega os dados do lançamento a ser alterado.
@@ -72,6 +76,7 @@ internal sealed partial class LancamentoAlteracaoViewModel(
             Responsavel = lancamento.Responsavel;
             NumeroParcela = lancamento.NumeroParcela;
             TotalParcelas = lancamento.TotalParcelas;
+            Natureza = lancamento.Natureza;
             CategoriaId = lancamento.CategoriaId;
 
             Categorias = opcoes.Categorias;
@@ -109,6 +114,7 @@ internal sealed partial class LancamentoAlteracaoViewModel(
                     DataCompra = DateOnly.FromDateTime(DataCompra),
                     Estabelecimento = Estabelecimento,
                     Responsavel = Responsavel,
+                    Natureza = Natureza,
                     CategoriaId = CategoriaId!.Value
                 },
                 cancellationToken);

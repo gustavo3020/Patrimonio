@@ -1,4 +1,6 @@
-﻿namespace Patrimonio.Financas.Contracts.Cartoes.Dtos;
+﻿using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
+
+namespace Patrimonio.Financas.Contracts.Cartoes.Dtos;
 
 /// <summary>
 /// Define os dados necessários para alterar um lançamento.
@@ -11,6 +13,7 @@ public sealed record LancamentoAlteracaoDto
     public required DateOnly DataCompra { get; init; }
     public required string Estabelecimento { get; init; }
     public required string Responsavel { get; init; }
+    public required Natureza Natureza { get; init; }
 
     // Relacionamentos.
     public required int CategoriaId { get; init; }

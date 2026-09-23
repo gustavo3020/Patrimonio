@@ -16,6 +16,9 @@ internal sealed class FaturaConfiguration : IEntityTypeConfiguration<Fatura>
 
         builder.HasKey(f => f.Id);
 
+        builder.HasIndex(f => new { f.CartaoId, f.DataVencimento })
+               .IsUnique();
+
         builder.HasOne<Cartao>()
                .WithMany()
                .HasForeignKey(f => f.CartaoId)

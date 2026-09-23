@@ -1,6 +1,7 @@
 ﻿using Patrimonio.Financas.Domain.Cartoes.ValueObjects;
 using Patrimonio.Financas.Domain.Common.Entities;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Domain.Cartoes.Entities;
 
@@ -16,6 +17,7 @@ public sealed class Lancamento : EntidadeBase
         Estabelecimento estabelecimento,
         Responsavel responsavel,
         Parcelamento parcelamento,
+        Natureza natureza,
         int faturaId,
         int categoriaId)
     {
@@ -25,6 +27,7 @@ public sealed class Lancamento : EntidadeBase
         Estabelecimento = estabelecimento;
         Responsavel = responsavel;
         Parcelamento = parcelamento;
+        Natureza = natureza;
         FaturaId = faturaId;
         CategoriaId = categoriaId;
     }
@@ -40,6 +43,7 @@ public sealed class Lancamento : EntidadeBase
     public Estabelecimento Estabelecimento { get; private set; }
     public Responsavel Responsavel { get; private set; }
     public Parcelamento Parcelamento { get; private set; }
+    public Natureza Natureza { get; private set; }
 
     // Relacionamentos.
     public int FaturaId { get; private set; }
@@ -54,6 +58,7 @@ public sealed class Lancamento : EntidadeBase
     /// <param name="estabelecimento">Estabelecimento onde o lançamento foi realizado.</param>
     /// <param name="responsavel">Responsável pelo lançamento.</param>
     /// <param name="parcelamento">Informações de parcelamento do lançamento.</param>
+    /// <param name="natureza">A natureza do lançamento.</param>
     /// <param name="faturaId">ID da fatura associada ao lançamento.</param>
     /// <param name="categoriaId">ID da categoria do lançamento.</param>
     /// <returns>A instância de Lancamento criada.</returns>
@@ -64,6 +69,7 @@ public sealed class Lancamento : EntidadeBase
         Estabelecimento estabelecimento,
         Responsavel responsavel,
         Parcelamento parcelamento,
+        Natureza natureza,
         int faturaId,
         int categoriaId)
     {
@@ -74,6 +80,7 @@ public sealed class Lancamento : EntidadeBase
             estabelecimento,
             responsavel,
             parcelamento,
+            natureza,
             faturaId,
             categoriaId);
     }
@@ -93,6 +100,7 @@ public sealed class Lancamento : EntidadeBase
         DateOnly dataCompra,
         Estabelecimento estabelecimento,
         Responsavel responsavel,
+        Natureza natureza,
         int categoriaId)
     {
         Descricao = descricao;
@@ -100,6 +108,7 @@ public sealed class Lancamento : EntidadeBase
         DataCompra = dataCompra;
         Estabelecimento = estabelecimento;
         Responsavel = responsavel;
+        Natureza = natureza;
         CategoriaId = categoriaId;
 
         RegistrarAlteracao();

@@ -1,4 +1,5 @@
 ﻿using Patrimonio.Financas.Contracts.Common.Dtos;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Contracts.Cartoes.Dtos;
 
@@ -15,6 +16,7 @@ public sealed record LancamentoDetalheDto : LeituraDtoBase
     public required string Responsavel { get; init; }
     public required int NumeroParcela { get; init; }
     public required int TotalParcelas { get; init; }
+    public required Natureza Natureza { get; init; }
 
     // Relacionamentos.
     public required int FaturaId { get; init; }

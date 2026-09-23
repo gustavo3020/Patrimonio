@@ -76,6 +76,7 @@ internal sealed class LancamentoCommandService(
             dto.DataCompra,
             new Estabelecimento(dto.Estabelecimento),
             new Responsavel(dto.Responsavel),
+            dto.Natureza,
             dto.CategoriaId
         );
 
@@ -161,6 +162,7 @@ internal sealed class LancamentoCommandService(
             new Estabelecimento(dto.Estabelecimento),
             new Responsavel(dto.Responsavel),
             new Parcelamento(grupoId, numeroParcela, dto.TotalParcelas),
+            dto.Natureza,
             faturaId,
             dto.CategoriaId
         );

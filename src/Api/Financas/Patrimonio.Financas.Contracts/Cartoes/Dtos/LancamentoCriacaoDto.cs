@@ -1,4 +1,6 @@
-﻿namespace Patrimonio.Financas.Contracts.Cartoes.Dtos;
+﻿using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
+
+namespace Patrimonio.Financas.Contracts.Cartoes.Dtos;
 
 /// <summary>
 /// Define os dados necessários para criar um lançamento.
@@ -12,6 +14,7 @@ public sealed record LancamentoCriacaoDto
     public required string Estabelecimento { get; init; }
     public required string Responsavel { get; init; }
     public required int TotalParcelas { get; init; }
+    public required Natureza Natureza { get; init; }
 
     // Relacionamentos.
     public required int FaturaId { get; init; }

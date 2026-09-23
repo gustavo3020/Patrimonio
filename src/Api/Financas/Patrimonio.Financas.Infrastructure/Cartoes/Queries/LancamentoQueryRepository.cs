@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Application.Cartoes.Queries.Abstractions;
 using Patrimonio.Financas.Application.Cartoes.Queries.ReadModels;
 using Patrimonio.Financas.Infrastructure.Persistence;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Infrastructure.Cartoes.Queries;
 
@@ -57,6 +58,7 @@ internal sealed class LancamentoQueryRepository(FinancasDbContext context) : ILa
                 Responsavel = lancamento.Responsavel.Valor,
                 NumeroParcela = lancamento.Parcelamento.NumeroParcela,
                 TotalParcelas = lancamento.Parcelamento.TotalParcelas,
+                Natureza = lancamento.Natureza,
                 FaturaId = lancamento.FaturaId,
                 CategoriaId = categoria.Id,
                 CategoriaNome = categoria.Nome.Valor,
@@ -73,6 +75,8 @@ internal sealed class LancamentoQueryRepository(FinancasDbContext context) : ILa
         return await context.Lancamentos
             .Where(l => l.FaturaId == faturaId)
             .AsNoTracking()
-            .SumAsync(l => l.Valor.Valor, cancellationToken);
+            .SumAsync(l => l.Natureza == Natureza.Saida
+                ? l.Valor.Valor
+                : -l.Valor.Valor, cancellationToken);
     }
 }
