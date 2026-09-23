@@ -38,6 +38,7 @@ internal static class LancamentoMapper
             Responsavel = lancamento.Responsavel,
             NumeroParcela = lancamento.NumeroParcela,
             TotalParcelas = lancamento.TotalParcelas,
+            Natureza = lancamento.Natureza,
             FaturaId = lancamento.FaturaId,
             CategoriaId = lancamento.CategoriaId,
             CategoriaNome = lancamento.CategoriaNome,

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Patrimonio.Financas.Contracts.Cartoes.Dtos;
 using Patrimonio.Financas.Contracts.Common.Dtos;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 using Patrimonio.Financas.Wpf.Cartoes.HttpClients;
 using Patrimonio.Financas.Wpf.Common.Exceptions;
 using Patrimonio.Financas.Wpf.Common.ViewModels;
@@ -16,6 +17,7 @@ internal sealed partial class LancamentoCriacaoViewModel(
     ExceptionHandler exceptionHandler) : BaseViewModel
 {
     private Func<CancellationToken, Task> _voltar = _ => Task.CompletedTask;
+    private int _faturaId;
 
     /// <inheritdoc />
     public override string Titulo => "Novo lançamento";
@@ -27,13 +29,14 @@ internal sealed partial class LancamentoCriacaoViewModel(
     [ObservableProperty] public partial string Responsavel { get; set; } = string.Empty;
     [ObservableProperty] public partial int NumeroParcela { get; set; } = 1;
     [ObservableProperty] public partial int TotalParcelas { get; set; } = 1;
+    [ObservableProperty] public partial Natureza Natureza { get; set; } = Natureza.Saida;
     [ObservableProperty] public partial IReadOnlyCollection<OpcaoDto> Categorias { get; set; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SalvarCommand))]
     public partial int? CategoriaId { get; set; }
 
-    private int _faturaId;
+    public static IReadOnlyCollection<Natureza> Naturezas { get; } = Enum.GetValues<Natureza>();
 
     /// <summary>
     /// Carrega os dados necessários para o funcionamento da tela.
@@ -88,6 +91,7 @@ internal sealed partial class LancamentoCriacaoViewModel(
                     Estabelecimento = Estabelecimento,
                     Responsavel = Responsavel,
                     TotalParcelas = TotalParcelas,
+                    Natureza = Natureza,
                     FaturaId = _faturaId,
                     CategoriaId = CategoriaId!.Value
                 },

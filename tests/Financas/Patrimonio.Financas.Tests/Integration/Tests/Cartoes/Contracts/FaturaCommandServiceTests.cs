@@ -47,6 +47,20 @@ public sealed class FaturaCommandServiceTests(IntegrationTestFactory factory)
         await acao.Should().ThrowAsync<ConflitoException>();
     }
 
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoDataVencimentoDuplicada()
+    {
+        using var scope = CreateScope();
+        var command = scope.ServiceProvider.GetRequiredService<IFaturaCommandService>();
+        var dto = FaturaDtoBuilder.Criar(
+            Factory.BaseData.Cartao.Id,
+            dataFechamento: Factory.BaseData.Fatura.DataFechamento,
+            dataVencimento: Factory.BaseData.Fatura.DataVencimento);
+
+        var acao = () => command.CriarAsync(dto, TestContext.Current.CancellationToken);
+        await acao.Should().ThrowAsync<ConflitoException>();
+    }
+
     // ============================================================================
     // AlterarAsync
     // ============================================================================

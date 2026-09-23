@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Domain.Cartoes.Entities;
 using Patrimonio.Financas.Domain.Cartoes.ValueObjects;
 using Patrimonio.Financas.Domain.Common.ValueObjects;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Tests.Unit.Cartoes.Domain.Entities;
 
@@ -16,6 +17,7 @@ public sealed class LancamentoTests
             new Estabelecimento("Estabelecimento Teste"),
             new Responsavel("Responsavel Teste"),
             new Parcelamento(Guid.NewGuid(), 1, 3),
+            Natureza.Saida,
             1,
             1);
     }
@@ -30,6 +32,7 @@ public sealed class LancamentoTests
         var estabelecimento = new Estabelecimento("Estabelecimento Teste");
         var responsavel = new Responsavel("Responsavel Teste");
         var parcelamento = new Parcelamento(Guid.NewGuid(), 1, 5);
+        var natureza = Natureza.Saida;
         var faturaId = 1;
         var categoriaId = 1;
 
@@ -41,6 +44,7 @@ public sealed class LancamentoTests
             estabelecimento,
             responsavel,
             parcelamento,
+            natureza,
             faturaId,
             categoriaId);
 
@@ -68,6 +72,7 @@ public sealed class LancamentoTests
             new DateOnly(2026, 8, 20),
             new Estabelecimento("Estabelecimento Alterado"),
             new Responsavel("Responsavel Alterado"),
+            Natureza.Entrada,
             2);
 
         // Assert
@@ -76,6 +81,7 @@ public sealed class LancamentoTests
         lancamento.DataCompra.Should().Be(new DateOnly(2026, 8, 20));
         lancamento.Estabelecimento.Should().Be(new Estabelecimento("Estabelecimento Alterado"));
         lancamento.Responsavel.Should().Be(new Responsavel("Responsavel Alterado"));
+        lancamento.Natureza.Should().Be(Natureza.Entrada);
         lancamento.CategoriaId.Should().Be(2);
     }
 }

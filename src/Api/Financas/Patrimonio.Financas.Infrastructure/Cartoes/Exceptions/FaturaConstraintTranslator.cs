@@ -12,6 +12,9 @@ internal sealed class FaturaConstraintTranslator : IConstraintTranslator
     {
         // Chaves estrangeiras
         ["FK_Faturas_Cartoes_CartaoId"] = "Não é possível excluir o cartão pois existem faturas vinculadas.",
+
+        // Índices únicos
+        ["IX_Faturas_CartaoId_DataVencimento"] = "Já existe uma fatura com essa data de vencimento para este cartão"
     };
 
     /// <inheritdoc/>

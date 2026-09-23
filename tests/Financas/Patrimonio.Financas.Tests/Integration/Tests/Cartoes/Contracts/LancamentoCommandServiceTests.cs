@@ -36,6 +36,7 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
         lancamento.Responsavel.Should().Be(dto.Responsavel);
         lancamento.NumeroParcela.Should().Be(1);
         lancamento.TotalParcelas.Should().Be(dto.TotalParcelas);
+        lancamento.Natureza.Should().Be(dto.Natureza);
         lancamento.FaturaId.Should().Be(dto.FaturaId);
         lancamento.CategoriaId.Should().Be(dto.CategoriaId);
     }
@@ -68,6 +69,7 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
         lancamento.Responsavel.Should().Be(dto.Responsavel);
         lancamento.NumeroParcela.Should().Be(1);
         lancamento.TotalParcelas.Should().Be(3);
+        lancamento.Natureza.Should().Be(dto.Natureza);
         lancamento.FaturaId.Should().Be(dto.FaturaId);
         lancamento.CategoriaId.Should().Be(dto.CategoriaId);
         faturas.Count.Should().Be(3);
@@ -151,6 +153,7 @@ public sealed class LancamentoCommandServiceTests(IntegrationTestFactory factory
         alterado.Responsavel.Should().Be(dto.Responsavel);
         alterado.NumeroParcela.Should().Be(lancamento.NumeroParcela);
         alterado.TotalParcelas.Should().Be(lancamento.TotalParcelas);
+        alterado.Natureza.Should().Be(dto.Natureza);
         alterado.FaturaId.Should().Be(lancamento.FaturaId);
         alterado.CategoriaId.Should().Be(dto.CategoriaId);
     }

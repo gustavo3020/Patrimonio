@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:LancamentoAlteracaoViewModel}">
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *, Auto">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto">
 
         <!-- DataCompra e valor -->
         <Grid Grid.Row="0" ColumnDefinitions="*, *">
@@ -27,8 +27,9 @@
         <Grid Grid.Row="1" ColumnDefinitions="*, *">
 
             <StackPanel Grid.Column="0">
-                <TextBlock Text="Descrição"/>
-                <TextBox Text="{Binding Descricao}"/>
+                <TextBlock Text="Natureza"/>
+                <ComboBox ItemsSource="{Binding Source={x:Static vm:LancamentoAlteracaoViewModel.Naturezas}}"
+                          SelectedItem="{Binding Natureza}"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1">
@@ -68,11 +69,18 @@
             </StackPanel>
         </Grid>
 
+        <!-- Descrição -->
+        <StackPanel Grid.Row="4">
+            <TextBlock Text="Descrição"/>
+            <TextBox Text="{Binding Descricao}"
+                     Style="{StaticResource DescriptionTextBoxStyle}"/>
+        </StackPanel>
+
         <!-- Espaço -->
-        <Grid Grid.Row="4"/>
+        <Grid Grid.Row="5"/>
 
         <!-- Ações -->
-        <StackPanel Grid.Row="5" Style="{StaticResource ActionStackPanelStyle}">
+        <StackPanel Grid.Row="6" Style="{StaticResource ActionStackPanelStyle}">
 
             <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
             <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>

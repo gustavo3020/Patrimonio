@@ -2,6 +2,7 @@
 using Patrimonio.Financas.Application.Cartoes.Queries.Abstractions;
 using Patrimonio.Financas.Application.Cartoes.Queries.ReadModels;
 using Patrimonio.Financas.Infrastructure.Persistence;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Infrastructure.Cartoes.Queries;
 
@@ -28,7 +29,9 @@ internal sealed class FaturaQueryRepository(FinancasDbContext context) : IFatura
                 Status = fatura.Status,
                 ValorTotal = context.Lancamentos
                     .Where(l => l.FaturaId == fatura.Id)
-                    .Sum(l => l.Valor.Valor),
+                    .Sum(l => l.Natureza == Natureza.Saida
+                        ? l.Valor.Valor
+                        : -l.Valor.Valor),
                 DataPagamento = fatura.DataPagamento,
                 CartaoNome = cartao.Nome.Valor,
                 DataCriacao = fatura.DataCriacao,

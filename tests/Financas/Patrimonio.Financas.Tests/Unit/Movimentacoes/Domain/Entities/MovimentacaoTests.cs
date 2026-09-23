@@ -83,18 +83,38 @@ public sealed class MovimentacaoTests
     }
 
     [Fact]
-    public void Alterar_DeveRejeitarAlteracao_QuandoAssociadaAFatura()
+    public void Alterar_DeveAlterarMovimentacao_QuandoDescricaoNula()
     {
         // Arrange
-        var movimentacao = Movimentacao.Criar(
-            new DateOnly(2026, 8, 15),
-            new Dinheiro(100m),
-            Natureza.Saida,
-            TipoMovimentacao.Pix,
-            new Descricao("Pagamento"),
-            1,
-            2,
-            faturaId: 1);
+        var movimentacao = CriarMovimentacao();
+        var novaData = new DateOnly(2026, 9, 1);
+        var novoValor = new Dinheiro(200m);
+
+        // Act
+        movimentacao.Alterar(
+            novaData,
+            novoValor,
+            Natureza.Entrada,
+            TipoMovimentacao.Credito,
+            null,
+            3,
+            4);
+
+        // Assert
+        movimentacao.Data.Should().Be(novaData);
+        movimentacao.Valor.Should().Be(novoValor);
+        movimentacao.Natureza.Should().Be(Natureza.Entrada);
+        movimentacao.Tipo.Should().Be(TipoMovimentacao.Credito);
+        movimentacao.Descricao.Should().Be(null);
+        movimentacao.ContaId.Should().Be(3);
+        movimentacao.CategoriaId.Should().Be(4);
+    }
+
+    [Fact]
+    public void Alterar_DeveLancarExcecao_QuandoAssociadaAFatura()
+    {
+        // Arrange
+        var movimentacao = CriarMovimentacao(faturaId: 1);
 
         // Act
         var acao = () => movimentacao.Alterar(
@@ -110,7 +130,20 @@ public sealed class MovimentacaoTests
         acao.Should().Throw<RegraDeNegocioException>();
     }
 
-    private static Movimentacao CriarMovimentacao()
+    [Fact]
+    public void Excluir_DeveLancarExcecao_QuandoAssociadaAFatura()
+    {
+        // Arrange
+        var movimentacao = CriarMovimentacao(faturaId: 1);
+
+        // Act
+        var acao = () => movimentacao.Excluir();
+
+        // Assert
+        acao.Should().Throw<RegraDeNegocioException>();
+    }
+
+    private static Movimentacao CriarMovimentacao(int? faturaId = null)
     {
         return Movimentacao.Criar(
             new DateOnly(2026, 8, 15),
@@ -119,6 +152,7 @@ public sealed class MovimentacaoTests
             TipoMovimentacao.Pix,
             new Descricao("Pagamento"),
             1,
-            2);
+            2,
+            faturaId: faturaId);
     }
 }

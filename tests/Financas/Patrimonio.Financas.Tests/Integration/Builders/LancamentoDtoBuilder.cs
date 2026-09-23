@@ -1,4 +1,5 @@
 ﻿using Patrimonio.Financas.Contracts.Cartoes.Dtos;
+using Patrimonio.Financas.SharedKernel.Movimentacoes.Enums;
 
 namespace Patrimonio.Financas.Tests.Integration.Builders;
 
@@ -18,6 +19,7 @@ internal static class LancamentoDtoBuilder
             Estabelecimento = "Estabelecimento Teste",
             Responsavel = "Responsavel Teste",
             TotalParcelas = totalParcelas ?? 1,
+            Natureza = Natureza.Saida,
             FaturaId = faturaId,
             CategoriaId = categoriaId
         };
@@ -34,6 +36,7 @@ internal static class LancamentoDtoBuilder
             DataCompra = new DateOnly(2026, 9, 6),
             Estabelecimento = "Estabelecimento Alterado",
             Responsavel = "Responsavel Alterado",
+            Natureza = Natureza.Entrada,
             CategoriaId = categoriaId
         };
     }
