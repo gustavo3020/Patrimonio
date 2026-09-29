@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Navigation">
+
+    <DataTemplate DataType="{x:Type nav:FinancasNavigation}">
+        <nav:FinancasNavigationView />
+    </DataTemplate>
+    
+</ResourceDictionary>

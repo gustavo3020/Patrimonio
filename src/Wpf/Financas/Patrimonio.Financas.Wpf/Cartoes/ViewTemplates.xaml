@@ -1,0 +1,59 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.ViewModels"
+                    xmlns:views="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.Views"
+                    xmlns:nav="clr-namespace:Patrimonio.Financas.Wpf.Cartoes.Navigation">
+
+    <DataTemplate DataType="{x:Type vm:CartaoAlteracaoViewModel}">
+        <views:CartaoFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:CartaoCriacaoViewModel}">
+        <views:CartaoFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:CartaoListaViewModel}">
+        <views:CartaoListaView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nav:CartaoNavigation}">
+        <nav:CartaoNavigationView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:FaturaAlteracaoViewModel}">
+        <views:FaturaFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:FaturaCriacaoViewModel}">
+        <views:FaturaFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:FaturaListaViewModel}">
+        <views:FaturaListaView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:FaturaPagamentoViewModel}">
+        <views:FaturaPagamentoView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nav:FaturaNavigation}">
+        <nav:FaturaNavigationView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:LancamentoAlteracaoViewModel}">
+        <views:LancamentoFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:LancamentoCriacaoViewModel}">
+        <views:LancamentoFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:LancamentoListaViewModel}">
+        <views:LancamentoListaView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nav:LancamentoNavigation}">
+        <nav:LancamentoNavigationView/>
+    </DataTemplate>
+
+</ResourceDictionary>

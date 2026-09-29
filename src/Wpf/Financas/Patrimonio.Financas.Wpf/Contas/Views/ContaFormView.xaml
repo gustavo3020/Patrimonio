@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="Patrimonio.Financas.Wpf.Contas.Views.ContaFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:vm="clr-namespace:Patrimonio.Financas.Wpf.Contas.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:ContaAlteracaoViewModel}">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <!-- Formulário -->
+        <Grid Grid.Row="0" RowDefinitions="Auto, Auto">
+
+            <!-- Nome -->
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="Nome"/>
+                <TextBox Text="{Binding Nome}"/>
+            </StackPanel>
+
+            <!-- Instituição -->
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="Instituição"/>
+                <ComboBox ItemsSource="{Binding Instituicoes}"
+                          SelectedValue="{Binding InstituicaoId}"
+                          SelectedValuePath="Id"
+                          DisplayMemberPath="Nome"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Espaço -->
+        <Grid Grid.Row="1"/>
+
+        <!-- Ações -->
+        <StackPanel Grid.Row="2" Style="{StaticResource ActionStackPanelStyle}">
+            <Button Content="Salvar" Command="{Binding SalvarCommand}"/>
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

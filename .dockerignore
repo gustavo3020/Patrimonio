@@ -1,0 +1,16 @@
+.git
+.github
+.vs
+.ref
+
+**/bin
+**/obj
+**/Wpf
+**/TestResults
+
+*.user
+*.suo
+
+docker-compose.override.yml
+
+.env

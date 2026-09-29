@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY src/Api/Financas/Patrimonio.Financas.Migrator/Patrimonio.Financas.Migrator.csproj src/Api/Financas/Patrimonio.Financas.Migrator/
+COPY src/Api/Financas/Patrimonio.Financas.Infrastructure/Patrimonio.Financas.Infrastructure.csproj src/Api/Financas/Patrimonio.Financas.Infrastructure/
+
+RUN dotnet restore src/Api/Financas/Patrimonio.Financas.Migrator/Patrimonio.Financas.Migrator.csproj
+
+COPY src/Api/ src/Api/
+
+RUN dotnet publish src/Api/Financas/Patrimonio.Financas.Migrator/Patrimonio.Financas.Migrator.csproj \
+	--configuration Release \
+	--output /app/publish
+
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS final
+
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "Patrimonio.Financas.Migrator.dll"]

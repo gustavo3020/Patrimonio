@@ -1,0 +1,60 @@
+﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Patrimonio.Financas.Contracts.Categorias.Services;
+using Patrimonio.Financas.Domain.Exceptions;
+using Patrimonio.Financas.Tests.Integration.Base;
+using Patrimonio.Financas.Tests.Integration.Config;
+
+namespace Patrimonio.Financas.Tests.Integration.Tests.Categorias.Contracts;
+
+public sealed class CategoriaQueryServiceTests(IntegrationTestFactory factory) : IntegrationTestBase(factory)
+{
+    // ============================================================================
+    // ListarAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task ListarAsync_DeveListarCategorias_QuandoDadosValidos()
+    {
+        using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
+
+        var categorias = await query.ListarAsync(TestContext.Current.CancellationToken);
+
+        categorias.Should().NotBeNull();
+        categorias.Should().Contain(c => c.Id == Factory.BaseData.Categoria.Id);
+    }
+
+    // ============================================================================
+    // ObterPorIdAsync
+    // ============================================================================
+
+    [Fact]
+    public async Task ObterPorIdAsync_DeveObterCategoriaPorId_QuandoDadosValidos()
+    {
+        using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
+        var categoriaEsperada = Factory.BaseData.Categoria;
+
+        var categoria = await query.ObterPorIdAsync(
+            categoriaEsperada.Id,
+            TestContext.Current.CancellationToken);
+
+        categoria.Should().NotBeNull();
+        categoria.Id.Should().Be(categoriaEsperada.Id);
+        categoria.Nome.Should().Be(categoriaEsperada.Nome);
+    }
+
+    [Fact]
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoCategoriaInexistente()
+    {
+        using var scope = CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<ICategoriaQueryService>();
+
+        var acao = () => query.ObterPorIdAsync(
+            int.MaxValue,
+            TestContext.Current.CancellationToken);
+
+        await acao.Should().ThrowAsync<RecursoNaoEncontradoException>();
+    }
+}
